@@ -823,12 +823,23 @@ function enforceRateLimit($action, $maxAttempts = 30, $windowSeconds = 3600, $bl
     $clientIP = getClientIP();
     $now = time();
 
-    // ── 1. per-IP 计数 ───────────────────────────────
+    // ── 1. per-IP 计数（flock 防竞态）─────────────────
     $ipKey = 'ratelimit_' . md5($action . '_' . $clientIP);
     $ipFile = getAppRuntimeDir() . '/' . $ipKey;
 
+    $fp = @fopen($ipFile, 'c+');
+    $locked = $fp && @flock($fp, LOCK_EX);
+
     $data = ['count' => 0, 'first' => $now, 'blocked_until' => 0];
-    if (file_exists($ipFile)) {
+    if ($locked) {
+        $content = @stream_get_contents($fp);
+        if ($content) {
+            $decoded = json_decode($content, true);
+            if (is_array($decoded)) {
+                $data = array_merge($data, $decoded);
+            }
+        }
+    } elseif (file_exists($ipFile)) {
         $content = @file_get_contents($ipFile);
         if ($content) {
             $decoded = json_decode($content, true);
@@ -839,6 +850,7 @@ function enforceRateLimit($action, $maxAttempts = 30, $windowSeconds = 3600, $bl
     }
 
     if ($data['blocked_until'] > 0 && $now < $data['blocked_until']) {
+        if ($locked) { @flock($fp, LOCK_UN); @fclose($fp); }
         http_response_code(429);
         header('Content-Type: application/json');
         header('Retry-After: ' . max(1, (int)($data['blocked_until'] - $now)));
@@ -860,7 +872,15 @@ function enforceRateLimit($action, $maxAttempts = 30, $windowSeconds = 3600, $bl
         if ($blockSeconds > 0) {
             $data['blocked_until'] = $now + $blockSeconds;
         }
-        @file_put_contents($ipFile, json_encode($data));
+        if ($locked) {
+            @ftruncate($fp, 0);
+            @rewind($fp);
+            @fwrite($fp, json_encode($data));
+            @flock($fp, LOCK_UN);
+            @fclose($fp);
+        } else {
+            @file_put_contents($ipFile, json_encode($data));
+        }
         http_response_code(429);
         header('Content-Type: application/json');
         header('Retry-After: ' . max(1, $blockSeconds > 0 ? $blockSeconds : ($windowSeconds - ($now - $data['first']))));
@@ -872,24 +892,55 @@ function enforceRateLimit($action, $maxAttempts = 30, $windowSeconds = 3600, $bl
         exit;
     }
 
-    @file_put_contents($ipFile, json_encode($data));
+    if ($locked) {
+        @ftruncate($fp, 0);
+        @rewind($fp);
+        @fwrite($fp, json_encode($data));
+        @flock($fp, LOCK_UN);
+        @fclose($fp);
+    } else {
+        @file_put_contents($ipFile, json_encode($data));
+    }
 
-    // ── 2. 全局动作计数（防IP轮换分布式攻击）────────────
+    // ── 2. 全局动作计数（flock 防竞态，防IP轮换分布式攻击）─
     $globalMax = $maxAttempts * 10;
     $globalKey = 'globalratelimit_' . md5($action . '_' . substr(date('YmdH'), 0, 10));
     $globalFile = getAppRuntimeDir() . '/' . $globalKey;
+
+    $gfp = @fopen($globalFile, 'c+');
+    $glocked = $gfp && @flock($gfp, LOCK_EX);
+
     $globalCount = 0;
-    if (file_exists($globalFile)) {
+    $currentHour = substr(date('YmdH'), 0, 10);
+    if ($glocked) {
+        $gc = @stream_get_contents($gfp);
+        if ($gc) {
+            $gd = json_decode($gc, true);
+            if (isset($gd['c']) && isset($gd['t']) && $gd['t'] === $currentHour) {
+                $globalCount = (int)$gd['c'];
+            }
+        }
+    } elseif (file_exists($globalFile)) {
         $gc = @file_get_contents($globalFile);
         if ($gc) {
             $gd = json_decode($gc, true);
-            if (isset($gd['c']) && isset($gd['t']) && $gd['t'] === substr(date('YmdH'), 0, 10)) {
+            if (isset($gd['c']) && isset($gd['t']) && $gd['t'] === $currentHour) {
                 $globalCount = (int)$gd['c'];
             }
         }
     }
     $globalCount++;
-    @file_put_contents($globalFile, json_encode(['c' => $globalCount, 't' => substr(date('YmdH'), 0, 10)]));
+
+    if ($glocked) {
+        @ftruncate($gfp, 0);
+        @rewind($gfp);
+        @fwrite($gfp, json_encode(['c' => $globalCount, 't' => $currentHour]));
+        @flock($gfp, LOCK_UN);
+        @fclose($gfp);
+    } else {
+        @file_put_contents($globalFile, json_encode(['c' => $globalCount, 't' => $currentHour]));
+    }
+
     if ($globalCount > $globalMax) {
         http_response_code(429);
         header('Content-Type: application/json');

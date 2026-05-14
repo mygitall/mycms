@@ -19,7 +19,7 @@ function safeJson($data) {
 }
 
 try {
-    require_once dirname(__DIR__, 2) . '/includes/mysql_install_helper.php';
+    require_once dirname(dirname(__DIR__)) . '/includes/mysql_install_helper.php';
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         safeJson(['code' => 405, 'msg' => '仅支持 POST 请求']);
@@ -31,7 +31,7 @@ try {
     $isLocal = in_array($remoteAddr, ['127.0.0.1', '::1', 'localhost'], true);
 
     if (!$isLocal && $isForceSetup) {
-        require_once dirname(__DIR__, 2) . '/config/db.php';
+        require_once dirname(dirname(__DIR__)) . '/config/db.php';
         $pdo = getDB();
         $adminId = requireAdmin($pdo);
         if (!$adminId) {
@@ -272,10 +272,10 @@ try {
         safeJson(['code' => 500, 'msg' => '创建管理员账号失败：' . $e->getMessage()]);
     }
 
-    $installDir = dirname(__DIR__, 2) . '/install';
+    $installDir = dirname(dirname(__DIR__)) . '/install';
     $configFile = $installDir . '/install.config.php';
     $lockFile   = $installDir . '/install.lock';
-    $envFile    = dirname(__DIR__, 2) . '/.env';
+    $envFile    = dirname(dirname(__DIR__)) . '/.env';
 
     $configContent = "<?php
 /**

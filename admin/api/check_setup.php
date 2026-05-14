@@ -6,9 +6,9 @@
 
 header('Content-Type: application/json; charset=utf-8');
 
-$lockFile = dirname(__DIR__, 2) . '/install/install.lock';
-$configFile = dirname(__DIR__, 2) . '/install/install.config.php';
-$envFile = dirname(__DIR__, 2) . '/.env';
+$lockFile = dirname(dirname(__DIR__)) . '/install/install.lock';
+$configFile = dirname(dirname(__DIR__)) . '/install/install.config.php';
+$envFile = dirname(dirname(__DIR__)) . '/.env';
 
 $installed = file_exists($lockFile);
 $configured = file_exists($configFile);

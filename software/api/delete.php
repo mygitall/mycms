@@ -9,28 +9,34 @@ require_once __DIR__ . '/../config.php';
 setSecurityHeaders();
 
 if (!sw_requireAdmin()) {
-    http_response_code(401);
-    echo json_encode(['code' => 401, 'msg' => '未授权访问']);
-    exit;
+    jsonResponse(401, '未登录或登录已过期', null);
 }
-if (!sw_validateCSRF()) {
-    http_response_code(403);
-    echo json_encode(['code' => 403, 'msg' => '请求来源验证失败']);
-    exit;
+if (!validateCSRF(getInput())) {
+    jsonResponse(403, '请求来源验证失败，请刷新页面后重试', null);
 }
 
-$db = getSoftwareDB();
+// IP 限流保护
+enforceRateLimit('software_delete', 20, 3600, 1800);
+
+$db = getDB();
 if (!$db) {
-    echo json_encode(['code' => 1, 'msg' => '数据库连接失败']);
-    exit;
+    jsonResponse(500, '数据库连接失败', null);
 }
 
 initSoftwareTables();
 
-$input  = getSoftwareInput();
+$input  = getInput();
 $prefix = defined('DB_PREFIX') ? DB_PREFIX : 'sys_';
 $adminId = sw_requireAdmin();
 $adminUsername = $adminId ? sw_getAdminUsername($db, $adminId) : 'unknown';
+
+// 删除操作仅限超级管理员
+$stmt = $db->prepare("SELECT is_super_admin FROM {$prefix}users WHERE id = :id LIMIT 1");
+$stmt->execute([':id' => $adminId]);
+$adminRow = $stmt->fetch();
+if (!$adminRow || !(int)$adminRow['is_super_admin']) {
+    jsonResponse(403, '权限不足：删除软件需要超级管理员权限', null);
+}
 
 // 单个删除
 if (!empty($input['id'])) {
@@ -51,16 +57,20 @@ if (!empty($input['id'])) {
         $del_stmt->closeCursor();
 
         if ($affected > 0) {
-            swWriteAdminLog($db, $adminId, $adminUsername, $id, $software_name, '删除软件', $software_name);
+            writeAdminLog($db, $adminId, $adminUsername, 'delete_software', [
+                'target_type' => 'software',
+                'target_id'   => $id,
+                'detail'      => '删除软件：' . $software_name,
+            ]);
         }
         $db->commit();
         $db->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
-        echo json_encode(['code' => $affected > 0 ? 0 : 1, 'msg' => $affected > 0 ? '删除成功' : '删除失败']);
+        jsonResponse($affected > 0 ? 0 : 500, $affected > 0 ? '删除成功' : '删除失败', null);
     } catch (Throwable $e) {
         $db->rollBack();
         $db->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
         error_log('software_delete error: ' . $e->getMessage());
-        echo json_encode(['code' => 1, 'msg' => '删除失败']);
+        jsonResponse(500, '删除失败', null);
     }
     exit;
 }
@@ -79,18 +89,21 @@ if (!empty($input['ids']) && is_array($input['ids'])) {
         $del_stmt->closeCursor();
 
         if ($count !== false && $count >= 0) {
-            swWriteAdminLog($db, $adminId, $adminUsername, 0, '', '批量删除软件', '共' . $count . '条');
+            writeAdminLog($db, $adminId, $adminUsername, 'delete_software_batch', [
+                'target_type' => 'software',
+                'detail'      => '批量删除软件：共' . $count . '条',
+            ]);
         }
         $db->commit();
         $db->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
-        echo json_encode(['code' => 0, 'msg' => "删除成功，共删除 {$count} 条"]);
+        jsonResponse(0, "删除成功，共删除 {$count} 条", null);
     } catch (Throwable $e) {
         $db->rollBack();
         $db->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
         error_log('software_batch_delete error: ' . $e->getMessage());
-        echo json_encode(['code' => 1, 'msg' => '删除失败']);
+        jsonResponse(500, '删除失败', null);
     }
     exit;
 }
 
-echo json_encode(['code' => 1, 'msg' => '参数错误']);
+jsonResponse(400, '请提供要删除的软件ID', null);

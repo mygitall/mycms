@@ -7,10 +7,10 @@
 header('Content-Type: application/json; charset=utf-8');
 ob_start();
 
-require_once dirname(__DIR__, 2) . '/includes/mysql_install_helper.php';
+require_once dirname(dirname(__DIR__)) . '/includes/mysql_install_helper.php';
 
 // 仅在未完成安装时允许无认证访问；安装完成后返回 403
-$lockFile = dirname(__DIR__, 2) . '/../install/install.lock';
+$lockFile = dirname(dirname(__DIR__)) . '/../install/install.lock';
 if (file_exists($lockFile)) {
     http_response_code(403);
     echo json_encode(['code' => 403, 'status' => 'forbidden', 'msg' => '安装已完成，禁止访问此接口']);

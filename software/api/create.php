@@ -9,25 +9,23 @@ require_once __DIR__ . '/../config.php';
 setSecurityHeaders();
 
 if (!sw_requireAdmin()) {
-    http_response_code(401);
-    echo json_encode(['code' => 401, 'msg' => '未授权访问']);
-    exit;
+    jsonResponse(401, '未登录或登录已过期', null);
 }
-if (!sw_validateCSRF()) {
-    http_response_code(403);
-    echo json_encode(['code' => 403, 'msg' => '请求来源验证失败']);
-    exit;
+if (!validateCSRF(getInput())) {
+    jsonResponse(403, '请求来源验证失败，请刷新页面后重试', null);
 }
 
-$db = getSoftwareDB();
+// IP 限流保护
+enforceRateLimit('software_create', 10, 3600, 1800);
+
+$db = getDB();
 if (!$db) {
-    echo json_encode(['code' => 1, 'msg' => '数据库连接失败']);
-    exit;
+    jsonResponse(500, '数据库连接失败', null);
 }
 
 initSoftwareTables();
 
-$input         = getSoftwareInput();
+$input         = getInput();
 $adminId       = sw_requireAdmin();
 $adminUsername = $adminId ? sw_getAdminUsername($db, $adminId) : 'unknown';
 $name          = isset($input['name']) ? trim($input['name']) : '';
@@ -35,12 +33,10 @@ $version       = isset($input['version']) ? trim($input['version']) : '';
 $download_urls = isset($input['download_urls']) ? trim($input['download_urls']) : '';
 
 if (empty($name)) {
-    echo json_encode(['code' => 1, 'msg' => '软件名称不能为空']);
-    exit;
+    jsonResponse(400, '软件名称不能为空', null);
 }
 if (empty($download_urls)) {
-    echo json_encode(['code' => 1, 'msg' => '下载地址不能为空']);
-    exit;
+    jsonResponse(400, '下载地址不能为空', null);
 }
 
 $category_name = isset($input['category_name']) ? trim($input['category_name']) : '';
@@ -67,9 +63,13 @@ $stmt->execute([
 
 if ($stmt->rowCount() > 0 || $db->lastInsertId() > 0) {
     $id = $db->lastInsertId();
-    swWriteAdminLog($db, $adminId, $adminUsername, $id, '', '创建软件', $name);
-    echo json_encode(['code' => 0, 'msg' => '创建成功', 'data' => ['id' => $id]]);
+    writeAdminLog($db, $adminId, $adminUsername, 'create_software', [
+        'target_type' => 'software',
+        'target_id'   => $id,
+        'detail'      => '创建软件：' . $name,
+    ]);
+    jsonResponse(0, '创建成功', ['id' => $id]);
 } else {
-    echo json_encode(['code' => 1, 'msg' => '创建失败']);
+    jsonResponse(500, '创建失败', null);
 }
 $stmt->closeCursor();

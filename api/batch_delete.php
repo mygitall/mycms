@@ -59,7 +59,7 @@ $adminUsername = getAdminUsername($pdo, $adminId);
 try {
     $prefix = DB_PREFIX;
     $placeholders = implode(',', array_fill(0, count($ids), '?'));
-    $stmt = $pdo->prepare("SELECT id, username FROM {$prefix}users WHERE id IN ($placeholders)");
+    $stmt = $pdo->prepare("SELECT id, username, is_super_admin FROM {$prefix}users WHERE id IN ($placeholders)");
     $stmt->execute($ids);
     $existingUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -69,6 +69,19 @@ try {
             'ids' => []
         ]);
         return;
+    }
+
+    // 非超级管理员不能删除超级管理员
+    $stmt = $pdo->prepare("SELECT is_super_admin FROM {$prefix}users WHERE id = :id LIMIT 1");
+    $stmt->execute([':id' => $adminId]);
+    $me = $stmt->fetch();
+    $isSuperAdmin = $me && (int)$me['is_super_admin'];
+    if (!$isSuperAdmin) {
+        foreach ($existingUsers as $u) {
+            if ((int)$u['is_super_admin']) {
+                jsonResponse(403, '权限不足：只有超级管理员才能删除超级管理员（含用户：' . htmlspecialchars($u['username']) . '）', null);
+            }
+        }
     }
 
     $existingIds = array_column($existingUsers, 'id');

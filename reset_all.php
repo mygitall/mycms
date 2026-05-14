@@ -18,55 +18,10 @@
  */
 
 // ── 访问权限验证（必须在所有逻辑之前）──────────────────────
+require_once __DIR__ . '/includes/auth.php';
+
 function ra_canAccess() {
-    $allowed = ['127.0.0.1', '::1', 'localhost'];
-    $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
-    if (in_array($remoteAddr, $allowed, true)) {
-        return true;
-    }
-
-    $token = null;
-    // 优先从 Cookie 读取（不暴露在 URL/日志中）
-    if (isset($_COOKIE['admin_token']) && $_COOKIE['admin_token'] !== '') {
-        $token = trim($_COOKIE['admin_token']);
-    } elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) {
-        if (preg_match('/^Bearer\s+(\S+)/i', $_SERVER['HTTP_AUTHORIZATION'], $m)) {
-            $token = trim($m[1]);
-        }
-    } elseif (isset($_SERVER['HTTP_X_TOKEN'])) {
-        $token = trim($_SERVER['HTTP_X_TOKEN']);
-    } elseif (isset($_GET['token'])) {
-        // URL 参数仅作为最后降级（会被记录到服务器日志）
-        $token = trim($_GET['token']);
-    }
-    if ($token !== null && $token !== '') {
-        require_once __DIR__ . '/config/db.php';
-        $pdo = getDB();
-        if (verifyToken($pdo, $token) !== null) {
-            return true;
-        }
-    }
-
-    $envFile = __DIR__ . '/.env';
-    if (is_file($envFile)) {
-        $lines = @file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        foreach ($lines as $line) {
-            $trimmed = trim($line);
-            if ($trimmed === '' || $trimmed[0] === '#') continue;
-            $pos = strpos($line, '=');
-            if ($pos === false) continue;
-            $k = trim(substr($line, 0, $pos));
-            $v = trim(substr($line, $pos + 1));
-            if (preg_match('/^([\'"])(.*)\1$/', $v, $m)) $v = $m[2];
-            if ($k === 'RESET_SECRET' && $v !== '') {
-                $secret = trim($_GET['secret'] ?? '');
-                if ($secret !== '' && hash_equals($v, $secret)) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
+    return requireResetAccess();
 }
 
 function ra_accessDenied() {

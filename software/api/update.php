@@ -9,42 +9,45 @@ require_once __DIR__ . '/../config.php';
 setSecurityHeaders();
 
 if (!sw_requireAdmin()) {
-    http_response_code(401);
-    echo json_encode(['code' => 401, 'msg' => '未授权访问']);
-    exit;
+    jsonResponse(401, '未登录或登录已过期', null);
 }
-if (!sw_validateCSRF()) {
-    http_response_code(403);
-    echo json_encode(['code' => 403, 'msg' => '请求来源验证失败']);
-    exit;
+if (!validateCSRF(getInput())) {
+    jsonResponse(403, '请求来源验证失败，请刷新页面后重试', null);
 }
 
-$db = getSoftwareDB();
+// IP 限流保护
+enforceRateLimit('software_update', 20, 3600, 1800);
+
+$db = getDB();
 if (!$db) {
-    echo json_encode(['code' => 1, 'msg' => '数据库连接失败']);
-    exit;
+    jsonResponse(500, '数据库连接失败', null);
 }
 
 initSoftwareTables();
 
-$input         = getSoftwareInput();
+$input         = getInput();
 $adminId = sw_requireAdmin();
 $adminUsername = $adminId ? sw_getAdminUsername($db, $adminId) : 'unknown';
+
+// 更新操作仅限超级管理员
+$stmt = $db->prepare("SELECT is_super_admin FROM " . DB_PREFIX . "users WHERE id = :id LIMIT 1");
+$stmt->execute([':id' => $adminId]);
+$adminRow = $stmt->fetch();
+if (!$adminRow || !(int)$adminRow['is_super_admin']) {
+    jsonResponse(403, '权限不足：更新软件需要超级管理员权限', null);
+}
 $id            = isset($input['id']) ? intval($input['id']) : 0;
 $name          = isset($input['name']) ? trim($input['name']) : '';
 $download_urls = isset($input['download_urls']) ? trim($input['download_urls']) : '';
 
 if ($id <= 0) {
-    echo json_encode(['code' => 1, 'msg' => '参数错误：缺少软件ID']);
-    exit;
+    jsonResponse(400, '请提供要更新的软件ID', null);
 }
 if (empty($name)) {
-    echo json_encode(['code' => 1, 'msg' => '软件名称不能为空']);
-    exit;
+    jsonResponse(400, '软件名称不能为空', null);
 }
 if (empty($download_urls)) {
-    echo json_encode(['code' => 1, 'msg' => '下载地址不能为空']);
-    exit;
+    jsonResponse(400, '下载地址不能为空', null);
 }
 
 $version       = isset($input['version']) ? trim($input['version']) : '';
@@ -73,9 +76,13 @@ $stmt->execute([
 
 $affected = $stmt->rowCount();
 if ($affected !== false) {
-    swWriteAdminLog($db, $adminId, $adminUsername, $id, $name, '更新软件', $name);
-    echo json_encode(['code' => 0, 'msg' => '更新成功']);
+    writeAdminLog($db, $adminId, $adminUsername, 'update_software', [
+        'target_type' => 'software',
+        'target_id'   => $id,
+        'detail'      => '更新软件：' . $name,
+    ]);
+    jsonResponse(0, '更新成功', null);
 } else {
-    echo json_encode(['code' => 1, 'msg' => '更新失败']);
+    jsonResponse(500, '更新失败', null);
 }
 $stmt->closeCursor();

@@ -41,11 +41,22 @@ enforceRateLimit('delete_user', 20, 3600);
 
 try {
     $prefix = DB_PREFIX;
-    $stmt = $pdo->prepare("SELECT id FROM {$prefix}users WHERE id = :id LIMIT 1");
+    $stmt = $pdo->prepare("SELECT id, is_super_admin FROM {$prefix}users WHERE id = :id LIMIT 1");
     $stmt->execute([':id' => $id]);
+    $targetUser = $stmt->fetch();
 
-    if (!$stmt->fetch()) {
+    if (!$targetUser) {
         jsonResponse(404, '用户不存在', null);
+    }
+
+    // 非超级管理员不能删除超级管理员
+    if ((int)$targetUser['is_super_admin']) {
+        $stmt = $pdo->prepare("SELECT is_super_admin FROM {$prefix}users WHERE id = :id LIMIT 1");
+        $stmt->execute([':id' => $adminId]);
+        $me = $stmt->fetch();
+        if (!$me || !(int)$me['is_super_admin']) {
+            jsonResponse(403, '权限不足：只有超级管理员才能删除超级管理员', null);
+        }
     }
 
     $pdo->beginTransaction();

@@ -274,6 +274,9 @@ try {
         }
         if (strpos($sUpper, 'CREATE ') === 0) continue;
         if (strpos($sUpper, 'TRUNCATE ') === 0) continue;
+        if (strpos($sUpper, 'UPDATE ') === 0) continue;
+        if (strpos($sUpper, 'DELETE ') === 0) continue;
+        if (strpos($sUpper, 'ALTER ') === 0) continue;
 
         try {
             $pdo->exec($stmt);
