@@ -8,11 +8,15 @@
  * - 已登录（有效 Token）：返回所有文章（包含草稿）
  */
 require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../config.php';
+
+header('Content-Type: application/json; charset=utf-8');
 
 $input = getInput();
 
 try {
     $pdo = getDB();
+    art_initDatabase($pdo);
 } catch (PDOException $e) {
     error_log('article_list db error: ' . $e->getMessage());
     jsonResponse(500, '数据库连接失败', null);

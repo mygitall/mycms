@@ -25,6 +25,28 @@ try {
         safeJson(['code' => 405, 'msg' => '仅支持 POST 请求']);
     }
 
+    // 安全检查：仅允许本地访问或已认证的超级管理员在 force_setup 模式下操作
+    $isForceSetup = isset($_GET['force_setup']) && $_GET['force_setup'] === '1';
+    $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+    $isLocal = in_array($remoteAddr, ['127.0.0.1', '::1', 'localhost'], true);
+
+    if (!$isLocal && $isForceSetup) {
+        require_once dirname(__DIR__, 2) . '/config/db.php';
+        $pdo = getDB();
+        $adminId = requireAdmin($pdo);
+        if (!$adminId) {
+            safeJson(['code' => 401, 'msg' => '未登录或登录已过期']);
+        }
+        $stmt = $pdo->prepare("SELECT is_super_admin FROM " . DB_PREFIX . "users WHERE id = :id LIMIT 1");
+        $stmt->execute([':id' => $adminId]);
+        $row = $stmt->fetch();
+        if (!$row || !(int)$row['is_super_admin']) {
+            safeJson(['code' => 403, 'msg' => '权限不足：需要超级管理员权限']);
+        }
+    } elseif (!$isLocal && !$isForceSetup) {
+        safeJson(['code' => 403, 'msg' => '禁止远程访问安装接口']);
+    }
+
     $input = [];
     $raw = @file_get_contents('php://input');
     if (!empty($raw)) {

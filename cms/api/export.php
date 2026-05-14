@@ -124,6 +124,7 @@ echo "\xEF\xBB\xBF";
 
 // 先统计导出数据量，防止内存溢出
 try {
+    $prefix = DB_PREFIX;
     $countSql = "SELECT COUNT(*) FROM {$prefix}users u {$whereCondition}";
     $countStmt = $pdo->prepare($countSql);
     foreach ($params as $key => $value) {
@@ -148,7 +149,6 @@ $headers = ['ID', '用户名', '登录次数', '注册时间', 'VIP到期时间'
 echo implode(',', $headers) . "\n";
 
 try {
-    $prefix = DB_PREFIX;
     $sql = "
         SELECT u.id, u.username, u.login_count, u.created_at,
                MAX(t.expires_at) AS token_expires_at

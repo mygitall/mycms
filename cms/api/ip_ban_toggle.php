@@ -16,6 +16,16 @@ header('X-Content-Type-Options: nosniff');
 require_once __DIR__ . '/../config/db.php';
 
 $pdo = getDB();
+
+// POST 操作需要 CSRF 验证
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = getInput();
+    if (!validateCSRF($input)) {
+        echo json_encode(['code' => 403, 'msg' => '请求来源验证失败，请刷新页面后重试']);
+        exit;
+    }
+}
+
 $adminId = requireAdmin($pdo);
 if ($adminId === null) {
     echo json_encode(['code' => 401, 'msg' => '未授权，请先登录']);

@@ -15,8 +15,12 @@
  */
 
 require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../config.php';
+
+header('Content-Type: application/json; charset=utf-8');
 
 $pdo = getDB();
+art_initDatabase($pdo);
 $input = getInput();
 
 // CSRF 保护

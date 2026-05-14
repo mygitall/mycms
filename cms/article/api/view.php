@@ -4,6 +4,9 @@
  * GET /article/api/view?id=xxx
  */
 require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../config.php';
+
+header('Content-Type: application/json; charset=utf-8');
 
 $input = getInput();
 $id = isset($input['id']) ? intval($input['id']) : 0;
@@ -14,6 +17,7 @@ if ($id <= 0) {
 
 try {
     $pdo = getDB();
+    art_initDatabase($pdo);
 } catch (PDOException $e) {
     error_log('article_view db error: ' . $e->getMessage());
     jsonResponse(500, '数据库连接失败', null);

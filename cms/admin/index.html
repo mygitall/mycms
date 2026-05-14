@@ -6886,7 +6886,7 @@ if (response.code == 401) {
             // ══════════════════════════════════════════
             // 搜索管理
             // ══════════════════════════════════════════
-            const SEARCH_HISTORY_API = BASE_PATH + '/api/search_history';
+            const SEARCH_HISTORY_API = BASE_PATH + '/api/search_history.php';
 
             function loadSearchHistory(page) {
               if (!page || page < 1) page = 1;
@@ -7022,7 +7022,11 @@ if (response.code == 401) {
                   updateArticleCategoryDropdown(res.data.categories || []);
                 } else {
                   toast(res.msg || '加载失败', 'error');
+                  renderArticleTable([]);
                 }
+              }).catch(() => {
+                toast('网络错误，加载文章失败', 'error');
+                renderArticleTable([]);
               });
             }
 
@@ -7248,10 +7252,11 @@ if (response.code == 401) {
                 $('article-published-at').value = '';
               }
 
-              if (article.cover_image) {
+              if (article.cover_image && /^https?:\/\//.test(article.cover_image)) {
                 $('article-cover-preview').querySelector('img').src = article.cover_image;
                 $('article-cover-preview').style.display = 'block';
               } else {
+                $('article-cover-preview').querySelector('img').src = '';
                 $('article-cover-preview').style.display = 'none';
               }
 
