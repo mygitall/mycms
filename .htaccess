@@ -1,0 +1,19 @@
+# PHP 上传限制（mod_php 模式，Apache 直接解析 PHP）
+<IfModule mod_php.c>
+    php_value upload_max_filesize 1024M
+    php_value post_max_size 1050M
+    php_value memory_limit 1100M
+    php_value max_execution_time 600
+    php_value max_input_time 600
+</IfModule>
+
+# 短链接重写：/abcdefgh → s.php?c=abcdefgh
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^([a-z]{8})$ s.php?c=$1 [L,QSA]
+</IfModule>
+
+# 禁止直接访问 .user.ini 和配置文件
+<FilesMatch "\.(user\.ini|htaccess)">
+    Require all denied
+</FilesMatch>

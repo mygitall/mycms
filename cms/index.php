@@ -1,0 +1,235 @@
+<?php
+/**
+ * 前端控制器 - 所有请求的唯一入口
+ *
+ * PHP 版本：7.3+（str_starts_with/str_ends_with 为 PHP 8.0+ 内置函数，7.x 兼容由 config/db.php 提供）
+ *
+ * 核心特性：
+ *   - 自动检测项目所在的路径层级（如 /wei/、/pro/、/sub/ 或根目录 /）
+ *   - 自动适配所有 API 和静态资源的路径前缀
+ *   - 同时支持本地 phpStudy 和远程宝塔，无需修改任何代码
+ */
+
+// ================================================================
+// 动态计算项目基础路径（核心）
+// __DIR__ = /Applications/phpstudy/WWW/pro
+// SCRIPT_NAME = /wei/index.php  （或 /pro/index.php）
+// 基础路径 = /wei
+// ================================================================
+$scriptName = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
+if (empty($scriptName) && isset($_SERVER['ORIG_SCRIPT_NAME'])) {
+    $scriptName = $_SERVER['ORIG_SCRIPT_NAME'];
+}
+
+// 从 SCRIPT_NAME 提取项目路径前缀（如 /wei 或 /pro 或 /）
+$scriptDir = pathinfo($scriptName, PATHINFO_DIRNAME);
+if ($scriptDir === '.' || $scriptDir === '/') {
+    $BASE_PATH = '/';
+} else {
+    $BASE_PATH = $scriptDir; // 末尾不带斜杠，如 /wei
+}
+
+// 同时支持直接访问 .php 文件的场景（SCRIPT_NAME 可能就是 /wei/api/login.php）
+// 注意：只在校验 SCRIPT_NAME 的基础上叠加，不覆盖已有值
+// 避免 REQUEST_URI（如 /pro/api/login）中的子路径错误覆盖 BASE_PATH
+$requestUri = isset($_SERVER['REQUEST_URI']) ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '/';
+$scriptDirFromUri = pathinfo($requestUri, PATHINFO_DIRNAME);
+// 只有当 SCRIPT_NAME 指向的是根目录文件（如 /index.php）时才从 URI 推断
+if ($scriptDirFromUri !== '.' && $scriptDirFromUri !== '/' && ($scriptDir === '.' || $scriptDir === '/')) {
+    $BASE_PATH = $scriptDirFromUri;
+}
+
+// ================================================================
+// 加载配置
+// ================================================================
+require_once __DIR__ . '/config/db.php';
+
+// ================================================================
+// 路由分发
+// ================================================================
+$path = rtrim($requestUri, '/');
+if ($path === '') {
+    $path = '/';
+}
+
+// ── 根路径 / → 空白页 ──────────────────────────────────────
+if ($path === '/' || $path === $BASE_PATH) {
+    header('Content-Type: text/html; charset=utf-8');
+    echo '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title></title></head><body></body></html>';
+    exit;
+}
+
+// ── /api/* → 动态 API（兼容 /wei/api/login.php 和 /wei/api/login 两种写法） ──
+$apiPrefix1 = $BASE_PATH . '/api/';
+$apiPrefix2 = '/api/';
+
+if (str_starts_with($path, $apiPrefix1) || str_starts_with($path, $apiPrefix2)) {
+    $apiPath = preg_replace(
+        ['/^' . preg_quote($BASE_PATH, '/') . '\/api\//', '/^\/api\//', '/\.php$/'],
+        '',
+        $path
+    );
+
+    if (!preg_match('/^[a-zA-Z0-9_]+$/', $apiPath)) {
+        http_response_code(400);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['code' => 400, 'msg' => '无效的 API 路径', 'data' => null], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $apiFile = __DIR__ . '/api/' . $apiPath . '.php';
+    if (file_exists($apiFile)) {
+        require_once $apiFile;
+        exit;
+    }
+
+    http_response_code(404);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['code' => 404, 'msg' => '接口不存在: ' . $apiPath, 'data' => null], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// ── /storage/* → 静态文件 ──────────────────────────────────────
+$storagePrefix1 = $BASE_PATH . '/storage/';
+$storagePrefix2 = '/storage/';
+
+if (str_starts_with($path, $storagePrefix1) || str_starts_with($path, $storagePrefix2)) {
+    $storageFile = __DIR__ . '/storage/' . preg_replace(
+        ['/^' . preg_quote($BASE_PATH, '/') . '\/storage\//', '/^\/storage\//'],
+        '',
+        $path
+    );
+    if (file_exists($storageFile) && is_file($storageFile)) {
+        $ext = pathinfo($storageFile, PATHINFO_EXTENSION);
+        $mimeTypes = [
+            'txt' => 'text/plain', 'json' => 'application/json',
+            'css' => 'text/css', 'js' => 'application/javascript',
+            'png' => 'image/png', 'jpg' => 'image/jpeg',
+            'gif' => 'image/gif', 'svg' => 'image/svg+xml',
+            'ico' => 'image/x-icon', 'pdf' => 'application/pdf',
+            'zip' => 'application/zip',
+        ];
+        header('Content-Type: ' . ($mimeTypes[$ext] ?? 'application/octet-stream'));
+        readfile($storageFile);
+        exit;
+    }
+}
+
+// ── /article/p/:id → 文章详情页 ─────────────────────────────────
+$baseForRe = preg_quote($BASE_PATH === '/' ? '' : $BASE_PATH, '/');
+$detailPattern = '/^' . $baseForRe . '\/article\/p\/(\d+)$/';
+if (preg_match($detailPattern, $path, $m)) {
+    $articleId = (int)$m[1];
+    $file = __DIR__ . '/article/detail.html';
+    if (is_file($file)) {
+        $html = file_get_contents($file);
+        $injectScript = "<script>window.__ARTICLE_ID__ = {$articleId};window.__BASE_PATH__ = " . json_encode($BASE_PATH === '/' ? '' : $BASE_PATH) . ";</script>";
+        if (strpos($html, '</body>') !== false) {
+            $html = str_replace('</body>', $injectScript . "\n</body>", $html);
+        } else {
+            $html .= "\n" . $injectScript;
+        }
+        header('Content-Type: text/html; charset=utf-8');
+        echo $html;
+        exit;
+    }
+}
+
+// ── /article/* → 文章模块（独立隔离）────────────────────────────
+$articlePrefix1 = $BASE_PATH . '/article/';
+$articlePrefix2 = '/article/';
+
+if (str_starts_with($path, $articlePrefix1) || str_starts_with($path, $articlePrefix2)) {
+    // 提取 article/ 后的路径（去掉 $BASE_PATH 前缀）
+    $articleRel = preg_replace(
+        ['/^' . preg_quote($BASE_PATH, '/') . '\/article\//', '/^\/article\//'],
+        '',
+        $path
+    );
+    // 尝试 article/rel 路径
+    $artFile = __DIR__ . '/article/' . ltrim($articleRel, '/');
+    if (!is_file($artFile)) {
+        $artFile = __DIR__ . '/article/' . ltrim($articleRel, '/') . '.php';
+    }
+    if (is_file($artFile)) {
+        require_once $artFile;
+        exit;
+    }
+    // /article 或 /article/ → article/index.html（含 BASE_PATH 注入）
+    if ($path === $BASE_PATH . '/article' || $path === '/article') {
+        $html = file_get_contents(__DIR__ . '/article/index.html');
+        $injectPath = ($BASE_PATH === '/') ? '' : $BASE_PATH;
+        $injectScript = "<script>window.__BASE_PATH__ = " . json_encode($injectPath) . ";</script>";
+        if (strpos($html, '</body>') !== false) {
+            $html = str_replace('</body>', $injectScript . "\n</body>", $html);
+        } else {
+            $html .= "\n" . $injectScript;
+        }
+        // 替换 article/index.html 中的硬编码路径为动态路径
+        $html = str_replace("'/article/api/", json_encode(rtrim($BASE_PATH, '/') . '/article/api/'), $html);
+        header('Content-Type: text/html; charset=utf-8');
+        echo $html;
+        exit;
+    }
+    http_response_code(404);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['code' => 404, 'msg' => '文章模块资源不存在: ' . $path, 'data' => null], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// ── /search/* → 搜索模块 ────────────────────────────────
+$searchPrefix1 = $BASE_PATH . '/search/';
+$searchPrefix2 = '/search/';
+
+if (str_starts_with($path, $searchPrefix1) || str_starts_with($path, $searchPrefix2)) {
+    $searchRel = preg_replace(
+        ['/^' . preg_quote($BASE_PATH, '/') . '\/search\//', '/^\/search\//'],
+        '',
+        $path
+    );
+    $searchFile = __DIR__ . '/search/' . ltrim($searchRel, '/');
+    if (!is_file($searchFile)) {
+        $searchFile = __DIR__ . '/search/' . ltrim($searchRel, '/') . '.php';
+    }
+    if (is_file($searchFile)) {
+        require_once $searchFile;
+        exit;
+    }
+    // /search 或 /search/ → search/index.html（含 BASE_PATH 注入）
+    if ($path === $BASE_PATH . '/search' || $path === '/search' || $path === $BASE_PATH . '/search/' || $path === '/search/') {
+        $html = file_get_contents(__DIR__ . '/search/index.html');
+        $injectPath = ($BASE_PATH === '/') ? '' : $BASE_PATH;
+        $injectScript = "<script>window.__BASE_PATH__ = " . json_encode($injectPath) . ";</script>";
+        if (strpos($html, '</body>') !== false) {
+            $html = str_replace('</body>', $injectScript . "\n</body>", $html);
+        } else {
+            $html .= "\n" . $injectScript;
+        }
+        header('Content-Type: text/html; charset=utf-8');
+        echo $html;
+        exit;
+    }
+    // 搜索 API 路由
+    $searchApiRel = preg_replace(
+        ['/^' . preg_quote($BASE_PATH, '/') . '\/search\/api\//', '/^\/search\/api\//'],
+        '',
+        $path
+    );
+    $searchApiFile = __DIR__ . '/search/api/' . ltrim($searchApiRel, '/');
+    if (!is_file($searchApiFile)) {
+        $searchApiFile = __DIR__ . '/search/api/' . ltrim($searchApiRel, '/') . '.php';
+    }
+    if (is_file($searchApiFile)) {
+        require_once $searchApiFile;
+        exit;
+    }
+    http_response_code(404);
+    header('Content-Type: text/html; charset=utf-8');
+    echo '<h1>404 Not Found</h1><p>搜索模块资源不存在: ' . htmlspecialchars($path) . '</p>';
+    exit;
+}
+
+// ── 其他路径 → 404 ──────────────────────────────────────────────
+http_response_code(404);
+header('Content-Type: text/html; charset=utf-8');
+echo '<h1>404 Not Found</h1><p>页面不存在: ' . htmlspecialchars($path) . '</p>';

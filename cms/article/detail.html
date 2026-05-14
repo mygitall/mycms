@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文章详情</title>
+  <style>
+    :root {
+      --bg: #f0f2f5;
+      --surface: #ffffff;
+      --border: #e4e6eb;
+      --text: #1c1e21;
+      --text-muted: #65676b;
+      --accent: #f5a623;
+      --accent-light: rgba(245,166,35,0.12);
+      --success: #31b545;
+      --danger: #e74c3c;
+      --radius: 10px;
+      --radius-sm: 6px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+      --ff: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #18191a;
+        --surface: #242526;
+        --border: #3e4042;
+        --text: #e4e6eb;
+        --text-muted: #b0b3b8;
+        --accent-light: rgba(245,166,35,0.15);
+        --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2);
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--ff);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── 顶部导航 ── */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+    .topbar-inner {
+      max-width: 820px;
+      margin: 0 auto;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 13.5px;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+    .back-btn:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+    .back-btn svg { width: 14px; height: 14px; }
+    .topbar-title {
+      font-size: 13px;
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* ── 布局 ── */
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+
+    /* ── 文章主体卡片 ── */
+    .article-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    /* ── 文章头部 ── */
+    .article-header {
+      padding: 28px 32px 0;
+    }
+    .article-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .article-category {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 3px 9px;
+      border-radius: 4px;
+    }
+    .article-date {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .article-featured {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #f5a623, #ff7a00);
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .article-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.4;
+      margin-bottom: 16px;
+      letter-spacing: -0.3px;
+    }
+    .article-author-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .author-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .author-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .author-avatar span {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .author-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .author-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .article-stats-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .stat-item svg { width: 13px; height: 13px; }
+
+    /* ── 标签 ── */
+    .article-tags {
+      padding: 16px 32px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 3px 10px;
+      border-radius: 20px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tag:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* ── 正文 ── */
+    .article-body {
+      padding: 24px 32px 32px;
+      font-size: 15.5px;
+      line-height: 1.85;
+      color: var(--text);
+    }
+    .article-body p { margin-bottom: 16px; }
+    .article-body h1,
+    .article-body h2,
+    .article-body h3 {
+      color: var(--text);
+      margin: 24px 0 12px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+    .article-body h1 { font-size: 20px; }
+    .article-body h2 { font-size: 18px; }
+    .article-body h3 { font-size: 16px; }
+    .article-body a { color: var(--accent); text-decoration: none; }
+    .article-body a:hover { text-decoration: underline; }
+    .article-body img {
+      max-width: 100%;
+      border-radius: var(--radius-sm);
+      margin: 8px 0;
+      display: block;
+    }
+    .article-body blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 10px 16px;
+      margin: 16px 0;
+      background: var(--accent-light);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    .article-body pre {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-size: 13px;
+      font-family: "SF Mono", "Fira Code", Consolas, monospace;
+      margin: 16px 0;
+      line-height: 1.6;
+    }
+    .article-body code {
+      font-family: "SF Mono", "Fira Code", Consolas, monospace;
+      font-size: 13px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    .article-body ul,
+    .article-body ol {
+      padding-left: 24px;
+      margin-bottom: 16px;
+    }
+    .article-body li { margin-bottom: 6px; }
+    .article-body hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 24px 0;
+    }
+    .article-body table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin: 16px 0;
+    }
+    .article-body th,
+    .article-body td {
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: left;
+    }
+    .article-body th { background: var(--bg); font-weight: 600; }
+
+    /* ── 底部操作栏 ── */
+    .article-footer {
+      padding: 16px 32px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .footer-views {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .footer-views svg { width: 14px; height: 14px; }
+    .footer-source {
+      font-size: 12.5px;
+    }
+    .footer-source a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .footer-source a:hover { text-decoration: underline; }
+
+    /* ── 加载中 ── */
+    .loading {
+      text-align: center;
+      padding: 80px 24px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .loading-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      margin-right: 8px;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+
+    /* ── 错误 ── */
+    .error-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 48px 32px;
+      text-align: center;
+    }
+    .error-icon {
+      width: 52px; height: 52px;
+      background: rgba(231,76,60,0.08);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .error-icon svg { width: 22px; height: 22px; color: var(--danger); }
+    .error-box h2 { font-size: 16px; margin-bottom: 8px; }
+    .error-box p { font-size: 13.5px; color: var(--text-muted); margin-bottom: 20px; }
+    .error-box .back-btn {
+      display: inline-flex;
+      color: var(--accent);
+      border-color: var(--accent);
+      background: var(--accent-light);
+      padding: 8px 20px;
+      font-size: 13.5px;
+    }
+
+    /* ── 响应式 ── */
+    @media (max-width: 600px) {
+      .article-header { padding: 20px 20px 0; }
+      .article-tags { padding: 14px 20px 0; }
+      .article-body { padding: 20px 20px 24px; font-size: 14.5px; }
+      .article-footer { padding: 14px 20px; }
+      .article-title { font-size: 19px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a href="javascript:history.back()" class="back-btn" id="back-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+      </svg>
+      返回列表
+    </a>
+    <span class="topbar-title" id="topbar-title"></span>
+  </div>
+</nav>
+
+<!-- 主内容 -->
+<main class="container" id="main-content">
+  <div class="loading"><span class="loading-dot"></span>正在加载文章...</div>
+</main>
+
+<script>
+// ─── 路径自动检测 ──────────────────────────────────────
+(function () {
+  const injected = window.__BASE_PATH__;
+  if (injected !== undefined) { window._detectedBasePath = injected; return; }
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  const idx = parts.indexOf('article');
+  if (idx >= 0) { window._detectedBasePath = '/' + parts.slice(0, idx).join('/'); }
+  else { window._detectedBasePath = '/' + parts.slice(0, -1).join('/'); }
+})();
+const BASE_PATH = (window._detectedBasePath || '').replace(/\/+$/, '');
+const VIEW_API = BASE_PATH + '/article/api/view';
+const LIST_URL = BASE_PATH + '/article.php';
+
+// ─── 文章 ID 自动检测（兼容直接访问和路由注入两种方式）───
+const articleId = (function() {
+  // 优先使用 index.php 注入的 ID
+  if (window.__ARTICLE_ID__ !== undefined) return window.__ARTICLE_ID__;
+  // 从 URL 路径自动解析：/article/p/123 → 123
+  const match = window.location.pathname.match(/\/article\/p\/(\d+)/i);
+  return match ? parseInt(match[1], 10) : null;
+})();
+
+// ─── 带超时的 fetch ───────────────────────────────────
+async function safeFetch(url, options = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000); // 10秒超时
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(timeout);
+    return res;
+  } catch (e) {
+    clearTimeout(timeout);
+    if (e.name === 'AbortError') {
+      throw new Error('请求超时，请检查网络连接');
+    }
+    throw e;
+  }
+}
+
+async function loadArticle() {
+  const main = document.getElementById('main-content');
+  const titleEl = document.getElementById('topbar-title');
+
+  if (!articleId) {
+    main.innerHTML = renderError('缺少文章ID参数，请从文章列表页进入');
+    return;
+  }
+
+  try {
+    // 注意：view.php 接口使用 GET 方法，id 通过 URL 参数传递
+    const res = await safeFetch(VIEW_API + '?id=' + articleId);
+
+    if (!res.ok) {
+      const status = res.status;
+      let msg = '加载失败';
+      if (status === 404) msg = '文章不存在或已下架';
+      else if (status === 403) msg = '无权限访问该文章';
+      else if (status >= 500) msg = '服务器错误，请稍后重试';
+      else msg = '加载失败 (HTTP ' + status + ')';
+      main.innerHTML = renderError(msg);
+      return;
+    }
+
+    const json = await res.json();
+
+    if (json.code !== 0) {
+      main.innerHTML = renderError(json.msg || '文章不存在或已下架');
+      return;
+    }
+
+    const a = json.data;
+    document.title = a.title + ' · CSM';
+    titleEl.textContent = a.title;
+
+    main.innerHTML = `
+    <div class="article-card">
+      <div class="article-header">
+        <div class="article-meta-row">
+          ${a.category ? `<span class="article-category">${escapeHtml(a.category)}</span>` : ''}
+          <span class="article-date">${formatDate(a.published_at || a.created_at)}</span>
+          ${a.is_featured == 1 ? '<span class="article-featured">精选</span>' : ''}
+        </div>
+        <h1 class="article-title">${escapeHtml(a.title)}</h1>
+        <div class="article-author-row">
+          <div class="author-avatar">
+            ${a.author_avatar
+              ? `<img src="${escapeHtml(a.author_avatar)}" alt="avatar" onerror="this.parentElement.innerHTML='<span>${escapeHtml((a.author_name||'A')[0])}</span>'">`
+              : `<span>${escapeHtml((a.author_name || 'A')[0])}</span>`
+            }
+          </div>
+          <div class="author-info">
+            <span class="author-name">${escapeHtml(a.author_name || '匿名作者')}</span>
+            <div class="article-stats-row">
+              <span class="stat-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                ${a.view_count || 0}
+              </span>
+              <span class="stat-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                </svg>
+                ${formatDate(a.published_at || a.created_at)}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      ${renderTags(a.tags)}
+      <div class="article-body" id="article-body-content">
+        ${renderContent(a.content)}
+      </div>
+      <div class="article-footer">
+        <span class="footer-views">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          ${a.view_count || 0} 次阅读
+        </span>
+        ${a.source_url ? `<span class="footer-source">来源：<a href="${escapeHtml(a.source_url)}" target="_blank" rel="noopener">${escapeHtml(a.source_url)}</a></span>` : ''}
+      </div>
+    </div>`;
+
+  } catch (e) {
+    console.error('文章加载失败:', e);
+    const msg = e.message || '网络错误，请检查服务器连接';
+    main.innerHTML = renderError(msg);
+  }
+}
+
+function renderTags(tags) {
+  if (!tags) return '';
+  let tagList = [];
+  try {
+    if (typeof tags === 'string') {
+      tags = tags.trim();
+      // 优先尝试 JSON 数组格式
+      if (tags.startsWith('[')) {
+        const parsed = JSON.parse(tags);
+        if (Array.isArray(parsed) && parsed.length) tagList = parsed;
+      } else if (tags.includes(',')) {
+        // 逗号分隔格式：a, b, c
+        tagList = tags.split(',').map(t => t.trim()).filter(Boolean);
+      } else {
+        // 单个标签
+        tagList = [tags];
+      }
+    } else if (Array.isArray(tags)) {
+      tagList = tags;
+    }
+  } catch (_) {
+    // 解析失败，尝试逗号分隔兜底
+    if (typeof tags === 'string' && tags.includes(',')) {
+      tagList = tags.split(',').map(t => t.trim()).filter(Boolean);
+    }
+  }
+  if (!tagList.length) return '';
+  return `<div class="article-tags">` +
+    tagList.map(t => `<span class="tag">${escapeHtml(String(t))}</span>`).join('') +
+    `</div>`;
+}
+
+function renderContent(content) {
+  if (!content) return '<p style="color:var(--text-muted);font-style:italic">暂无正文内容</p>';
+  return sanitizeHtml(content);
+}
+
+/**
+ * HTML 安全过滤器：允许安全标签，剥离危险标签和属性（防止存储型 XSS）
+ * 允许: p, h1-h6, img, a, blockquote, pre, code, ul, ol, li, hr, table, strong, em, b, i, u, s, sup, sub, br, span, div
+ * 剥离: script, iframe, object, embed, form, style, link, meta, svg, math, button, input, textarea, select
+ * 剥离: 所有 on* 事件属性，javascript: URL，危险 data: URL
+ */
+function sanitizeHtml(html) {
+  if (!html) return '';
+
+  // 第一步：剥离危险标签（正则预处理）
+  const dangerousTags = [
+    /<script\b[^>]*>(.*?)<\/script>/gis,
+    /<iframe\b[^>]*>(.*?)<\/iframe>/gis,
+    /<object\b[^>]*>(.*?)<\/object>/gis,
+    /<embed\b[^>]*>/gi,
+    /<form\b[^>]*>(.*?)<\/form>/gis,
+    /<input\b[^>]*>/gi,
+    /<button\b[^>]*>(.*?)<\/button>/gis,
+    /<select\b[^>]*>(.*?)<\/select>/gis,
+    /<textarea\b[^>]*>(.*?)<\/textarea>/gis,
+    /<link\b[^>]*>/gi,
+    /<style\b[^>]*>(.*?)<\/style>/gis,
+    /<meta\b[^>]*>/gi,
+    /<!--[\s\S]*?-->/g,
+    /<svg\b[^>]*>([\s\S]*?)<\/svg>/gi,
+    /<math\b[^>]*>([\s\S]*?)<\/math>/gi,
+  ];
+  let clean = html;
+  dangerousTags.forEach(pattern => { clean = clean.replace(pattern, ''); });
+
+  // 第二步：使用 DOMParser 清理危险属性
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(
+    '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>' + clean + '</body></html>',
+    'text/html'
+  );
+
+  const allowedTags = new Set([
+    'p','h1','h2','h3','h4','h5','h6',
+    'img','a','blockquote','pre','code',
+    'ul','ol','li','hr',
+    'table','thead','tbody','tr','th','td',
+    'span','div','br','strong','em','b','i','u','s','sup','sub',
+    'figure','figcaption',
+  ]);
+  const attrALink  = new Set(['href','title','target','rel','download']);
+  const attrImg    = new Set(['src','alt','title','width','height','class','loading']);
+  const attrCommon = new Set(['id','class','style','title','lang','dir','align']);
+
+  function walk(node) {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const tag = node.nodeName.toLowerCase();
+
+      // 剥离不允许的标签（保留子节点）
+      if (!allowedTags.has(tag)) {
+        const frag = document.createDocumentFragment();
+        while (node.firstChild) frag.appendChild(node.removeChild(node.firstChild));
+        node.parentNode.replaceChild(frag, node);
+        return;
+      }
+
+      // 清理属性
+      const toRemove = [];
+      for (const attr of node.attributes) {
+        const name = attr.name.toLowerCase();
+        let remove = false;
+
+        // 事件属性一律剥离
+        if (name.startsWith('on')) {
+          remove = true;
+        }
+        // javascript: 协议
+        else if (/^javascript:/i.test(attr.value)) {
+          remove = true;
+        }
+        // 危险 data: 链接（除 img/src 外）
+        else if (/^data:(?!image\/)/i.test(attr.value) && tag !== 'img') {
+          remove = true;
+        }
+        // 非白名单属性
+        else {
+          if (tag === 'a') {
+            if (!attrALink.has(name)) remove = true;
+          } else if (tag === 'img') {
+            if (!attrImg.has(name)) remove = true;
+          } else {
+            if (!attrCommon.has(name)) remove = true;
+          }
+        }
+        if (remove) toRemove.push(name);
+      }
+      toRemove.forEach(a => node.removeAttribute(a));
+
+      // a 标签：外部链接追加安全属性
+      if (tag === 'a' && node.hasAttribute('href')) {
+        const href = node.getAttribute('href');
+        if (/^javascript:/i.test(href)) {
+          node.removeAttribute('href');
+        } else {
+          node.setAttribute('rel', 'noopener noreferrer');
+          const target = node.getAttribute('target');
+          if (target && /^_blank$/i.test(target)) {
+            node.setAttribute('rel', 'noopener noreferrer');
+          }
+        }
+      }
+
+      // img 标签：只允许 data:image/* 和 http(s)://
+      if (tag === 'img' && node.hasAttribute('src')) {
+        const src = node.getAttribute('src');
+        if (!/^(https?:\/\/|data:image\/)/i.test(src)) {
+          node.removeAttribute('src');
+        }
+      }
+    }
+    // 递归处理子节点
+    for (let i = 0; i < node.childNodes.length; i++) {
+      walk(node.childNodes[i]);
+    }
+  }
+
+  walk(doc.body);
+
+  // 提取 body 内容
+  let result = '';
+  for (const child of doc.body.childNodes) {
+    result += child.outerHTML || '';
+  }
+  return result || clean;
+}
+
+function renderError(msg) {
+  return `
+  <div class="error-box">
+    <div class="error-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+      </svg>
+    </div>
+    <h2>加载失败</h2>
+    <p>${escapeHtml(msg)}</p>
+    <a href="${LIST_URL}" class="back-btn">返回文章列表</a>
+  </div>`;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    return d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+  } catch { return dateStr; }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadArticle);
+} else {
+  loadArticle();
+}
+</script>
+
+</body>
+</html>

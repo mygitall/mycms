@@ -1,0 +1,8 @@
+# 优先使用 index.php 作为目录入口，确保 BASE_PATH 正确注入
+DirectoryIndex index.php index.html
+
+# 拦截直接访问 index.html，转发到 index.php（防止绕过 BASE_PATH 注入）
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^index\.html$ index.php [L,NC]
+</IfModule>

@@ -1,0 +1,20 @@
+# 禁止 PHP 执行
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phar|pl|cgi|py|sh|asp|aspx|jsp)$">
+    Require all denied
+</FilesMatch>
+
+# 禁用脚本执行（仅 mod_php 环境生效，PHP-FPM 自动忽略）
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+
+# 禁用 CGI 执行
+Options -ExecCGI
+
+# 强制下载而非内联显示（防止 XSS via SVG/HTML）
+<IfModule mod_headers.c>
+    <FilesMatch ".*">
+        Header set X-Content-Type-Options "nosniff"
+        Header set Content-Disposition "attachment"
+    </FilesMatch>
+</IfModule>

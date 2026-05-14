@@ -1,0 +1,7 @@
+.DS_Store
+config.php
+install.lock
+uploads/*
+!uploads/.gitkeep
+data/backups/*
+!data/backups/.gitkeep
