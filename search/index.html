@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>搜索 - 全站搜索</title>
+  <style>
+    :root {
+      --ff-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --ff-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    /* ─── Theme: Dark ─── */
+    html, html[data-theme="dark"] {
+      --bg:          #0a0a0a;
+      --surface:     #141414;
+      --surface-2:   #1c1c1c;
+      --border:      #252525;
+      --border-2:    #2e2e2e;
+      --accent:      #f5a623;
+      --accent-dim:  rgba(245, 166, 35, 0.12);
+      --accent-glow: rgba(245, 166, 35, 0.25);
+      --text:        #f2f2f2;
+      --text-muted:  #8c8c8c;
+      --text-dim:    #4a4a4a;
+      --on-surface:  #f0f0f0;
+      --danger:      #ff5f5f;
+      --danger-dim:  rgba(255, 95, 95, 0.10);
+      --on-danger:   #ffffff;
+      --success:     #4ade80;
+      --scrollbar-track: #0a0a0a;
+      --scrollbar-thumb: #2e2e2e;
+      --transition: 0.2s ease;
+    }
+    html[data-theme="light"] {
+      --bg:          #f4f5f7;
+      --surface:     #ffffff;
+      --surface-2:   #eef0f5;
+      --border:      #dfe2ea;
+      --border-2:    #c8cdd8;
+      --accent:      #e8920a;
+      --accent-dim:  rgba(232, 146, 10, 0.10);
+      --accent-glow: rgba(232, 146, 10, 0.22);
+      --text:        #111827;
+      --text-muted:  #5a6474;
+      --text-dim:    #c0c4cc;
+      --on-surface:  #1a1a2e;
+      --danger:      #dc2626;
+      --danger-dim:  rgba(220, 38, 38, 0.08);
+      --on-danger:   #ffffff;
+      --success:     #16a34a;
+      --scrollbar-track: #eef0f5;
+      --scrollbar-thumb: #c8cdd8;
+      --transition: 0.2s ease;
+    }
+    html[data-theme="neon"] {
+      --bg:          #050510;
+      --surface:     #0d0d24;
+      --surface-2:   #13132e;
+      --border:      #1e1e40;
+      --border-2:    #2a2a58;
+      --accent:      #00e5ff;
+      --accent-dim:  rgba(0, 229, 255, 0.10);
+      --accent-glow: rgba(0, 229, 255, 0.25);
+      --text:        #ddeeff;
+      --text-muted:  #7888aa;
+      --text-dim:    #2a2e50;
+      --on-surface:  #ddeeff;
+      --danger:      #ff2d78;
+      --danger-dim:  rgba(255, 45, 120, 0.10);
+      --on-danger:   #ffffff;
+      --success:     #00ff9d;
+      --scrollbar-track: #050510;
+      --scrollbar-thumb: #2a2a58;
+      --transition: 0.2s ease;
+    }
+    html[data-theme="forest"] {
+      --bg:          #080f08;
+      --surface:     #0e1a0e;
+      --surface-2:   #152215;
+      --border:      #1e301e;
+      --border-2:    #284028;
+      --accent:      #4caf50;
+      --accent-dim:  rgba(76, 175, 80, 0.10);
+      --accent-glow: rgba(76, 175, 80, 0.25);
+      --text:        #dceedc;
+      --text-muted:  #72b072;
+      --text-dim:    #2a4a2a;
+      --on-surface:  #dceedc;
+      --danger:      #ef5350;
+      --danger-dim:  rgba(239, 83, 80, 0.10);
+      --on-danger:   #ffffff;
+      --success:     #81c784;
+      --scrollbar-track: #080f08;
+      --scrollbar-thumb: #284028;
+      --transition: 0.2s ease;
+    }
+    html[data-theme="ocean"] {
+      --bg:          #060d18;
+      --surface:     #0b1929;
+      --surface-2:   #0f2035;
+      --border:      #152a44;
+      --border-2:    #1c3858;
+      --accent:      #4fc3f7;
+      --accent-dim:  rgba(79, 195, 247, 0.10);
+      --accent-glow: rgba(79, 195, 247, 0.25);
+      --text:        #ddeeff;
+      --text-muted:  #7898b8;
+      --text-dim:    #2a3e58;
+      --on-surface:  #ddeeff;
+      --danger:      #f06292;
+      --danger-dim:  rgba(240, 98, 146, 0.10);
+      --on-danger:   #ffffff;
+      --success:     #4dd0e1;
+      --scrollbar-track: #060d18;
+      --scrollbar-thumb: #1c3858;
+      --transition: 0.2s ease;
+    }
+
+    /* ─── Base ─── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      font-family: var(--ff-sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background var(--transition), color var(--transition);
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+    a { color: var(--accent); text-decoration: none; }
+
+    /* ─── Header ─── */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-logo {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.3px;
+    }
+    .header-title {
+      font-size: 14px;
+      color: var(--text-muted);
+      padding-left: 12px;
+      border-left: 1px solid var(--border);
+    }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .theme-btn {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ─── Search Hero ─── */
+    .search-hero {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 24px 32px;
+      text-align: center;
+    }
+    .search-hero h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .search-hero p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+    .search-form {
+      display: flex;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 6px;
+      transition: border-color var(--transition);
+    }
+    .search-form:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+    .search-form input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 15px;
+      font-family: var(--ff-sans);
+      padding: 8px 12px;
+    }
+    .search-form input::placeholder { color: var(--text-dim); }
+    .search-form button {
+      padding: 8px 20px;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--ff-sans);
+      transition: background var(--transition);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .search-form button:hover { background: var(--accent-glow); }
+    .search-form button svg { width: 16px; height: 16px; }
+
+    /* ─── Main Container ─── */
+    .main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+    }
+
+    /* ─── Filter Bar ─── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-chip {
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-muted);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all var(--transition);
+      font-family: var(--ff-sans);
+    }
+    .filter-chip:hover { border-color: var(--accent); color: var(--accent); }
+    .filter-chip.active {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ─── Results ─── */
+    .results-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .results-meta strong { color: var(--accent); }
+
+    .result-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      transition: all var(--transition);
+      cursor: pointer;
+      display: block;
+    }
+    .result-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .result-type {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid var(--accent-glow);
+    }
+    .result-type.software {
+      background: rgba(96, 165, 250, 0.12);
+      color: #60a5fa;
+      border-color: rgba(96, 165, 250, 0.25);
+    }
+    .result-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+    .result-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .result-excerpt {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .result-excerpt mark {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+    .result-footer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+    .result-footer svg { width: 13px; height: 13px; }
+    .result-footer span { display: flex; align-items: center; gap: 4px; }
+
+    /* ─── Empty / Loading ─── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state svg { width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.4; }
+    .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; }
+    .loading-spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 40px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Pagination ─── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 24px;
+    }
+    .pagination-btn {
+      width: 36px; height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-2);
+      color: var(--text-muted);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+      font-family: var(--ff-sans);
+    }
+    .pagination-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .pagination-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .pagination-num {
+      width: 36px; height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-2);
+      color: var(--text-muted);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all var(--transition);
+      font-family: var(--ff-sans);
+    }
+    .pagination-num:hover { border-color: var(--accent); color: var(--accent); }
+    .pagination-num.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
+
+    /* ─── Toast ─── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 13px;
+      color: var(--text);
+      z-index: 2000;
+      transition: transform 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error { border-color: var(--danger); color: var(--danger); }
+    .toast.success { border-color: var(--success); color: var(--success); }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 640px) {
+      .search-hero { padding: 32px 16px 24px; }
+      .search-hero h1 { font-size: 22px; }
+      .search-form { flex-direction: column; }
+      .search-form button { justify-content: center; }
+      .main { padding: 0 16px 32px; }
+      .result-footer { flex-wrap: wrap; gap: 8px; }
+    }
+</style>
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<div class="header">
+  <div class="header-left">
+    <a href="/" class="header-logo">CMS</a>
+    <span class="header-title">全站搜索</span>
+  </div>
+  <div class="header-right">
+    <button class="theme-btn" onclick="switchThemeCycle()" title="切换主题">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:16px;height:16px">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- ─── Search Hero ─── -->
+<div class="search-hero">
+  <h1>全站搜索</h1>
+  <p>搜索文章、软件等全部内容</p>
+  <div class="search-form" id="search-form">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:20px;height:20px;color:var(--text-muted);flex-shrink:0;align-self:center;margin-left:10px">
+      <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+    </svg>
+    <input type="text" id="search-input" placeholder="输入关键词搜索..." autocomplete="off">
+    <button type="button" onclick="doSearch()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+      </svg>
+      搜索
+    </button>
+  </div>
+</div>
+
+<!-- ─── Main ─── -->
+<div class="main">
+
+  <!-- Filter chips -->
+  <div class="filter-bar" id="filter-bar">
+    <button class="filter-chip active" data-source="" onclick="setSource('')">全部</button>
+    <button class="filter-chip" data-source="article" onclick="setSource('article')">文章</button>
+    <button class="filter-chip" data-source="software" onclick="setSource('software')">软件</button>
+  </div>
+
+  <!-- Results meta -->
+  <div class="results-meta" id="results-meta" style="display:none"></div>
+
+  <!-- Results list -->
+  <div id="results-container"></div>
+
+  <!-- Loading -->
+  <div id="loading-indicator" style="display:none">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- Empty state -->
+  <div id="empty-state" class="empty-state" style="display:none">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+    </svg>
+    <h3 id="empty-title">未找到结果</h3>
+    <p id="empty-desc">换个关键词试试吧</p>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" id="pagination"></div>
+
+</div>
+
+<!-- ─── Toast ─── -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ CONFIG ════════════════════════════════════════
+const BASE_PATH = window.__BASE_PATH__ || '';
+const SEARCH_API = BASE_PATH + '/search/api/list';
+
+// ═══ STATE ════════════════════════════════════════
+let currentPage    = 1;
+let currentSource  = '';
+let currentKeyword = '';
+let currentResults = [];
+let totalPages     = 0;
+
+// ═══ THEME ══════════════════════════════════════════
+const THEMES = ['dark', 'light', 'neon', 'forest', 'ocean'];
+function switchTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('search_theme', theme);
+}
+function switchThemeCycle() {
+  const saved = localStorage.getItem('search_theme') || 'dark';
+  const idx = THEMES.indexOf(saved);
+  switchTheme(THEMES[(idx + 1) % THEMES.length]);
+}
+(function() {
+  const saved = localStorage.getItem('search_theme');
+  if (saved && THEMES.includes(saved)) {
+    document.documentElement.setAttribute('data-theme', saved);
+  }
+})();
+
+// ═══ TOAST ══════════════════════════════════════════
+let toastTimer = null;
+function showToast(msg, type = '') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toast.classList.add('show');
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ═══ SEARCH ══════════════════════════════════════════
+function doSearch(page) {
+  const keyword = document.getElementById('search-input').value.trim();
+
+  if (page === undefined || page === null) {
+    currentPage = 1;
+  } else {
+    currentPage = page;
+  }
+
+  currentKeyword = keyword;
+
+  if (!keyword) {
+    showToast('请输入搜索关键词', 'error');
+    return;
+  }
+
+  const form = document.getElementById('search-form');
+  const resultsContainer = document.getElementById('results-container');
+  const loadingIndicator = document.getElementById('loading-indicator');
+  const emptyState = document.getElementById('empty-state');
+  const metaEl = document.getElementById('results-meta');
+
+  form.style.display = 'none';
+  resultsContainer.innerHTML = '';
+  emptyState.style.display = 'none';
+  loadingIndicator.style.display = 'block';
+  metaEl.style.display = 'none';
+
+  const params = new URLSearchParams({
+    keyword: keyword,
+    page: currentPage,
+    page_size: 10,
+    source: currentSource,
+    sort_by: 'relevance',
+  });
+
+  fetch(SEARCH_API + '?' + params.toString(), {
+    method: 'GET',
+    headers: { 'Accept': 'application/json' },
+    credentials: 'same-origin',
+  })
+  .then(res => res.json())
+  .then(data => {
+    loadingIndicator.style.display = 'none';
+    form.style.display = 'flex';
+
+    if (data.code !== 0) {
+      showToast(data.msg || '搜索失败', 'error');
+      emptyState.style.display = 'block';
+      document.getElementById('empty-title').textContent = '搜索失败';
+      document.getElementById('empty-desc').textContent = data.msg || '请稍后重试';
+      return;
+    }
+
+    currentResults = data.data.list || [];
+    totalPages = data.data.total_pages || 0;
+
+    if (currentResults.length === 0) {
+      emptyState.style.display = 'block';
+      document.getElementById('empty-title').textContent = '未找到 "' + escapeHtml(keyword) + '" 相关结果';
+      document.getElementById('empty-desc').textContent = '试试其他关键词，或调整筛选条件';
+      metaEl.style.display = 'block';
+      metaEl.innerHTML = '找到 <strong>0</strong> 条结果';
+      document.getElementById('pagination').innerHTML = '';
+      return;
+    }
+
+    metaEl.style.display = 'block';
+    metaEl.innerHTML = '找到 <strong>' + data.data.total + '</strong> 条结果';
+    renderResults(currentResults);
+    renderPagination(data.data.page, data.data.total_pages);
+  })
+  .catch(err => {
+    loadingIndicator.style.display = 'none';
+    form.style.display = 'flex';
+    showToast('网络错误，请检查服务器连接', 'error');
+    emptyState.style.display = 'block';
+    document.getElementById('empty-title').textContent = '请求失败';
+    document.getElementById('empty-desc').textContent = err.message;
+  });
+}
+
+// ═══ RENDER RESULTS ═════════════════════════════════
+function renderResults(results) {
+  const container = document.getElementById('results-container');
+  let html = '';
+  results.forEach(item => {
+    const typeClass = item.type === 'software' ? 'software' : 'article';
+    const typeLabel = item.type === 'software' ? '软件' : '文章';
+    const viewsLabel = item.type === 'software'
+      ? (item.downloads > 0 ? '<span><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>' + item.downloads + ' 下载</span>' : '')
+      : (item.views > 0 ? '<span><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>' + item.views + ' 阅读</span>' : '');
+
+    const dateLabel = item.date ? '<span><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>' + formatDate(item.date) + '</span>' : '';
+
+    const excerpt = highlightKeyword(item.content || '', currentKeyword);
+
+    html += '<a class="result-card" href="' + item.url + '">';
+    html += '<div class="result-header">';
+    html += '<span class="result-type ' + typeClass + '">' + typeLabel + '</span>';
+    html += '</div>';
+    html += '<div class="result-title">' + escapeHtml(item.title || '') + '</div>';
+    if (item.subtitle) {
+      html += '<div class="result-subtitle">' + escapeHtml(item.subtitle) + '</div>';
+    }
+    if (excerpt) {
+      html += '<div class="result-excerpt">' + excerpt + '</div>';
+    }
+    html += '<div class="result-footer">';
+    if (viewsLabel) html += viewsLabel;
+    if (dateLabel) html += dateLabel;
+    html += '</div></a>';
+  });
+  container.innerHTML = html;
+}
+
+// ═══ HIGHLIGHT ══════════════════════════════════════
+function highlightKeyword(text, keyword) {
+  if (!keyword || !text) return text;
+  const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp('(' + escaped + ')', 'gi');
+  return escapeHtml(text).replace(regex, '<mark>$1</mark>');
+}
+
+// ═══ PAGINATION ═════════════════════════════════════
+function renderPagination(current, total) {
+  const container = document.getElementById('pagination');
+  if (total <= 1) { container.innerHTML = ''; return; }
+
+  let html = '';
+  html += '<button class="pagination-btn" onclick="doSearch(' + (current - 1) + ')" ' + (current <= 1 ? 'disabled' : '') + '>‹</button>';
+
+  const maxPages = 5;
+  let startPage = Math.max(1, current - Math.floor(maxPages / 2));
+  let endPage = Math.min(total, startPage + maxPages - 1);
+  if (endPage - startPage < maxPages - 1) {
+    startPage = Math.max(1, endPage - maxPages + 1);
+  }
+  for (let i = startPage; i <= endPage; i++) {
+    html += '<button class="pagination-num ' + (i === current ? 'active' : '') + '" onclick="doSearch(' + i + ')">' + i + '</button>';
+  }
+  html += '<button class="pagination-btn" onclick="doSearch(' + (current + 1) + ')" ' + (current >= total ? 'disabled' : '') + '>›</button>';
+  container.innerHTML = html;
+}
+
+// ═══ SOURCE FILTER ══════════════════════════════════
+function setSource(source) {
+  currentSource = source;
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.source === source);
+  });
+  if (currentKeyword) {
+    doSearch(1);
+  }
+}
+
+// ═══ UTILITIES ═════════════════════════════════════
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function formatDate(str) {
+  if (!str) return '';
+  const d = new Date(str);
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+
+// ═══ EVENT LISTENERS ═══════════════════════════════
+document.getElementById('search-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doSearch();
+});
+
+// 从 URL 参数读取关键词（可选）
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const kw = params.get('q') || params.get('keyword');
+  if (kw) {
+    document.getElementById('search-input').value = kw;
+    doSearch();
+  }
+})();
+</script>
+</body>
+</html>

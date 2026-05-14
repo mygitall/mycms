@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文章管理</title>
+  <style>
+    :root {
+      --ff-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --ff-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ═══ THEME: Dark ═══ */
+    html, html[data-theme="dark"] {
+      --bg:          #0a0a0a;
+      --surface:     #141414;
+      --surface-2:   #1c1c1c;
+      --border:      #252525;
+      --border-2:    #2e2e2e;
+      --accent:      #f5a623;
+      --accent-dim:  rgba(245, 166, 35, 0.12);
+      --accent-glow: rgba(245, 166, 35, 0.25);
+      --text:        #f2f2f2;
+      --text-muted:  #8c8c8c;
+      --text-dim:    #4a4a4a;
+      --on-surface:  #f0f0f0;
+      --danger:      #ff5f5f;
+      --danger-dim:  rgba(255, 95, 95, 0.10);
+      --on-danger:   #ffffff;
+      --success:     #4ade80;
+      --scrollbar-track: #0a0a0a;
+      --scrollbar-thumb: #2e2e2e;
+      --calendar-icon: invert(0.5);
+      --transition: 0.2s ease;
+    }
+    html[data-theme="light"] {
+      --bg:          #f4f5f7;
+      --surface:     #ffffff;
+      --surface-2:   #eef0f5;
+      --border:      #dfe2ea;
+      --border-2:    #c8cdd8;
+      --accent:      #e8920a;
+      --accent-dim:  rgba(232, 146, 10, 0.10);
+      --accent-glow: rgba(232, 146, 10, 0.22);
+      --text:        #111827;
+      --text-muted:  #5a6474;
+      --text-dim:    #c0c4cc;
+      --on-surface:  #1a1a2e;
+      --danger:      #dc2626;
+      --danger-dim:  rgba(220, 38, 38, 0.08);
+      --on-danger:   #ffffff;
+      --success:     #16a34a;
+      --scrollbar-track: #eef0f5;
+      --scrollbar-thumb: #c8cdd8;
+      --calendar-icon: none;
+      --transition: 0.2s ease;
+    }
+    html[data-theme="neon"] {
+      --bg:          #050510;
+      --surface:     #0d0d24;
+      --surface-2:   #13132e;
+      --border:      #1e1e40;
+      --border-2:    #2a2a58;
+      --accent:      #00e5ff;
+      --accent-dim:  rgba(0, 229, 255, 0.10);
+      --accent-glow: rgba(0, 229, 255, 0.25);
+      --text:        #ddeeff;
+      --text-muted:  #7888aa;
+      --text-dim:    #2a2e50;
+      --on-surface:  #ddeeff;
+      --danger:      #ff2d78;
+      --danger-dim:  rgba(255, 45, 120, 0.10);
+      --on-danger:   #ffffff;
+      --success:     #00ff9d;
+      --scrollbar-track: #050510;
+      --scrollbar-thumb: #2a2a58;
+      --calendar-icon: invert(0.85);
+      --transition: 0.2s ease;
+    }
+    html[data-theme="forest"] {
+      --bg:          #080f08;
+      --surface:     #0e1a0e;
+      --surface-2:   #152215;
+      --border:      #1e301e;
+      --border-2:    #284028;
+      --accent:      #4caf50;
+      --accent-dim:  rgba(76, 175, 80, 0.10);
+      --accent-glow: rgba(76, 175, 80, 0.25);
+      --text:        #dceedc;
+      --text-muted:  #72b072;
+      --text-dim:    #2a4a2a;
+      --on-surface:  #dceedc;
+      --danger:      #ef5350;
+      --danger-dim:  rgba(239, 83, 80, 0.10);
+      --on-danger:   #ffffff;
+      --success:     #81c784;
+      --scrollbar-track: #080f08;
+      --scrollbar-thumb: #284028;
+      --calendar-icon: invert(0.5);
+      --transition: 0.2s ease;
+    }
+    html[data-theme="ocean"] {
+      --bg:          #060d18;
+      --surface:     #0b1929;
+      --surface-2:   #0f2035;
+      --border:      #152a44;
+      --border-2:    #1c3858;
+      --accent:      #4fc3f7;
+      --accent-dim:  rgba(79, 195, 247, 0.10);
+      --accent-glow: rgba(79, 195, 247, 0.25);
+      --text:        #ddeeff;
+      --text-muted:  #7898b8;
+      --text-dim:    #2a3e58;
+      --on-surface:  #ddeeff;
+      --danger:      #f06292;
+      --danger-dim:  rgba(240, 98, 146, 0.10);
+      --on-danger:   #ffffff;
+      --success:     #4dd0e1;
+      --scrollbar-track: #060d18;
+      --scrollbar-thumb: #1c3858;
+      --calendar-icon: invert(0.5);
+      --transition: 0.2s ease;
+    }
+
+    /* ═══ BASE ═══ */
+    html, body {
+      font-family: var(--ff-sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background var(--transition), color var(--transition);
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+    a { color: var(--accent); text-decoration: none; }
+
+    /* ═══ LAYOUT ═══ */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-logo {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.3px;
+    }
+    .header-title {
+      font-size: 14px;
+      color: var(--text-muted);
+      padding-left: 12px;
+      border-left: 1px solid var(--border);
+    }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .theme-btn {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    /* ═══ STATS ═══ */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+    .stat-card:hover { border-color: var(--border-2); transform: translateY(-1px); }
+    .stat-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .stat-icon svg { width: 22px; height: 22px; }
+    .stat-icon.orange { background: rgba(245, 166, 35, 0.12); color: #f5a623; }
+    .stat-icon.green  { background: rgba(74, 222, 128, 0.12); color: #4ade80; }
+    .stat-icon.purple { background: rgba(167, 139, 250, 0.12); color: #a78bfa; }
+    .stat-icon.blue   { background: rgba(96, 165, 250, 0.12); color: #60a5fa; }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      font-family: var(--ff-mono);
+      line-height: 1.2;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ═══ TOOLBAR ═══ */
+    .toolbar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 100;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      flex: 1;
+      min-width: 200px;
+      max-width: 320px;
+      transition: border-color var(--transition);
+    }
+    .search-box:focus-within { border-color: var(--accent); }
+    .search-box svg { width: 16px; height: 16px; color: var(--text-muted); flex-shrink: 0; }
+    .search-box input {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 13px;
+      width: 100%;
+      font-family: var(--ff-sans);
+    }
+    .search-box input::placeholder { color: var(--text-dim); }
+
+    /* ═══ FORMS ═══ */
+    .form-input {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: var(--ff-sans);
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .form-input:focus { border-color: var(--accent); }
+    .form-input.error { border-color: var(--danger); }
+    .form-input::placeholder { color: var(--text-dim); }
+    .filter-date { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 7px 12px; color: var(--text); font-size: 12px; outline: none; cursor: pointer; transition: border-color var(--transition); }
+    .filter-date:focus { border-color: var(--accent); }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 13px;
+      font-family: var(--ff-sans);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000;
+      font-weight: 600;
+    }
+    .btn-primary:hover { background: var(--accent-glow); color: var(--accent); }
+    .btn-ghost { background: none; border-color: var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-danger {
+      background: var(--danger-dim);
+      border-color: var(--danger);
+      color: var(--danger);
+      font-weight: 600;
+    }
+    .btn-danger:hover { background: var(--danger); color: var(--on-danger); }
+    .btn-filter { background: var(--accent-dim); border-color: var(--accent-glow); color: var(--accent); font-size: 12px; padding: 7px 12px; }
+    .btn-filter:hover { background: var(--accent); color: #000; }
+    .btn-filter-clear { background: var(--danger-dim); border-color: var(--danger); color: var(--danger); font-size: 12px; padding: 7px 12px; }
+    .btn-filter-clear:hover { background: var(--danger); color: var(--on-danger); }
+    .batch-delete-btn {
+      display: none;
+      background: var(--danger-dim);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      font-size: 12px;
+      font-family: var(--ff-sans);
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+    .batch-delete-btn.visible {
+      display: inline-flex;
+    }
+    .batch-delete-btn:hover { background: var(--danger); color: var(--on-danger); }
+    .batch-delete-btn svg { width: 14px; height: 14px; }
+    .btn-icon {
+      padding: 5px 8px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      transition: all var(--transition);
+    }
+    .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ═══ TABLE ═══ */
+    .table-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .table-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .table-actions { display: flex; align-items: center; gap: 8px; }
+    .mono { font-family: var(--ff-mono); font-size: 12px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { border-bottom: 1px solid var(--border); }
+    th {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: var(--surface-2);
+      white-space: nowrap;
+    }
+    td {
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-2); }
+    .loading-row td { text-align: center; padding: 40px; }
+    .table-spinner {
+      width: 24px; height: 24px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ═══ PAGINATION ═══ */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .pagination-info { font-size: 12px; color: var(--text-muted); }
+    .pagination-controls { display: flex; align-items: center; gap: 4px; }
+    .pagination-btn {
+      width: 32px; height: 32px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface-2);
+      color: var(--text-muted);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    .pagination-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .pagination-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .pagination-num {
+      width: 32px; height: 32px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface-2);
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .pagination-num:hover { border-color: var(--accent); color: var(--accent); }
+    .pagination-num.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
+
+    /* ═══ TAG / BADGE ═══ */
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid var(--accent-glow);
+    }
+    .status-published {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--success);
+      color: #000;
+    }
+    .status-draft {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--text-dim);
+      color: var(--text-muted);
+    }
+    .badge-featured {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid var(--accent-glow);
+      margin-left: 4px;
+    }
+
+    /* ═══ FORM CARD (inline add/edit) ═══ */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+      display: none;
+      animation: fadeIn 0.15s ease;
+    }
+    .form-card.show { display: block; }
+    .form-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .form-card-header h3 { font-size: 14px; font-weight: 600; color: var(--text); }
+    .form-card-header p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .form-card-close {
+      width: 28px; height: 28px;
+      border: none;
+      background: var(--surface-2);
+      border-radius: 6px;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+      flex-shrink: 0;
+    }
+    .form-card-close:hover { background: var(--danger-dim); color: var(--danger); }
+    .form-card-close svg { width: 16px; height: 16px; }
+    .form-card-body { padding: 20px; }
+    .form-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ═══ MODAL (delete confirm only) ═══ */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      animation: fadeIn 0.15s ease;
+    }
+    .modal-overlay.show { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUp 0.2s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-header h3 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .modal-header p { font-size: 12px; color: var(--text-muted); }
+    .modal-close {
+      width: 28px; height: 28px;
+      border: none;
+      background: var(--surface-2);
+      border-radius: 6px;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+      flex-shrink: 0;
+    }
+    .modal-close:hover { background: var(--danger-dim); color: var(--danger); }
+    .modal-close svg { width: 16px; height: 16px; }
+    .modal-body { padding: 20px 24px; }
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 16px 24px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-group:last-child { margin-bottom: 0; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    .form-error {
+      font-size: 11px;
+      color: var(--danger);
+      margin-top: 4px;
+      display: none;
+    }
+    .form-error.show { display: block; }
+    .form-input { width: 100%; }
+    textarea.form-input { resize: vertical; }
+
+    /* ═══ TOAST ═══ */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 20px;
+      font-size: 13px;
+      color: var(--text);
+      z-index: 2000;
+      transition: transform 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--success); color: var(--success); }
+    .toast.error { border-color: var(--danger); color: var(--danger); }
+    .toast.info { border-color: var(--accent); color: var(--accent); }
+
+    /* ═══ SPINNER ═══ */
+    .spinner {
+      display: none;
+      width: 14px; height: 14px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<div class="header">
+  <div class="header-left">
+    <span class="header-logo">ArticleSys</span>
+    <span class="header-title">文章管理</span>
+  </div>
+  <div class="header-right">
+    <button class="theme-btn" onclick="switchThemeCycle()" title="切换主题">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:16px;height:16px">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon orange">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value" id="art-stat-total">0</div>
+        <div class="stat-label">文章总数</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value" id="art-stat-published">0</div>
+        <div class="stat-label">已发布</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value" id="art-stat-draft">0</div>
+        <div class="stat-label">草稿</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value" id="art-stat-views">0</div>
+        <div class="stat-label">总浏览量</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-box">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+      </svg>
+      <input type="text" id="art-search-input" placeholder="搜索文章标题...">
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <select id="art-filter-category" class="form-input" style="width:140px;padding:7px 12px;font-size:12px">
+        <option value="">全部分类</option>
+      </select>
+      <select id="art-filter-status" class="form-input" style="width:120px;padding:7px 12px;font-size:12px">
+        <option value="">全部状态</option>
+        <option value="1">已发布</option>
+        <option value="0">草稿</option>
+      </select>
+      <input type="date" id="art-filter-start-date" class="filter-date" placeholder="开始日期">
+      <span style="color:var(--text-muted);font-size:12px">至</span>
+      <input type="date" id="art-filter-end-date" class="filter-date" placeholder="结束日期">
+      <button class="btn-filter" id="art-btn-filter" onclick="applyArticleFilter()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px;height:14px">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0 .659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+        </svg>
+        筛选
+      </button>
+      <button class="btn-filter-clear" id="art-btn-filter-clear" onclick="clearArticleFilter()" style="display:none">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px;height:14px">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+        清除
+      </button>
+    </div>
+    <button class="btn btn-primary" onclick="openArticleAddModal()" style="width:auto;padding:9px 18px;">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:15px;height:15px">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+      新增文章
+    </button>
+  </div>
+
+  <!-- ═══ INLINE FORM: Add / Edit ═══ -->
+  <div class="form-card" id="article-form-card">
+    <div class="form-card-header">
+      <div>
+        <h3 id="article-modal-title">新增文章</h3>
+        <p id="article-modal-subtitle">填写文章信息</p>
+      </div>
+      <button class="form-card-close" onclick="closeArticleModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <div class="form-card-body">
+      <input type="hidden" id="article-id">
+      <div class="form-group">
+        <label class="form-label">文章标题 *</label>
+        <input type="text" id="article-title" class="form-input" placeholder="请输入文章标题" maxlength="255">
+        <p class="form-error" id="article-err-title">标题不能为空</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group">
+          <label class="form-label">分类</label>
+          <input type="text" id="article-category" class="form-input" placeholder="如：技术随笔" list="article-category-list">
+          <datalist id="article-category-list"></datalist>
+        </div>
+        <div class="form-group">
+          <label class="form-label">标签</label>
+          <input type="text" id="article-tags" class="form-input" placeholder="多个标签用逗号分隔">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">封面图片URL</label>
+        <input type="text" id="article-cover-image" class="form-input" placeholder="https://example.com/image.jpg">
+        <div id="article-cover-preview" style="margin-top:8px;display:none">
+          <img src="" alt="封面预览" style="max-width:200px;max-height:120px;border-radius:8px;object-fit:cover">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">文章内容 *</label>
+        <textarea id="article-content" class="form-input" style="min-height:120px;max-height:240px;resize:vertical" placeholder="请输入文章正文内容"></textarea>
+        <p class="form-error" id="article-err-content">内容不能为空</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+        <div class="form-group">
+          <label class="form-label">状态</label>
+          <select id="article-status" class="form-input" style="padding:10px 14px">
+            <option value="1">已发布</option>
+            <option value="0">草稿</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">是否精选</label>
+          <select id="article-is-featured" class="form-input" style="padding:10px 14px">
+            <option value="0">否</option>
+            <option value="1">是</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">发布时间</label>
+          <input type="datetime-local" id="article-published-at" class="form-input" style="padding:10px 14px">
+        </div>
+      </div>
+    </div>
+    <div class="form-card-footer">
+      <button class="btn btn-ghost" onclick="closeArticleModal()">取消</button>
+      <button class="btn btn-primary" onclick="submitArticleForm()" id="article-submit-btn" style="width:auto;padding:9px 22px;">
+        <span class="spinner"></span>
+        <span class="btn-text">保存文章</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-card">
+    <div class="table-header">
+      <div style="display:flex;align-items:center;gap:16px">
+        <span class="table-title">文章列表</span>
+        <div class="table-actions">
+          <button class="batch-delete-btn" id="art-batch-delete-btn" onclick="openArticleBatchDeleteModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+            </svg>
+            <span id="art-batch-count-text">批量删除</span>
+          </button>
+        </div>
+      </div>
+      <span style="font-size:12px;color:var(--text-muted)" id="art-count">0 条记录</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:40px"><input type="checkbox" id="art-select-all" onchange="toggleArticleSelectAll()"></th>
+          <th style="width:60px">ID</th>
+          <th>标题</th>
+          <th style="width:100px">分类</th>
+          <th style="width:80px">状态</th>
+          <th style="width:80px">精选</th>
+          <th style="width:80px">浏览</th>
+          <th style="width:160px">发布时间</th>
+          <th style="width:140px">操作</th>
+        </tr>
+      </thead>
+      <tbody id="art-table-body">
+        <tr class="loading-row">
+          <td colspan="9"><div class="table-spinner"></div></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="pagination" id="art-pagination" style="display:none">
+      <div class="pagination-info" id="art-pagination-info"></div>
+      <div class="pagination-controls">
+        <button class="pagination-btn" id="art-btn-prev" onclick="loadArticles(articlesPage - 1)" disabled>‹</button>
+        <div id="art-page-numbers"></div>
+        <button class="pagination-btn" id="art-btn-next" onclick="loadArticles(articlesPage + 1)" disabled>›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Delete Confirm ═══ -->
+<div class="modal-overlay" id="article-del-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div>
+        <h3>确认删除</h3>
+        <p id="article-del-subtitle">删除后将无法恢复</p>
+      </div>
+      <button class="modal-close" onclick="closeArticleDelModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--text);line-height:1.6" id="article-del-msg">确定要删除这篇文章吗？</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeArticleDelModal()">取消</button>
+      <button class="btn btn-danger" onclick="confirmArticleDelete()" id="article-del-submit-btn" style="width:auto;padding:9px 22px;">
+        <span class="spinner"></span>
+        <span class="btn-text">确认删除</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Batch Delete ═══ -->
+<div class="modal-overlay" id="article-batch-del-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div>
+        <h3>批量删除文章</h3>
+        <p>删除后将无法恢复</p>
+      </div>
+      <button class="modal-close" onclick="closeArticleBatchDelModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--text);line-height:1.6" id="article-batch-del-msg">确定要删除选中的文章吗？</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeArticleBatchDelModal()">取消</button>
+      <button class="btn btn-danger" onclick="confirmArticleBatchDelete()" id="article-batch-del-submit-btn" style="width:auto;padding:9px 22px;">
+        <span class="spinner"></span>
+        <span class="btn-text">确认删除</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOAST ═══ -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ CONFIG ════════════════════════════════════════
+const API_BASE = window.__BASE_PATH__ !== undefined ? window.__BASE_PATH__ : '';
+const ARTICLE_LIST_API   = API_BASE + '/article/api/list';
+const ARTICLE_CREATE_API = API_BASE + '/article/api/create';
+const ARTICLE_UPDATE_API = API_BASE + '/article/api/update';
+const ARTICLE_DELETE_API = API_BASE + '/article/api/delete';
+const CSRF_TOKEN_API    = API_BASE + '/api/csrf_token';
+
+// ═══ STATE ══════════════════════════════════════════
+let articlesPage = 1;
+let articlesPageSize = 10;
+let cachedArticles = [];
+let selectedArticleIds = new Set();
+let articleEditTarget = null;
+let articleDelTarget = null;
+let articleBatchDelTarget = null;
+let articleFilterStartDate = '';
+let articleFilterEndDate = '';
+
+// ═══ UTILITIES ═════════════════════════════════════
+function $(id) { return document.getElementById(id); }
+
+function toast(msg, type = 'info') {
+  const el = $('toast');
+  el.textContent = msg;
+  el.className = type + ' show';
+  setTimeout(() => { el.className = ''; }, 3000);
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function formatDate(str) {
+  if (!str) return '—';
+  const d = new Date(str);
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+// ═══ THEME ══════════════════════════════════════════
+const THEMES = ['dark', 'light', 'neon', 'forest', 'ocean'];
+function switchTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('article_theme', theme);
+}
+function switchThemeCycle() {
+  const saved = localStorage.getItem('article_theme') || 'dark';
+  const idx = THEMES.indexOf(saved);
+  switchTheme(THEMES[(idx + 1) % THEMES.length]);
+}
+(function() {
+  const saved = localStorage.getItem('article_theme');
+  if (saved && THEMES.includes(saved)) {
+    document.documentElement.setAttribute('data-theme', saved);
+  }
+})();
+
+// ═══ CSRF ═══════════════════════════════════════════
+let _csrfTokenCache = null;
+
+function getCSRFToken() {
+  const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+async function refreshCSRFToken() {
+  try {
+    const res = await fetch(CSRF_TOKEN_API, {
+      method: 'GET',
+      credentials: 'same-origin'
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.code === 0) return data.data.csrf_token;
+    }
+  } catch (e) {
+    console.warn('获取CSRF Token失败:', e);
+  }
+  return null;
+}
+
+async function ensureCSRFToken() {
+  if (_csrfTokenCache) return _csrfTokenCache;
+  let token = getCSRFToken();
+  if (!token) token = await refreshCSRFToken();
+  if (token) _csrfTokenCache = token;
+  return token;
+}
+
+// ═══ API CALL ═══════════════════════════════════════
+async function apiCall(url, data) {
+  const token = localStorage.getItem('adminToken');
+  const csrfToken = await ensureCSRFToken();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = 'Bearer ' + token;
+    headers['X-Token'] = token;
+    data = Object.assign({}, data, { _token: token });
+  }
+  if (csrfToken) {
+    headers['X-CSRF-Token'] = csrfToken;
+  }
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers,
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error(`服务器错误 (${res.status})`);
+    return await res.json();
+  } catch (e) {
+    console.error('API请求失败:', url, e);
+    return { code: -1, msg: '网络错误，请检查服务器连接' };
+  }
+}
+
+// ═══ LOAD ARTICLES ══════════════════════════════════
+function loadArticles(page) {
+  if (!page || page < 1) page = 1;
+  articlesPage = page;
+
+  const keyword  = $('art-search-input') ? $('art-search-input').value.trim() : '';
+  const category = $('art-filter-category') ? $('art-filter-category').value : '';
+  const status   = $('art-filter-status') ? $('art-filter-status').value : '';
+  const startDate = $('art-filter-start-date') ? $('art-filter-start-date').value : '';
+  const endDate   = $('art-filter-end-date') ? $('art-filter-end-date').value : '';
+
+  apiCall(ARTICLE_LIST_API, {
+    page: articlesPage,
+    page_size: articlesPageSize,
+    keyword: keyword,
+    category: category,
+    status: status,
+    start_date: startDate,
+    end_date: endDate
+  }).then(res => {
+    if (res.code === 0) {
+      renderArticleTable(res.data.list);
+      cachedArticles = res.data.list;
+      updateArticleStats(res.data);
+      renderArticlePagination(res.data);
+      updateArticleCategoryDropdown(res.data.categories || []);
+    } else {
+      toast(res.msg || '加载失败', 'error');
+    }
+  });
+}
+
+// ═══ RENDER TABLE ══════════════════════════════════
+function renderArticleTable(articles) {
+  const tbody = $('art-table-body');
+  if (!articles || articles.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted)">暂无文章</td></tr>';
+    return;
+  }
+  let html = '';
+  articles.forEach(article => {
+    const statusClass = article.status == 1 ? 'status-published' : 'status-draft';
+    const statusText  = article.status == 1 ? '已发布' : '草稿';
+    const featuredBadge = article.is_featured == 1 ? '<span class="badge-featured">精选</span>' : '';
+    const isChecked = selectedArticleIds.has(article.id) ? 'checked' : '';
+
+    html += `
+      <tr>
+        <td><input type="checkbox" class="art-row-check" data-id="${article.id}" ${isChecked} onchange="toggleArticleSelect(${article.id})"></td>
+        <td class="mono">${article.id}</td>
+        <td>
+          <div style="max-width:280px">
+            <div style="font-weight:600;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(article.title)}</div>
+            <div style="font-size:11px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(article.content || '')}</div>
+          </div>
+        </td>
+        <td><span class="tag">${escapeHtml(article.category || '未分类')}</span></td>
+        <td><span class="${statusClass}">${statusText}</span>${featuredBadge}</td>
+        <td><span style="color:${article.is_featured == 1 ? 'var(--accent)' : 'var(--text-dim)'}">${article.is_featured == 1 ? '是' : '否'}</span></td>
+        <td class="mono" style="color:var(--text-muted)">${article.view_count}</td>
+        <td style="font-size:12px;color:var(--text-muted)">${formatDate(article.published_at || article.created_at)}</td>
+        <td>
+          <div style="display:flex;gap:4px">
+            <button class="btn-icon" onclick="openArticleEditModal(${article.id})" title="编辑">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:14px;height:14px">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+              </svg>
+            </button>
+            <button class="btn btn-danger" onclick="openArticleDelModal(${article.id}, '${escapeHtml(article.title)}')" style="padding:5px 8px;font-size:12px">删除</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+  tbody.innerHTML = html;
+}
+
+// ═══ STATS ══════════════════════════════════════════
+function updateArticleStats(data) {
+  if ($('art-stat-total')) $('art-stat-total').textContent = data.total || 0;
+  if ($('art-count')) $('art-count').textContent = (data.total || 0) + ' 条记录';
+
+  if (data.list) {
+    const published = data.list.filter(a => a.status == 1).length;
+    const draft    = data.list.filter(a => a.status == 0).length;
+    const totalViews = data.list.reduce((sum, a) => sum + (a.view_count || 0), 0);
+    if ($('art-stat-published')) $('art-stat-published').textContent = published;
+    if ($('art-stat-draft'))      $('art-stat-draft').textContent      = draft;
+    if ($('art-stat-views'))      $('art-stat-views').textContent      = totalViews;
+  }
+}
+
+// ═══ PAGINATION ════════════════════════════════════
+function renderArticlePagination(data) {
+  const pagination = $('art-pagination');
+  if (!pagination) return;
+  if (data.total_pages <= 1) { pagination.style.display = 'none'; return; }
+
+  pagination.style.display = 'flex';
+  const info = $('art-pagination-info');
+  if (info) info.textContent = `共 ${data.total} 条，第 ${data.page}/${data.total_pages} 页`;
+  $('art-btn-prev').disabled = data.page <= 1;
+  $('art-btn-next').disabled = data.page >= data.total_pages;
+
+  let pageHtml = '';
+  const maxPages = 5;
+  let startPage = Math.max(1, data.page - Math.floor(maxPages / 2));
+  let endPage = Math.min(data.total_pages, startPage + maxPages - 1);
+  if (endPage - startPage < maxPages - 1) {
+    startPage = Math.max(1, endPage - maxPages + 1);
+  }
+  for (let i = startPage; i <= endPage; i++) {
+    pageHtml += `<button class="pagination-num ${i === data.page ? 'active' : ''}" onclick="loadArticles(${i})">${i}</button>`;
+  }
+  $('art-page-numbers').innerHTML = pageHtml;
+}
+
+// ═══ CATEGORY DROPDOWN ══════════════════════════════
+function updateArticleCategoryDropdown(categories) {
+  const select   = $('art-filter-category');
+  const datalist = $('article-category-list');
+  if (!select) return;
+
+  const currentValue = select.value;
+  select.innerHTML = '<option value="">全部分类</option>';
+  categories.forEach(cat => {
+    select.innerHTML += `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`;
+  });
+  select.value = currentValue;
+
+  if (datalist) {
+    datalist.innerHTML = '';
+    categories.forEach(cat => {
+      datalist.innerHTML += `<option value="${escapeHtml(cat)}">`;
+    });
+  }
+}
+
+// ═══ FILTER ══════════════════════════════════════════
+function applyArticleFilter() {
+  loadArticles(1);
+  $('art-btn-filter-clear').style.display = 'inline-flex';
+}
+
+function clearArticleFilter() {
+  if ($('art-search-input'))         $('art-search-input').value         = '';
+  if ($('art-filter-category'))     $('art-filter-category').value     = '';
+  if ($('art-filter-status'))       $('art-filter-status').value       = '';
+  if ($('art-filter-start-date'))   $('art-filter-start-date').value   = '';
+  if ($('art-filter-end-date'))     $('art-filter-end-date').value     = '';
+  $('art-btn-filter-clear').style.display = 'none';
+  loadArticles(1);
+}
+
+// ═══ SELECTION ═══════════════════════════════════════
+function toggleArticleSelect(id) {
+  const checkbox = document.querySelector(`.art-row-check[data-id="${id}"]`);
+  if (checkbox && checkbox.checked) {
+    selectedArticleIds.add(id);
+  } else {
+    selectedArticleIds.delete(id);
+  }
+  updateArticleBatchDeleteBtn();
+}
+
+function toggleArticleSelectAll() {
+  const checkbox  = $('art-select-all');
+  const checkboxes = document.querySelectorAll('.art-row-check');
+  if (checkbox && checkbox.checked) {
+    checkboxes.forEach(cb => { cb.checked = true; selectedArticleIds.add(parseInt(cb.dataset.id)); });
+  } else {
+    checkboxes.forEach(cb => { cb.checked = false; });
+    selectedArticleIds.clear();
+  }
+  updateArticleBatchDeleteBtn();
+}
+
+function updateArticleBatchDeleteBtn() {
+  const btn   = $('art-batch-delete-btn');
+  const count = selectedArticleIds.size;
+  if (count > 0) {
+    btn.classList.add('visible');
+    $('art-batch-count-text').textContent = `批量删除 (${count})`;
+  } else {
+    btn.classList.remove('visible');
+  }
+}
+
+// ═══ ADD / EDIT MODAL ════════════════════════════════
+function openArticleAddModal() {
+  articleEditTarget = null;
+  $('article-modal-title').textContent    = '新增文章';
+  $('article-modal-subtitle').textContent = '填写文章信息';
+  $('article-id').value         = '';
+  $('article-title').value      = '';
+  $('article-category').value   = '';
+  $('article-tags').value        = '';
+  $('article-cover-image').value = '';
+  $('article-content').value    = '';
+  $('article-status').value     = '1';
+  $('article-is-featured').value = '0';
+  $('article-published-at').value = '';
+  $('article-cover-preview').style.display = 'none';
+  clearArticleFormErrors();
+  $('article-form-card').classList.add('show');
+  $('article-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function openArticleEditModal(id) {
+  const article = cachedArticles.find(a => a.id === id);
+  if (!article) { toast('文章不存在', 'error'); return; }
+  articleEditTarget = article;
+  $('article-modal-title').textContent    = '编辑文章';
+  $('article-modal-subtitle').textContent = '修改文章信息';
+  $('article-id').value         = article.id;
+  $('article-title').value      = article.title || '';
+  $('article-category').value   = article.category || '';
+  $('article-tags').value       = article.tags || '';
+  $('article-cover-image').value = article.cover_image || '';
+  $('article-content').value   = article.content || '';
+  $('article-status').value    = article.status;
+  $('article-is-featured').value = article.is_featured;
+
+  if (article.published_at) {
+    const d   = new Date(article.published_at);
+    const pad = n => String(n).padStart(2, '0');
+    $('article-published-at').value =
+      `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  } else {
+    $('article-published-at').value = '';
+  }
+
+  if (article.cover_image) {
+    $('article-cover-preview').querySelector('img').src = article.cover_image;
+    $('article-cover-preview').style.display = 'block';
+  } else {
+    $('article-cover-preview').style.display = 'none';
+  }
+
+  clearArticleFormErrors();
+  $('article-form-card').classList.add('show');
+  $('article-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeArticleModal() {
+  $('article-form-card').classList.remove('show');
+  articleEditTarget = null;
+}
+
+function clearArticleFormErrors() {
+  $('article-err-title').classList.remove('show');
+  $('article-err-content').classList.remove('show');
+  $('article-title').classList.remove('error');
+  $('article-content').classList.remove('error');
+}
+
+// ═══ SUBMIT FORM ════════════════════════════════════
+function submitArticleForm() {
+  clearArticleFormErrors();
+
+  const title       = $('article-title').value.trim();
+  const content     = $('article-content').value.trim();
+  const category    = $('article-category').value.trim();
+  const tags        = $('article-tags').value.trim();
+  const coverImage  = $('article-cover-image').value.trim();
+  const status      = parseInt($('article-status').value);
+  const isFeatured  = parseInt($('article-is-featured').value);
+  const publishedAt = $('article-published-at').value;
+
+  let hasError = false;
+  if (!title) {
+    $('article-title').classList.add('error');
+    $('article-err-title').classList.add('show');
+    hasError = true;
+  }
+  if (!content) {
+    $('article-content').classList.add('error');
+    $('article-err-content').classList.add('show');
+    hasError = true;
+  }
+  if (hasError) return;
+
+  const submitBtn = $('article-submit-btn');
+  submitBtn.disabled = true;
+  submitBtn.querySelector('.spinner').style.display = 'inline-block';
+  submitBtn.querySelector('.btn-text').textContent = articleEditTarget ? '更新中...' : '创建中...';
+
+  const payload = {
+    title,
+    content,
+    category,
+    tags,
+    cover_image: coverImage,
+    status,
+    is_featured: isFeatured,
+    published_at: publishedAt || null
+  };
+  const api = articleEditTarget ? ARTICLE_UPDATE_API : ARTICLE_CREATE_API;
+  if (articleEditTarget) payload.id = articleEditTarget.id;
+
+  apiCall(api, payload).then(res => {
+    submitBtn.disabled = false;
+    submitBtn.querySelector('.spinner').style.display = 'none';
+    submitBtn.querySelector('.btn-text').textContent = '保存文章';
+    if (res.code === 0) {
+      toast(res.msg || '保存成功', 'success');
+      closeArticleModal();
+      loadArticles(articlesPage);
+    } else {
+      toast(res.msg || '保存失败', 'error');
+    }
+  }).catch(() => {
+    submitBtn.disabled = false;
+    submitBtn.querySelector('.spinner').style.display = 'none';
+    submitBtn.querySelector('.btn-text').textContent = '保存文章';
+    toast('网络错误，请重试', 'error');
+  });
+}
+
+// ═══ DELETE ═════════════════════════════════════════
+function openArticleDelModal(id, title) {
+  articleDelTarget = id;
+  $('article-del-msg').textContent = `确定要删除文章「${title}」吗？`;
+  $('article-del-modal').classList.add('show');
+}
+
+function closeArticleDelModal() {
+  $('article-del-modal').classList.remove('show');
+  articleDelTarget = null;
+}
+
+function confirmArticleDelete() {
+  if (!articleDelTarget) return;
+
+  const submitBtn = $('article-del-submit-btn');
+  submitBtn.disabled = true;
+  submitBtn.querySelector('.spinner').style.display = 'inline-block';
+  submitBtn.querySelector('.btn-text').textContent = '删除中...';
+
+  apiCall(ARTICLE_DELETE_API, { id: articleDelTarget }).then(res => {
+    submitBtn.disabled = false;
+    submitBtn.querySelector('.spinner').style.display = 'none';
+    submitBtn.querySelector('.btn-text').textContent = '确认删除';
+    if (res.code === 0) {
+      toast(res.msg || '删除成功', 'success');
+      closeArticleDelModal();
+      selectedArticleIds.delete(articleDelTarget);
+      loadArticles(articlesPage);
+    } else {
+      toast(res.msg || '删除失败', 'error');
+    }
+  }).catch(() => {
+    submitBtn.disabled = false;
+    submitBtn.querySelector('.spinner').style.display = 'none';
+    submitBtn.querySelector('.btn-text').textContent = '确认删除';
+    toast('网络错误，请重试', 'error');
+  });
+}
+
+// ═══ BATCH DELETE ════════════════════════════════════
+function openArticleBatchDeleteModal() {
+  const count = selectedArticleIds.size;
+  if (count === 0) { toast('请先选择要删除的文章', 'info'); return; }
+  articleBatchDelTarget = Array.from(selectedArticleIds);
+  $('article-batch-del-msg').textContent = `确定要删除选中的 ${count} 篇文章吗？删除后将无法恢复。`;
+  $('article-batch-del-modal').classList.add('show');
+}
+
+function closeArticleBatchDelModal() {
+  $('article-batch-del-modal').classList.remove('show');
+  articleBatchDelTarget = null;
+}
+
+function confirmArticleBatchDelete() {
+  if (!articleBatchDelTarget || articleBatchDelTarget.length === 0) return;
+
+  const submitBtn = $('article-batch-del-submit-btn');
+  submitBtn.disabled = true;
+  submitBtn.querySelector('.spinner').style.display = 'inline-block';
+  submitBtn.querySelector('.btn-text').textContent = '删除中...';
+
+  apiCall(ARTICLE_DELETE_API, { ids: articleBatchDelTarget }).then(res => {
+    submitBtn.disabled = false;
+    submitBtn.querySelector('.spinner').style.display = 'none';
+    submitBtn.querySelector('.btn-text').textContent = '确认删除';
+    if (res.code === 0) {
+      toast(res.msg || '删除成功', 'success');
+      closeArticleBatchDelModal();
+      selectedArticleIds.clear();
+      if ($('art-select-all')) $('art-select-all').checked = false;
+      updateArticleBatchDeleteBtn();
+      loadArticles(articlesPage);
+    } else {
+      toast(res.msg || '删除失败', 'error');
+    }
+  }).catch(() => {
+    submitBtn.disabled = false;
+    submitBtn.querySelector('.spinner').style.display = 'none';
+    submitBtn.querySelector('.btn-text').textContent = '确认删除';
+    toast('网络错误，请重试', 'error');
+  });
+}
+
+// ═══ EVENT LISTENERS ════════════════════════════════
+// Cover preview
+const coverInput = $('article-cover-image');
+if (coverInput) {
+  coverInput.addEventListener('input', function() {
+    const preview = $('article-cover-preview');
+    const img = preview.querySelector('img');
+    if (this.value.trim()) {
+      img.src = this.value.trim();
+      preview.style.display = 'block';
+      img.onerror = function() { preview.style.display = 'none'; };
+    } else {
+      preview.style.display = 'none';
+    }
+  });
+}
+
+// Search Enter key
+const artSearchInput = $('art-search-input');
+if (artSearchInput) {
+  artSearchInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') loadArticles(1);
+  });
+}
+
+// Modal overlay click to close (delete modals only)
+$('article-del-modal') && $('article-del-modal').addEventListener('click', (e) => {
+  if (e.target === $('article-del-modal')) closeArticleDelModal();
+});
+$('article-batch-del-modal') && $('article-batch-del-modal').addEventListener('click', (e) => {
+  if (e.target === $('article-batch-del-modal')) closeArticleBatchDelModal();
+});
+
+// ═══ INIT ════════════════════════════════════════════
+loadArticles(1);
+</script>
+</body>
+</html>
