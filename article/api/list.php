@@ -10,7 +10,17 @@
 require_once __DIR__ . '/../../config/db.php';
 require_once __DIR__ . '/../config.php';
 
+// CORS 跨域支持（允许外部网站调用文章列表）
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-CSRF-Token, X-Token');
 header('Content-Type: application/json; charset=utf-8');
+
+// 预检请求
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
 
 $input = getInput();
 

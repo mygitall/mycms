@@ -2079,7 +2079,7 @@
     </div>
 
     <div class="version" style="text-align:center;margin-top:20px;font-size:12px;color:var(--text-dim);">
-      UserSys v1.0 · Powered by PHP
+      UserSys v1.0.1 · Powered by PHP
     </div>
   </div>
 </div>
@@ -2153,7 +2153,7 @@
         </div>
         <div class="sidebar-logo-text">
           <h2>UserSys</h2>
-          <span>v1.0</span>
+          <span>v1.0.1</span>
         </div>
       </div>
 
@@ -3093,7 +3093,7 @@
             <div class="form-row-2">
               <div class="form-group">
                 <label class="form-label">版本号 *</label>
-                <input type="text" id="sw-version" class="form-input" placeholder="如 v1.0.0" maxlength="50">
+                <input type="text" id="sw-version" class="form-input" placeholder="如 v1.0.1" maxlength="50">
                 <p class="form-error" id="sw-err-version">版本号不能为空</p>
               </div>
               <div class="form-group">
@@ -3175,7 +3175,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">更新日志</label>
-              <textarea id="sw-changelog" class="form-input" rows="3" placeholder="v1.0.0 - 首个版本发布&#10;v1.1.0 - 新增xxx功能" style="resize:vertical;font-family:monospace;font-size:12px"></textarea>
+              <textarea id="sw-changelog" class="form-input" rows="3" placeholder="v1.0.1 - 首个版本发布&#10;v1.1.0 - 新增xxx功能" style="resize:vertical;font-family:monospace;font-size:12px"></textarea>
             </div>
           </div>
           <div class="form-card-footer">
@@ -3252,24 +3252,222 @@
       ══════════════════════════════════════════ -->
       <div class="page" id="page-api-doc" style="display:none">
 
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
+          <span style="font-weight:600;font-size:15px;">CMS API 接口文档</span>
+          <span style="display:flex;align-items:center;gap:12px;">
+            <span style="color:var(--text-muted);font-size:11px;">版本 <strong style="color:var(--accent);">v1.0.1</strong> · 共计 41 个接口</span>
+            <a href="api-docs.html" target="_blank" style="display:inline-block;background:var(--accent);color:#fff;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600;text-decoration:none;">📄 查看完整文档</a>
+          </span>
+        </div>
+
         <div class="api-doc-tabs" role="tablist" aria-label="接口文档分类">
-          <button type="button" class="api-doc-tab active" role="tab" aria-selected="true" aria-controls="api-doc-panel-basic" id="api-doc-tab-basic" data-api-doc-tab="basic">基础信息接口</button>
+          <button type="button" class="api-doc-tab active" role="tab" aria-selected="true" aria-controls="api-doc-panel-search" id="api-doc-tab-search" data-api-doc-tab="search">搜索接口</button>
+          <button type="button" class="api-doc-tab" role="tab" aria-selected="false" aria-controls="api-doc-panel-basic" id="api-doc-tab-basic" data-api-doc-tab="basic">基础信息接口</button>
           <button type="button" class="api-doc-tab" role="tab" aria-selected="false" aria-controls="api-doc-panel-article" id="api-doc-tab-article" data-api-doc-tab="article">文章接口</button>
           <button type="button" class="api-doc-tab" role="tab" aria-selected="false" aria-controls="api-doc-panel-favorite" id="api-doc-tab-favorite" data-api-doc-tab="favorite">收藏接口</button>
           <button type="button" class="api-doc-tab" role="tab" aria-selected="false" aria-controls="api-doc-panel-software" id="api-doc-tab-software" data-api-doc-tab="software">软件 API</button>
-          <button type="button" class="api-doc-tab" role="tab" aria-selected="false" aria-controls="api-doc-panel-search" id="api-doc-tab-search" data-api-doc-tab="search">搜索接口</button>
         </div>
 
-        <div id="api-doc-panel-basic" class="api-doc-panel" role="tabpanel" aria-labelledby="api-doc-tab-basic">
+
+        <div id="api-doc-panel-search" class="api-doc-panel" role="tabpanel" aria-labelledby="api-doc-tab-search" style="display:none !important;">
+
+        <div class="table-card" style="margin-bottom:20px">
+          <div class="table-header">
+            <span class="table-title">搜索模块 · 基础信息</span><span style="font-size:10px;color:var(--text-muted);margin-left:8px;background:var(--bg);padding:2px 8px;border-radius:10px;font-weight:600;">v1.0.1</span>
+          </div>
+          <table>
+            <tbody>
+              <tr><td style="width:140px;color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">完整地址格式</td><td><span class="mono" style="color:var(--accent);font-size:13px"><span style="color:var(--text-muted);">{base}</span>/search/api/list</span><br><span style="color:var(--text-muted);font-size:11px;">（{base} = 当前部署路径，如 <span style="background:var(--bg);padding:2px 6px;border-radius:3px;font-family:monospace;">http://localhost/cms</span>，自动适配任意部署位置）</span></td></tr>
+              <tr><td style="width:140px;color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">模块基础路径</td><td><span class="mono" style="color:var(--accent);font-size:13px"><span style="color:var(--text-muted);">{base}</span>/search/api</span></td></tr>
+              <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">请求方式</td><td><span class="mono" style="color:var(--accent);font-size:13px">GET / POST</span>（搜索接口支持两种方式，搜索历史需 POST）</td></tr>
+              <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">Content-Type</td><td><span class="mono" style="font-size:13px">application/json</span>（POST 时必填）</td></tr>
+              <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">认证</td><td>全站搜索 <span style="color:var(--text-muted)">为公开接口，无需认证。</span><br>搜索历史管理需管理员认证：<span class="mono" style="font-size:12px">Authorization: Bearer &lt;adminToken&gt;</span>，或在 JSON Body 中带 <span class="mono" style="font-size:12px">_token</span></td></tr>
+              <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">CORS</td><td><span style="color:var(--success)">已开启</span> — <span class="mono" style="font-size:12px">Access-Control-Allow-Origin: *</span>，允许外部网站调用搜索接口</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="endpoint-card" id="api-search-list" style="margin-bottom:16px">
+          <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+            <span class="endpoint-method" style="background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:0.5px">GET / POST</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/search/api/list</span>
+            <span class="endpoint-name">全站搜索</span>
+          </div>
+          <div style="margin-bottom:16px">
+            <div class="form-label" style="color:var(--text-muted);margin-bottom:10px">请求参数（Query String 或 JSON Body）</div>
+            <div class="code-block mono">{
+  <span style="color:#ff7b72">"keyword"</span>: "PHP教程",     <span style="color:#6b9b6b">// string，</span><span style="color:#ff7b72">必填</span><span style="color:#6b9b6b">，搜索关键词，最多 100 字符</span>
+  <span style="color:#79c0ff">"source"</span>: "article",    <span style="color:#6b9b6b">// string，可选，article / software / 空（全部）</span>
+  <span style="color:#79c0ff">"page"</span>: 1,               <span style="color:#6b9b6b">// number，可选，默认 1</span>
+  <span style="color:#79c0ff">"page_size"</span>: 10,          <span style="color:#6b9b6b">// number，可选，1–100，默认 10</span>
+  <span style="color:#79c0ff">"sort_by"</span>: "relevance"  <span style="color:#6b9b6b">// string，可选，relevance / created / views，默认 relevance</span>
+}</div>
+          </div>
+          <div style="margin-bottom:16px">
+            <div class="form-label" style="color:var(--text-muted);margin-bottom:10px">成功响应</div>
+            <div class="code-block mono">{
+  <span style="color:#6b9b6b">"code": 0,</span>
+  <span style="color:#6b9b6b">"msg": "success",</span>
+  <span style="color:#6b9b6b">"data": {</span>
+    <span style="color:#6b9b6b">"list": [</span>
+      <span style="color:#6b9b6b">{</span>
+        <span style="color:#6b9b6b">"type": "article",</span>
+        <span style="color:#6b9b6b">"id": 1,</span>
+        <span style="color:#6b9b6b">"title": "PHP入门教程",</span>
+        <span style="color:#6b9b6b">"subtitle": "分类 · 标签",</span>
+        <span style="color:#6b9b6b">"category": "PHP",</span>
+        <span style="color:#6b9b6b">"tags": "教程,入门",</span>
+        <span style="color:#6b9b6b">"author": "作者名",</span>
+        <span style="color:#6b9b6b">"views": 100,</span>
+        <span style="color:#6b9b6b">"url": "http://localhost/cms/article/p/1",</span>  <span style="color:#6b9b6b">// 完整 URL（外部调用可直接使用）</span>
+        <span style="color:#6b9b6b">"date": "2026-01-01 00:00:00",</span>
+        <span style="color:#6b9b6b">"content": "文章内容摘要...",</span>
+        <span style="color:#6b9b6b">"relevance": 4</span>
+      <span style="color:#6b9b6b">},</span>
+      <span style="color:#6b9b6b">{</span>
+        <span style="color:#6b9b6b">"type": "software",</span>
+        <span style="color:#6b9b6b">"id": 2,</span>
+        <span style="color:#6b9b6b">"title": "PHPStorm",</span>
+        <span style="color:#6b9b6b">"subtitle": "开发工具 · v2024.1",</span>
+        <span style="color:#6b9b6b">"version": "v2024.1",</span>
+        <span style="color:#6b9b6b">"category": "开发工具",</span>
+        <span style="color:#6b9b6b">"os": "Windows, macOS",</span>
+        <span style="color:#6b9b6b">"views": 200,</span>
+        <span style="color:#6b9b6b">"downloads": 50,</span>
+        <span style="color:#6b9b6b">"url": "http://localhost/cms/software/p/2"</span>  <span style="color:#6b9b6b">// 完整 URL</span>
+      <span style="color:#6b9b6b">}</span>
+    <span style="color:#6b9b6b">],</span>
+    <span style="color:#6b9b6b">"total": 42,</span>
+    <span style="color:#6b9b6b">"sources": ["article", "software"],</span>
+    <span style="color:#6b9b6b">"page": 1,</span>
+    <span style="color:#6b9b6b">"page_size": 10,</span>
+    <span style="color:#6b9b6b">"total_pages": 5,</span>
+    <span style="color:#6b9b6b">"base_path": "/cms",</span>      <span style="color:#6b9b6b">// 项目部署路径（供外部网站拼接 URL）</span>
+    <span style="color:#6b9b6b">"base_url": "http://localhost/cms"</span>  <span style="color:#6b9b6b">// 完整基础 URL</span>
+  <span style="color:#6b9b6b">}</span>
+}</div>
+          </div>
+          <div style="margin-bottom:16px">
+            <div class="form-label" style="color:var(--text-muted);margin-bottom:10px">Relevance 评分规则</div>
+            <div class="code-block mono"><span style="color:#6b9b6b">// title 命中：+3 分
+// 其他字段命中（content/category/tags 等）：+1 分/字段
+// 多字段同时命中时分数累加
+// 默认排序：relevance DESC, created_at DESC</span></div>
+          </div>
+          <div style="margin-bottom:16px">
+            <div class="form-label" style="color:var(--text-muted);margin-bottom:10px">外部网站调用示例</div>
+            <div class="code-block mono"><span style="color:#6b9b6b">// 1. 直接调用（返回完整 URL，开箱即用）</span>
+fetch('http://localhost/cms/search/api/list', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ keyword: 'PHP', page: 1, page_size: 10 })
+})
+.then(r => r.json())
+.then(data => {
+  // data.base_url = "http://localhost/cms"（供验证）
+  // data.list[].url = "http://localhost/cms/article/p/1"（完整URL，可直接跳转）
+  data.list.forEach(item => {
+    console.log(item.title, item.url);
+    // 直接使用 url 跳转，无需拼接
+    window.open(item.url);
+  });
+});
+
+<span style="color:#6b9b6b">// 2. 使用 base_url 拼接其他链接</span>
+const { base_url } = data;
+const customUrl = base_url + '/article/p/' + item.id;
+
+<span style="color:#6b9b6b">// 3. GET 方式调用（同样支持 CORS）</span>
+fetch('http://localhost/cms/search/api/list?keyword=PHP&page=1')
+  .then(r => r.json())
+  .then(console.log);</div>
+          </div>
+          <div style="margin-bottom:0">
+            <div class="form-label" style="color:var(--text-muted);margin-bottom:10px">失败响应</div>
+            <div class="code-block mono">{
+  <span style="color:#6b9b6b">"code": 400,</span>
+  <span style="color:#6b9b6b">"msg": "关键词长度不能超过100个字符",</span>
+  <span style="color:#6b9b6b">"data": null</span>
+}
+{
+  <span style="color:#6b9b6b">"code": 400,</span>
+  <span style="color:#6b9b6b">"msg": "无效的数据源类型: xxx",</span>
+  <span style="color:#6b9b6b">"data": null</span>
+}</div>
+          </div>
+        </div>
+
+        <div class="endpoint-card" id="api-search-history" style="margin-bottom:16px">
+          <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+            <span class="endpoint-method method-post">POST</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/admin/api/search_history</span>
+            <span class="endpoint-name">搜索历史管理</span>
+          </div>
+          <div style="margin-bottom:16px">
+            <div class="form-label" style="color:var(--text-muted);margin-bottom:10px">请求参数（JSON Body）</div>
+            <div class="code-block mono">{
+  <span style="color:#ff7b72">"action"</span>: "list",       <span style="color:#6b9b6b">// string，</span><span style="color:#ff7b72">必填</span><span style="color:#6b9b6b">，list / delete / clear</span>
+  <span style="color:#79c0ff">"_token"</span>: "adminToken", <span style="color:#6b9b6b">// string，</span><span style="color:#ff7b72">必填</span><span style="color:#6b9b6b">，管理员认证 Token</span>
+  <span style="color:#79c0ff">"page"</span>: 1,             <span style="color:#6b9b6b">// number，list 时必填</span>
+  <span style="color:#79c0ff">"page_size"</span>: 20,        <span style="color:#6b9b6b">// number，可选，默认 20</span>
+  <span style="color:#79c0ff">"keyword"</span>: "PHP"        <span style="color:#6b9b6b">// string，可选，关键词过滤</span>
+  <span style="color:#79c0ff">"id"</span>: 1                 <span style="color:#6b9b6b">// number，delete 时必填，历史记录 ID</span>
+}</div>
+          </div>
+          <div style="margin-bottom:16px">
+            <div class="form-label" style="color:var(--text-muted);margin-bottom:10px">成功响应（list）</div>
+            <div class="code-block mono">{
+  <span style="color:#6b9b6b">"code": 0,</span>
+  <span style="color:#6b9b6b">"msg": "success",</span>
+  <span style="color:#6b9b6b">"data": {</span>
+    <span style="color:#6b9b6b">"list": [</span>
+      <span style="color:#6b9b6b">{</span>
+        <span style="color:#6b9b6b">"id": 1,</span>
+        <span style="color:#6b9b6b">"keyword": "PHP",</span>
+        <span style="color:#6b9b6b">"search_count": 5,</span>
+        <span style="color:#6b9b6b">"last_searched_at": "2026-05-15 10:00:00"</span>
+      <span style="color:#6b9b6b">}</span>
+    <span style="color:#6b9b6b">],</span>
+    <span style="color:#6b9b6b">"total": 42,</span>
+    <span style="color:#6b9b6b">"page": 1,</span>
+    <span style="color:#6b9b6b">"page_size": 20,</span>
+    <span style="color:#6b9b6b">"total_pages": 3,</span>
+    <span style="color:#6b9b6b">"stats": {</span>
+      <span style="color:#6b9b6b">"total": 100,</span>
+      <span style="color:#6b9b6b">"today": 12,</span>
+      <span style="color:#6b9b6b">"top_keyword": "PHP"</span>
+    <span style="color:#6b9b6b">}</span>
+  <span style="color:#6b9b6b">}</span>
+}</div>
+          </div>
+          <div style="margin-bottom:0">
+            <div class="form-label" style="color:var(--text-muted);margin-bottom:10px">失败响应</div>
+            <div class="code-block mono">{
+  <span style="color:#6b9b6b">"code": 403,</span>
+  <span style="color:#6b9b6b">"msg": "权限不足",</span>
+  <span style="color:#6b9b6b">"data": null</span>
+}
+{
+  <span style="color:#6b9b6b">"code": 401,</span>
+  <span style="color:#6b9b6b">"msg": "未登录或登录已过期",</span>
+  <span style="color:#6b9b6b">"data": null</span>
+}</div>
+          </div>
+        </div>
+
+        </div><!-- /api-doc-panel-search -->
+
+        <div id="api-doc-panel-basic" class="api-doc-panel" role="tabpanel" aria-labelledby="api-doc-tab-basic" style="display:none !important;">
 
         <!-- 基础地址 -->
         <div class="table-card" style="margin-bottom:20px">
           <div class="table-header">
-            <span class="table-title">基础信息</span>
+            <span class="table-title">基础信息</span><span style="font-size:10px;color:var(--text-muted);margin-left:8px;background:var(--bg);padding:2px 8px;border-radius:10px;font-weight:600;">v1.0.1</span>
           </div>
           <table>
             <tbody>
-              <tr><td style="width:140px;color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">接口基础地址</td><td><span class="mono" style="color:var(--accent);font-size:13px" id="api-base-url"></span></td></tr>
+              <tr><td style="width:140px;color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">接口基础地址</td><td><span class="mono" style="color:var(--accent);font-size:13px"><span style="color:var(--text-muted);">{base}</span>/api</span></td></tr>
+              <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;vertical-align:top">说明</td><td style="font-size:12px;color:var(--text-muted)"><span style="background:var(--bg);padding:2px 6px;border-radius:3px;font-family:monospace;">{base}</span> 表示当前部署路径（如 <span style="background:var(--bg);padding:2px 6px;border-radius:3px;font-family:monospace;">http://localhost/cms</span>），完整地址 = <span style="background:var(--bg);padding:2px 6px;border-radius:3px;font-family:monospace;">{base}</span> + 接口路径，自动适配子目录部署</td></tr>
               <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">请求方式</td><td><span class="mono" style="color:var(--danger);font-size:13px">POST</span>（必须用 POST，GET 无效）</td></tr>
               <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">Content-Type</td><td><span class="mono" style="font-size:13px">application/json</span></td></tr>
             </tbody>
@@ -3280,7 +3478,7 @@
         <div class="endpoint-card" id="api-register">
           <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
             <span class="endpoint-method method-post">POST</span>
-            <span class="endpoint-path mono">/api/register</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/api/register</span>
             <span class="endpoint-name">用户注册</span>
           </div>
 
@@ -3322,7 +3520,7 @@
         <div class="endpoint-card" id="api-login" style="margin-top:16px">
           <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
             <span class="endpoint-method method-post">POST</span>
-            <span class="endpoint-path mono">/api/login</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/api/login</span>
             <span class="endpoint-name">用户登录</span>
           </div>
 
@@ -3436,19 +3634,20 @@ if (response.code == 401) {
 
         </div><!-- /api-doc-panel-basic -->
 
-        <div id="api-doc-panel-article" class="api-doc-panel" role="tabpanel" aria-labelledby="api-doc-tab-article" style="display:none">
+        <div id="api-doc-panel-article" class="api-doc-panel" role="tabpanel" aria-labelledby="api-doc-tab-article" style="display:none !important;">
 
         <div class="table-card" style="margin-bottom:20px">
           <div class="table-header">
-            <span class="table-title">文章模块 · 基础信息</span>
+            <span class="table-title">文章模块 · 基础信息</span><span style="font-size:10px;color:var(--text-muted);margin-left:8px;background:var(--bg);padding:2px 8px;border-radius:10px;font-weight:600;">v1.0.1</span>
           </div>
           <table>
             <tbody>
-              <tr><td style="width:140px;color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">模块基础地址</td><td><span class="mono" style="color:var(--accent);font-size:13px" id="article-api-base-url"></span></td></tr>
+              <tr><td style="width:140px;color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">完整地址格式</td><td><span class="mono" style="color:var(--accent);font-size:13px"><span style="color:var(--text-muted);">{base}</span>/article/api/list</span><br><span style="color:var(--text-muted);font-size:11px;">（{base} = 当前部署路径，如 <span style="background:var(--bg);padding:2px 6px;border-radius:3px;font-family:monospace;">http://localhost/cms</span>，自动适配任意部署位置）</span></td></tr>
+              <tr><td style="width:140px;color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">模块基础路径</td><td><span class="mono" style="color:var(--accent);font-size:13px"><span style="color:var(--text-muted);">{base}</span>/article/api</span></td></tr>
               <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">请求方式</td><td><span class="mono" style="color:var(--danger);font-size:13px">POST</span>（必须用 POST，GET 无效）</td></tr>
               <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">Content-Type</td><td><span class="mono" style="font-size:13px">application/json</span></td></tr>
               <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">认证</td><td><span style="color:var(--text-muted)">list 为公开接口，无需认证。</span><br>写操作（create/update/delete/favorite）需认证：<span class="mono" style="font-size:12px">Authorization: Bearer &lt;token&gt;</span>，或在 JSON Body 中带 <span class="mono" style="font-size:12px">_token</span></td></tr>
-              <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">CSRF</td><td>写操作需通过 CSRF 校验（同源表单自动放行，跨域请求请先 <span class="mono" style="font-size:12px">GET /api/csrf_token</span> 取 Cookie，请求头带 <span class="mono" style="font-size:12px">X-CSRF-Token</span>）</td></tr>
+              <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">CSRF</td><td>写操作需通过 CSRF 校验（同源表单自动放行，跨域请求请先 <span class="mono" style="font-size:12px">GET <span style="color:var(--text-muted);">{base}</span>/api/csrf_token</span> 取 Cookie，请求头带 <span class="mono" style="font-size:12px">X-CSRF-Token</span>）</td></tr>
               <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">频率限制</td><td>写操作统一限流：每分钟最多 <span class="mono">10</span> 次创建、<span class="mono">20</span> 次更新/删除、<span class="mono">30</span> 次收藏/取消收藏，超限返回 <span class="mono">429</span> + <span class="mono">Retry-After</span> 头</td></tr>
             </tbody>
           </table>
@@ -3457,7 +3656,7 @@ if (response.code == 401) {
         <div class="endpoint-card" id="api-article-list" style="margin-bottom:16px">
           <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
             <span class="endpoint-method method-post">POST</span>
-            <span class="endpoint-path mono">/article/api/list</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/article/api/list</span>
             <span class="endpoint-name">文章列表（分页与筛选）</span>
           </div>
           <div style="margin-bottom:16px">
@@ -3499,7 +3698,7 @@ if (response.code == 401) {
         <div class="endpoint-card" id="api-article-create" style="margin-bottom:16px">
           <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
             <span class="endpoint-method method-post">POST</span>
-            <span class="endpoint-path mono">/article/api/create</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/article/api/create</span>
             <span class="endpoint-name">创建文章</span>
           </div>
           <div style="margin-bottom:16px">
@@ -3524,7 +3723,7 @@ if (response.code == 401) {
         <div class="endpoint-card" id="api-article-update" style="margin-bottom:16px">
           <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
             <span class="endpoint-method method-post">POST</span>
-            <span class="endpoint-path mono">/article/api/update</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/article/api/update</span>
             <span class="endpoint-name">更新文章（按需传字段）</span>
           </div>
           <div style="margin-bottom:16px">
@@ -3546,7 +3745,7 @@ if (response.code == 401) {
         <div class="endpoint-card" id="api-article-delete">
           <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
             <span class="endpoint-method method-post">POST</span>
-            <span class="endpoint-path mono">/article/api/delete</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/article/api/delete</span>
             <span class="endpoint-name">删除文章（单篇或批量）</span>
           </div>
           <div style="margin-bottom:16px">
@@ -3567,11 +3766,11 @@ if (response.code == 401) {
 
         </div><!-- /api-doc-panel-article -->
 
-        <div id="api-doc-panel-favorite" class="api-doc-panel" role="tabpanel" aria-labelledby="api-doc-tab-favorite" style="display:none">
+        <div id="api-doc-panel-favorite" class="api-doc-panel" role="tabpanel" aria-labelledby="api-doc-tab-favorite" style="display:none !important;">
 
         <div class="table-card" style="margin-bottom:20px">
           <div class="table-header">
-            <span class="table-title">收藏接口</span>
+            <span class="table-title">收藏接口</span><span style="font-size:10px;color:var(--text-muted);margin-left:8px;background:var(--bg);padding:2px 8px;border-radius:10px;font-weight:600;">v1.0.1</span>
           </div>
           <table>
             <thead>
@@ -3585,25 +3784,25 @@ if (response.code == 401) {
             <tbody>
               <tr>
                 <td>收藏文章</td>
-                <td><code>/article/api/favorite.php</code></td>
+                <td><code><span style="color:var(--text-muted);">{base}</span>/article/api/favorite.php</code></td>
                 <td><span class="badge badge-post">POST</span></td>
                 <td>用户收藏指定文章（含 CSRF + 限流 30次/分钟）</td>
               </tr>
               <tr>
                 <td>取消收藏</td>
-                <td><code>/article/api/unfavorite.php</code></td>
+                <td><code><span style="color:var(--text-muted);">{base}</span>/article/api/unfavorite.php</code></td>
                 <td><span class="badge badge-post">POST</span></td>
                 <td>取消收藏（支持单个或全部，含 CSRF + 限流 30次/分钟）</td>
               </tr>
               <tr>
                 <td>我的收藏列表</td>
-                <td><code>/article/api/favorites.php</code></td>
+                <td><code><span style="color:var(--text-muted);">{base}</span>/article/api/favorites.php</code></td>
                 <td><span class="badge badge-post">POST</span></td>
                 <td>获取当前用户的收藏列表</td>
               </tr>
               <tr>
                 <td>收藏状态查询</td>
-                <td><code>/article/api/favorite_status.php</code></td>
+                <td><code><span style="color:var(--text-muted);">{base}</span>/article/api/favorite_status.php</code></td>
                 <td><span class="badge badge-post">POST</span></td>
                 <td>查询单个或批量文章的收藏状态</td>
               </tr>
@@ -3614,8 +3813,8 @@ if (response.code == 401) {
         <!-- 收藏文章 -->
         <div class="table-card" style="margin-bottom:20px">
           <div class="table-header">
-            <span class="table-title">收藏文章</span>
-            <span class="endpoint-badge">POST /article/api/favorite.php</span>
+            <span class="table-title">收藏文章</span><span style="font-size:10px;color:var(--text-muted);margin-left:8px;background:var(--bg);padding:2px 8px;border-radius:10px;font-weight:600;">v1.0.1</span>
+            <span class="endpoint-badge">POST <span style="color:var(--text-muted);">{base}</span>/article/api/favorite.php</span>
           </div>
           <div class="param-section">
             <div class="param-title">请求参数</div>
@@ -3668,8 +3867,8 @@ if (response.code == 401) {
         <!-- 取消收藏 -->
         <div class="table-card" style="margin-bottom:20px">
           <div class="table-header">
-            <span class="table-title">取消收藏</span>
-            <span class="endpoint-badge">POST /article/api/unfavorite.php</span>
+            <span class="table-title">取消收藏</span><span style="font-size:10px;color:var(--text-muted);margin-left:8px;background:var(--bg);padding:2px 8px;border-radius:10px;font-weight:600;">v1.0.1</span>
+            <span class="endpoint-badge">POST <span style="color:var(--text-muted);">{base}</span>/article/api/unfavorite.php</span>
           </div>
           <div class="param-section">
             <div class="param-title">请求参数</div>
@@ -3721,8 +3920,8 @@ if (response.code == 401) {
         <!-- 我的收藏列表 -->
         <div class="table-card" style="margin-bottom:20px">
           <div class="table-header">
-            <span class="table-title">我的收藏列表</span>
-            <span class="endpoint-badge">POST /article/api/favorites.php</span>
+            <span class="table-title">我的收藏列表</span><span style="font-size:10px;color:var(--text-muted);margin-left:8px;background:var(--bg);padding:2px 8px;border-radius:10px;font-weight:600;">v1.0.1</span>
+            <span class="endpoint-badge">POST <span style="color:var(--text-muted);">{base}</span>/article/api/favorites.php</span>
           </div>
           <div class="param-section">
             <div class="param-title">请求参数</div>
@@ -3795,8 +3994,8 @@ if (response.code == 401) {
         <!-- 收藏状态查询 -->
         <div class="table-card" style="margin-bottom:20px">
           <div class="table-header">
-            <span class="table-title">收藏状态查询</span>
-            <span class="endpoint-badge">POST /article/api/favorite_status.php</span>
+            <span class="table-title">收藏状态查询</span><span style="font-size:10px;color:var(--text-muted);margin-left:8px;background:var(--bg);padding:2px 8px;border-radius:10px;font-weight:600;">v1.0.1</span>
+            <span class="endpoint-badge">POST <span style="color:var(--text-muted);">{base}</span>/article/api/favorite_status.php</span>
           </div>
           <div class="param-section">
             <div class="param-title">请求参数</div>
@@ -3856,22 +4055,22 @@ if (response.code == 401) {
 
         </div><!-- /api-doc-panel-favorite -->
 
-        <div id="api-doc-panel-software" class="api-doc-panel" role="tabpanel" aria-labelledby="api-doc-tab-software" style="display:none">
+        <div id="api-doc-panel-software" class="api-doc-panel" role="tabpanel" aria-labelledby="api-doc-tab-software" style="display:none !important;">
 
 
 
             <!-- 模块基础信息 -->
             <div class="table-card" style="margin-bottom:20px">
             <div class="table-header">
-            <span class="table-title">软件模块 · 基础信息</span>
+            <span class="table-title">软件模块 · 基础信息</span><span style="font-size:10px;color:var(--text-muted);margin-left:8px;background:var(--bg);padding:2px 8px;border-radius:10px;font-weight:600;">v1.0.1</span>
             </div>
             <table>
             <tbody>
-            <tr><td style="width:140px;color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">模块基础地址</td><td><span class="mono" style="color:var(--accent);font-size:13px">/software/api/</span></td></tr>
+            <tr><td style="width:140px;color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">模块基础路径</td><td><span class="mono" style="color:var(--accent);font-size:13px"><span style="color:var(--text-muted);">{base}</span>/software/api</span> <span style="color:var(--text-muted);font-size:11px;">（{base} = 当前部署路径，如 http://localhost/cms，自动适配子目录部署）</span></td></tr>
             <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">请求方式</td><td><span class="mono" style="color:var(--danger);font-size:13px">POST</span>（必须用 POST，GET 无效）</td></tr>
             <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">Content-Type</td><td><span class="mono" style="font-size:13px">application/json</span></td></tr>
             <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">认证</td><td><span style="color:var(--text-muted)">管理员接口，需登录后台并在请求头携带 </span><span class="mono" style="font-size:12px">Authorization: Bearer &lt;adminToken&gt;</span><span style="color:var(--text-muted)"> 或在 JSON Body 中带 </span><span class="mono" style="font-size:12px">_token</span></td></tr>
-            <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">CSRF</td><td>写操作需通过 CSRF 校验（同源自动放行），跨域请求请先 <span class="mono" style="font-size:12px">GET /api/csrf_token</span> 取 Cookie，请求头带 <span class="mono" style="font-size:12px">X-CSRF-Token</span></td></tr>
+            <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">CSRF</td><td>写操作需通过 CSRF 校验（同源自动放行），跨域请求请先 <span class="mono" style="font-size:12px">GET <span style="color:var(--text-muted);">{base}</span>/api/csrf_token</span> 取 Cookie，请求头带 <span class="mono" style="font-size:12px">X-CSRF-Token</span></td></tr>
             <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">通用响应格式</td><td><div class="code-block mono" style="font-size:11px"><span style="color:#6b9b6b">// 成功</span><br>{ "code": 0, "msg": "success", "data": { ... } }<br><span style="color:#6b9b6b">// 失败</span><br>{ "code": 1, "msg": "错误信息" }<br><span style="color:#6b9b6b">// 未授权</span><br>{ "code": 401, "msg": "未授权访问" }</div></td></tr>
             <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">软件状态值</td><td><span class="mono">0</span> = 已下架 &nbsp; <span class="mono">1</span> = 已上架 &nbsp; <span class="mono">2</span> = 草稿</td></tr>
             </tbody>
@@ -3882,7 +4081,7 @@ if (response.code == 401) {
             <div class="endpoint-card" id="api-sw-list" style="margin-bottom:16px">
             <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
             <span class="endpoint-method method-post">POST</span>
-            <span class="endpoint-path mono">/software/api/list.php</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/software/api/list.php</span>
             <span class="endpoint-name">软件列表（分页、搜索、筛选）</span>
             </div>
             <div style="margin-bottom:16px">
@@ -3951,21 +4150,21 @@ if (response.code == 401) {
             <div class="endpoint-card" id="api-sw-create" style="margin-bottom:16px">
             <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
             <span class="endpoint-method method-post">POST</span>
-            <span class="endpoint-path mono">/software/api/create.php</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/software/api/create.php</span>
             <span class="endpoint-name">创建软件</span>
             </div>
             <div style="margin-bottom:16px">
             <div class="form-label" style="color:var(--text-muted);margin-bottom:10px">请求参数（JSON Body）</div>
             <div class="code-block mono">{
             <span style="color:#ff7b72">"name"</span>: "Visual Studio Code",      <span style="color:#6b9b6b">// string，</span><span style="color:#ff7b72">必填</span><span style="color:#6b9b6b">，≤200字符，软件名称</span>
-            <span style="color:#79c0ff">"version"</span>: "v1.85.0",            <span style="color:#6b9b6b">// string，</span><span style="color:#79c0ff">必填</span><span style="color:#6b9b6b">，版本号如 v1.0.0</span>
+            <span style="color:#79c0ff">"version"</span>: "v1.85.0",            <span style="color:#6b9b6b">// string，</span><span style="color:#79c0ff">必填</span><span style="color:#6b9b6b">，版本号如 v1.0.1</span>
             <span style="color:#79c0ff">"download_urls"</span>: "https://...",    <span style="color:#6b9b6b">// string，</span><span style="color:#79c0ff">必填</span><span style="color:#6b9b6b">，下载地址，支持多地址用\n换行分隔</span>
             <span style="color:#79c0ff">"category_name"</span>: "开发工具",        <span style="color:#6b9b6b">// string，可选，分类名称（不存在则自动创建）</span>
             <span style="color:#79c0ff">"os_support"</span>: "Windows,macOS",    <span style="color:#6b9b6b">// string，可选，逗号分隔，可选值：Windows / macOS / Linux / Android / iOS</span>
             <span style="color:#79c0ff">"file_size"</span>: "98.5",               <span style="color:#6b9b6b">// string，可选，软件大小，单位 MB</span>
             <span style="color:#79c0ff">"screenshots"</span>: "https://...",     <span style="color:#6b9b6b">// string，可选，多图URL，逗号分隔</span>
             <span style="color:#79c0ff">"description"</span>: "&lt;p&gt;介绍...&lt;/p&gt;", <span style="color:#6b9b6b">// string，可选，软件介绍，支持富文本HTML</span>
-            <span style="color:#79c0ff">"changelog"</span>: "v1.0.0 - 首个版本", <span style="color:#6b9b6b">// string，可选，更新日志</span>
+            <span style="color:#79c0ff">"changelog"</span>: "v1.0.1 - 首个版本", <span style="color:#6b9b6b">// string，可选，更新日志</span>
             <span style="color:#79c0ff">"status"</span>: 2,                         <span style="color:#6b9b6b">// number，可选，0下架/1上架/2草稿，默认2</span>
             <span style="color:#79c0ff">"sort_order"</span>: 0,                    <span style="color:#6b9b6b">// number，可选，排序权重，默认0，数字越大越靠前</span>
             <span style="color:#79c0ff">"tags"</span>: "免费,开源"               <span style="color:#6b9b6b">// string，可选，标签，逗号分隔</span>
@@ -3992,7 +4191,7 @@ if (response.code == 401) {
             <div class="endpoint-card" id="api-sw-update" style="margin-bottom:16px">
             <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
             <span class="endpoint-method method-post">POST</span>
-            <span class="endpoint-path mono">/software/api/update.php</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/software/api/update.php</span>
             <span class="endpoint-name">更新软件（按需传字段）</span>
             </div>
             <div style="margin-bottom:16px">
@@ -4028,7 +4227,7 @@ if (response.code == 401) {
             <div class="endpoint-card" id="api-sw-delete" style="margin-bottom:16px">
             <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
             <span class="endpoint-method method-post">POST</span>
-            <span class="endpoint-path mono">/software/api/delete.php</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/software/api/delete.php</span>
             <span class="endpoint-name">删除软件（单个或批量）</span>
             </div>
             <div style="margin-bottom:16px">
@@ -4061,7 +4260,7 @@ if (response.code == 401) {
             <div class="endpoint-card" id="api-sw-status" style="margin-bottom:16px">
             <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
             <span class="endpoint-method method-post">POST</span>
-            <span class="endpoint-path mono">/software/api/status.php</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/software/api/status.php</span>
             <span class="endpoint-name">修改软件状态 / 批量上下架</span>
             </div>
             <div style="margin-bottom:16px">
@@ -4096,7 +4295,7 @@ if (response.code == 401) {
             <div class="endpoint-card" id="api-sw-categories" style="margin-bottom:16px">
             <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
             <span class="endpoint-method method-get">GET</span>
-            <span class="endpoint-path mono">/software/api/categories.php</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/software/api/categories.php</span>
             <span class="endpoint-name">获取分类列表</span>
             </div>
             <div style="margin-bottom:16px">
@@ -4120,7 +4319,7 @@ if (response.code == 401) {
             <div class="endpoint-card" id="api-sw-cat-create" style="margin-bottom:16px">
             <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
             <span class="endpoint-method method-post">POST</span>
-            <span class="endpoint-path mono">/software/api/categories.php</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/software/api/categories.php</span>
             <span class="endpoint-name">创建分类</span>
             </div>
             <div style="margin-bottom:16px">
@@ -4146,7 +4345,7 @@ if (response.code == 401) {
             <div class="endpoint-card" id="api-sw-cat-update" style="margin-bottom:16px">
             <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
             <span class="endpoint-method method-post">POST</span>
-            <span class="endpoint-path mono">/software/api/categories.php</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/software/api/categories.php</span>
             <span class="endpoint-name">更新分类</span>
             </div>
             <div style="margin-bottom:16px">
@@ -4173,7 +4372,7 @@ if (response.code == 401) {
             <div class="endpoint-card" id="api-sw-cat-delete" style="margin-bottom:16px">
             <div class="endpoint-header" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
             <span class="endpoint-method method-post">POST</span>
-            <span class="endpoint-path mono">/software/api/categories.php</span>
+            <span class="endpoint-path mono"><span style="color:var(--text-muted);">{base}</span>/software/api/categories.php</span>
             <span class="endpoint-name">删除分类</span>
             </div>
             <div style="margin-bottom:16px">
@@ -4220,76 +4419,13 @@ if (response.code == 401) {
             "未授权访问"               - 未带 token 或 token 无效</div>
             </div>
           </div>
-        </div><!-- /api-doc-panel-software -->
-
-        <div id="api-doc-panel-search" class="api-doc-panel" role="tabpanel" aria-labelledby="api-doc-tab-search" style="display:none">
-
-            <!-- 模块基础信息 -->
-            <div class="table-card" style="margin-bottom:20px">
-            <div class="table-header">
-            <span class="table-title">搜索模块 · 基础信息</span>
-            </div>
-            <table>
-            <tbody>
-            <tr><td style="width:140px;color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">模块基础地址</td><td><span class="mono" style="color:var(--accent);font-size:13px">/search/api/</span></td></tr>
-            <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">请求方式</td><td><span class="mono" style="color:var(--success);font-size:13px">GET / POST</span></td></tr>
-            <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">Content-Type</td><td><span class="mono" style="font-size:13px">application/json</span></td></tr>
-            <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">认证</td><td>搜索接口无需认证，搜索历史管理接口需要管理员认证</td></tr>
-            <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">通用响应格式</td><td><div class="code-block mono" style="font-size:11px"><span style="color:#6b9b6b">// 成功</span><br>{ "code": 0, "msg": "success", "data": { ... } }<br><span style="color:#6b9b6b">// 失败</span><br>{ "code": 非0, "msg": "错误信息" }</div></td></tr>
-            </tbody>
-            </table>
-            </div>
-
-            <!-- 1. 搜索列表 -->
-            <div class="table-card" style="margin-bottom:20px">
-            <div class="table-header">
-            <span class="table-title">1. 搜索列表</span>
-            <span class="api-method" style="background:var(--success)">GET /search/api/list</span>
-            </div>
-            <table>
-            <tbody>
-            <tr><td style="width:120px;color:var(--text-muted);font-size:12px;font-weight:600">功能说明</td><td>全站搜索，支持搜索文章、软件等数据源，可按类型筛选和分页</td></tr>
-            <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600">Query 参数</td><td>
-              <span class="mono" style="font-size:12px">keyword</span> <span style="color:var(--text-dim)">(必填)</span> 搜索关键词<br>
-              <span class="mono" style="font-size:12px">source</span> <span style="color:var(--text-dim)">(可选)</span> 数据源类型，可选值：article / software / 空(全部)<br>
-              <span class="mono" style="font-size:12px">page</span> <span style="color:var(--text-dim)">(可选)</span> 页码，默认 1<br>
-              <span class="mono" style="font-size:12px">page_size</span> <span style="color:var(--text-dim)">(可选)</span> 每页条数，默认 10，最大 100<br>
-              <span class="mono" style="font-size:12px">sort_by</span> <span style="color:var(--text-dim)">(可选)</span> 排序方式：relevance / created / views，默认 relevance
-            </td></tr>
-            <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600">响应示例</td><td><div class="code-block mono" style="font-size:11px">{<br>&nbsp;&nbsp;"code": 0,<br>&nbsp;&nbsp;"msg": "success",<br>&nbsp;&nbsp;"data": {<br>&nbsp;&nbsp;&nbsp;&nbsp;"list": [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ "type": "article", "id": 1, "title": "...", "url": "/article/p/1", ... },<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ "type": "software", "id": 2, "name": "...", "url": "/software/p/2", ... }<br>&nbsp;&nbsp;&nbsp;&nbsp;],<br>&nbsp;&nbsp;&nbsp;&nbsp;"total": 42,<br>&nbsp;&nbsp;&nbsp;&nbsp;"sources": ["article", "software"],<br>&nbsp;&nbsp;&nbsp;&nbsp;"page": 1,<br>&nbsp;&nbsp;&nbsp;&nbsp;"page_size": 10,<br>&nbsp;&nbsp;&nbsp;&nbsp;"total_pages": 5<br>&nbsp;&nbsp;}<br>}</div></td></tr>
-            </tbody>
-            </table>
-            </div>
-
-            <!-- 2. 搜索历史管理 -->
-            <div class="table-card" style="margin-bottom:20px">
-            <div class="table-header">
-            <span class="table-title">2. 搜索历史管理（管理员）</span>
-            <span class="api-method">POST /admin/api/search_history</span>
-            </div>
-            <table>
-            <tbody>
-            <tr><td style="width:120px;color:var(--text-muted);font-size:12px;font-weight:600">功能说明</td><td>查看、清空搜索历史记录，支持分页和关键词搜索</td></tr>
-            <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600">JSON 参数</td><td>
-              <span class="mono" style="font-size:12px">action</span> <span style="color:var(--text-dim)">(必填)</span> 操作类型：list / delete / clear<br>
-              <span class="mono" style="font-size:12px">page</span> <span style="color:var(--text-dim)">(list时必填)</span> 页码<br>
-              <span class="mono" style="font-size:12px">page_size</span> <span style="color:var(--text-dim)">(可选)</span> 每页条数，默认 20<br>
-              <span class="mono" style="font-size:12px">keyword</span> <span style="color:var(--text-dim)">(list时可选)</span> 搜索关键词过滤<br>
-              <span class="mono" style="font-size:12px">id</span> <span style="color:var(--text-dim)">(delete时必填)</span> 搜索历史记录ID
-            </td></tr>
-            <tr><td style="color:var(--text-muted);font-size:12px;font-weight:600">响应示例</td><td><div class="code-block mono" style="font-size:11px">{<br>&nbsp;&nbsp;"code": 0,<br>&nbsp;&nbsp;"msg": "success",<br>&nbsp;&nbsp;"data": {<br>&nbsp;&nbsp;&nbsp;&nbsp;"list": [{ "id": 1, "keyword": "PHP", "search_count": 5, ... }],<br>&nbsp;&nbsp;&nbsp;&nbsp;"total": 42,<br>&nbsp;&nbsp;&nbsp;&nbsp;"stats": { "total": 100, "today": 12, "top_keyword": "PHP" }<br>&nbsp;&nbsp;}<br>}</div></td></tr>
-            </tbody>
-            </table>
-            </div>
-
-        </div><!-- /api-doc-panel-search -->
-      </div>
       </div><!-- /page-api-doc -->
+
 
       <!-- ══════════════════════════════════════════
            搜索管理页
           ══════════════════════════════════════════ -->
-      <div class="page" id="page-search" style="display:none">
+      <div class="page" id="page-search" style="display:block">
         <!-- Stats -->
         <div class="stats-row">
           <div class="stat-card">
@@ -4352,7 +4488,7 @@ if (response.code == 401) {
         <!-- Table -->
         <div class="table-card">
           <div class="table-header">
-            <span class="table-title">搜索历史</span>
+            <span class="table-title">搜索历史</span><span style="font-size:10px;color:var(--text-muted);margin-left:8px;background:var(--bg);padding:2px 8px;border-radius:10px;font-weight:600;">v1.0.1</span>
             <span style="font-size:12px;color:var(--text-muted)" id="sh-count">0 条记录</span>
           </div>
           <table>
@@ -4381,6 +4517,7 @@ if (response.code == 401) {
             </div>
           </div>
         </div>
+
       </div><!-- /page-search -->
 
         <!-- ══════════════════════════════════════════
@@ -6822,22 +6959,29 @@ if (response.code == 401) {
               const el = document.getElementById('api-base-url');
               if (el) el.textContent = apiBase;
 
-              const articleApiBase = origin + (API_BASE || '') + '/article/api';
-              const elArtBase = document.getElementById('article-api-base-url');
-              if (elArtBase) elArtBase.textContent = articleApiBase;
+              // 替换所有 {base} 占位符为实际部署路径（自动适配子目录部署）
+              document.querySelectorAll('span[style*="color:var(--text-muted)"]').forEach(function(el) {
+                if (el.textContent === '{base}') {
+                  el.textContent = origin + (BASE_PATH || '');
+                }
+              });
 
-              document.querySelectorAll('.api-doc-tab').forEach(btn => {
-                btn.addEventListener('click', () => {
-                  const tab = btn.getAttribute('data-api-doc-tab');
-                  if (!tab) return;
-                  document.querySelectorAll('.api-doc-tab').forEach(b => {
-            const on = b === btn;
-            b.classList.toggle('active', on);
-            b.setAttribute('aria-selected', on ? 'true' : 'false');
+              document.querySelectorAll('.api-doc-tab').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                  var activeTab = btn.getAttribute('data-api-doc-tab');
+                  if (!activeTab) return;
+                  var allTabs = document.querySelectorAll('.api-doc-tab');
+                  var allNames = ['basic', 'article', 'favorite', 'software', 'search'];
+                  allTabs.forEach(function(tb) {
+                    var isActive = tb === btn;
+                    tb.classList.toggle('active', isActive);
+                    tb.setAttribute('aria-selected', isActive ? 'true' : 'false');
                   });
-                  ['basic', 'article', 'favorite', 'software', 'search'].forEach(name => {
-            const panel = document.getElementById('api-doc-panel-' + name);
-            if (panel) panel.style.display = name === tab ? 'block' : 'none';
+                  allNames.forEach(function(name) {
+                    var panel = document.getElementById('api-doc-panel-' + name);
+                    if (panel) {
+                      panel.style.display = name === activeTab ? 'block' : 'none';
+                    }
                   });
                 });
               });
@@ -6912,6 +7056,9 @@ if (response.code == 401) {
                 }
                 if (page === 'search') {
                   loadSearchHistory(1);
+                }
+                if (page === 'api-doc') {
+                  // api-doc-panel-search 现在通过 Tab 切换逻辑控制，无需额外处理
                 }
               });
             });
@@ -7026,7 +7173,6 @@ if (response.code == 401) {
               loadSearchHistory(1);
               $('sh-btn-filter-clear').style.display = 'none';
             }
-
             // ══════════════════════════════════════════
             // 收藏管理
             // ══════════════════════════════════════════

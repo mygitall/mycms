@@ -1,0 +1,39 @@
+RewriteEngine On
+
+# 禁止 Apache 自动给目录加斜杠（前台路由 /search 会被误判为目录）
+DirectorySlash Off
+
+# 前台路由精确匹配
+RewriteRule ^search$ index.php [L,QSA]
+RewriteRule ^list$ index.php [L,QSA]
+RewriteRule ^detail$ index.php [L,QSA]
+RewriteRule ^favorites$ index.php [L,QSA]
+RewriteRule ^login$ index.php [L,QSA]
+
+# 如果请求的是真实文件或目录，直接访问
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# admin api 模块 URL 重写
+RewriteRule ^admin/api/([^/]+)$ admin/api/$1.php [L,QSA]
+
+# 核心 api 模块 URL 重写
+RewriteRule ^api/([^/]+)$ api/$1.php [L,QSA]
+
+# search 模块 URL 重写
+RewriteRule ^search/api/list$ search/api/list.php [L,QSA]
+RewriteRule ^search/api/([^/]+)$ search/api/$1.php [L,QSA]
+
+# article 模块 URL 重写
+RewriteRule ^article/api/list$ article/api/list.php [L,QSA]
+RewriteRule ^article/api/([^/]+)$ article/api/$1.php [L,QSA]
+
+# software 模块 URL 重写
+RewriteRule ^software/api/list$ software/api/list.php [L,QSA]
+RewriteRule ^software/api/([^/]+)$ software/api/$1.php [L,QSA]
+
+# 前台页面路由 → index.php（/list, /detail, /search, /favorites, /login 等）
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L,QSA]

@@ -909,7 +909,11 @@
 
 <script>
 // ═══ CONFIG ════════════════════════════════════════
-const API_BASE = window.__BASE_PATH__ !== undefined ? window.__BASE_PATH__ : '';
+const API_BASE = window.__BASE_PATH__ || (function(){
+    var p = window.location.pathname;
+    var i = p.indexOf('/article');
+    return i > 0 ? p.substring(0, i) : '';
+})();
 const ARTICLE_LIST_API   = API_BASE + '/article/api/list';
 const ARTICLE_CREATE_API = API_BASE + '/article/api/create';
 const ARTICLE_UPDATE_API = API_BASE + '/article/api/update';

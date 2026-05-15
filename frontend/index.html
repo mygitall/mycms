@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MYCMS - 首页</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- ═══ 导航栏 ═══ -->
+<header class="topbar">
+  <a href="index.html" class="logo">MY<span>CMS</span></a>
+  <nav>
+    <a href="index.html" class="active">首页</a>
+    <a href="list.html">文章</a>
+    <a href="search.html">搜索</a>
+    <a href="favorites.html" id="nav-favorites" style="display:none">收藏</a>
+  </nav>
+  <div class="user-area" id="user-area">
+    <span id="user-info" style="display:none"></span>
+    <a href="login.html" class="btn-sm btn-outline" id="btn-login">登录</a>
+    <button class="btn-sm btn-outline" id="btn-logout" style="display:none" onclick="doLogout()">退出</button>
+  </div>
+</header>
+
+<!-- ═══ 英雄区 ═══ -->
+<section class="main">
+  <div class="hero">
+    <h1>发现好文章</h1>
+    <p>最新技术分享、实用教程，探索知识的世界</p>
+    <div class="hero-search">
+      <input type="text" id="hero-search-input" placeholder="搜索感兴趣的内容..." onkeydown="if(event.key==='Enter')heroSearch()">
+      <button onclick="heroSearch()">搜索</button>
+    </div>
+  </div>
+
+  <!-- 统计 -->
+  <div class="stats-row" id="stats-row"></div>
+
+  <!-- 分类 -->
+  <div class="categories" id="categories"></div>
+
+  <!-- 最新文章 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">最新文章</span>
+      <a href="list.html" style="font-size:13px">查看全部 &#8594;</a>
+    </div>
+    <div class="article-grid" id="latest-articles">
+      <div class="empty"><p>加载中...</p></div>
+    </div>
+  </div>
+
+  <!-- 热门文章 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">热门文章</span>
+    </div>
+    <div class="article-list" id="popular-articles">
+      <div class="empty"><p>加载中...</p></div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">MYCMS Frontend v1.0.1 · Powered by MYCMS API</footer>
+
+<script src="assets/js/api.js"></script>
+<script>
+// ═══ 更新导航栏 ═══
+function updateUI() {
+  var li = CMS.isLoggedIn();
+  document.getElementById('btn-login').style.display = li ? 'none' : '';
+  document.getElementById('btn-logout').style.display = li ? '' : 'none';
+  document.getElementById('nav-favorites').style.display = li ? '' : 'none';
+  if (li && CMS._user) {
+    document.getElementById('user-info').style.display = '';
+    document.getElementById('user-info').textContent = CMS._user.username;
+  }
+}
+
+function doLogout() {
+  CMS.clearAuth();
+  updateUI();
+  showToast('已退出登录');
+}
+
+function heroSearch() {
+  var kw = document.getElementById('hero-search-input').value.trim();
+  if (kw) location.href = CMS.BASE + '/search?q=' + encodeURIComponent(kw);
+}
+
+// ═══ 加载数据 ═══
+Promise.all([
+  CMS.post(CMS.articleList, { page: 1, page_size: 6, sort_by: 'created_at', sort_order: 'desc' }),
+  CMS.post(CMS.articleList, { page: 1, page_size: 5, sort_by: 'view_count', sort_order: 'desc' })
+]).then(function(results) {
+  var latest = results[0];
+  var popular = results[1];
+
+  // 统计
+  var cats = latest.data.categories || [];
+  document.getElementById('stats-row').innerHTML =
+    '<div class="stat-card"><div class="num">' + (latest.data.total || 0) + '</div><div class="label">文章总数</div></div>' +
+    '<div class="stat-card"><div class="num">' + cats.length + '</div><div class="label">分类</div></div>' +
+    '<div class="stat-card"><div class="num">' + (popular.data.total || 0) + '</div><div class="label">热门文章</div></div>';
+
+  // 分类
+  var catHTML = '<a href="list.html" class="active">全部</a>';
+  cats.forEach(function(c) {
+    catHTML += '<a href="list.html?category=' + encodeURIComponent(c) + '">' + escapeHtml(c) + '</a>';
+  });
+  document.getElementById('categories').innerHTML = catHTML;
+
+  // 最新
+  var grid = document.getElementById('latest-articles');
+  if (latest.data.list && latest.data.list.length) {
+    grid.innerHTML = latest.data.list.map(renderArticleCard).join('');
+  } else {
+    grid.innerHTML = '<div class="empty"><p>暂无文章</p></div>';
+  }
+
+  // 热门
+  var popDiv = document.getElementById('popular-articles');
+  if (popular.data.list && popular.data.list.length) {
+    popDiv.innerHTML = popular.data.list.map(renderArticleItem).join('');
+  } else {
+    popDiv.innerHTML = '<div class="empty"><p>暂无热门文章</p></div>';
+  }
+}).catch(function(e) {
+  console.error('Load error:', e);
+  document.getElementById('latest-articles').innerHTML = '<div class="empty"><p>加载失败，请检查网络</p></div>';
+});
+
+updateUI();
+</script>
+</body>
+</html>

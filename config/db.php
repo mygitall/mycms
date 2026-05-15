@@ -983,7 +983,7 @@ function setSecurityHeaders() {
     // 严格 CSP，只允许同源资源
     $csp = [
         "default-src 'self'",
-        "script-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: https://images.unsplash.com https://picsum.photos https://via.placeholder.com",
         "font-src 'self'",

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文章列表 - MYCMS</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="logo">MY<span>CMS</span></a>
+  <nav>
+    <a href="index.html">首页</a>
+    <a href="list.html" class="active">文章</a>
+    <a href="search.html">搜索</a>
+    <a href="favorites.html" id="nav-favorites" style="display:none">收藏</a>
+  </nav>
+  <div class="user-area" id="user-area">
+    <a href="login.html" class="btn-sm btn-outline" id="btn-login">登录</a>
+    <button class="btn-sm btn-outline" id="btn-logout" style="display:none" onclick="doLogout()">退出</button>
+  </div>
+</header>
+
+<section class="main">
+  <h2 style="margin-bottom:16px">文章列表</h2>
+
+  <!-- 分类 -->
+  <div class="categories" id="categories"><a class="active">全部</a></div>
+
+  <!-- 筛选栏 -->
+  <div class="toolbar">
+    <input type="text" id="filter-keyword" placeholder="搜索标题..." value="">
+    <select id="filter-sort">
+      <option value="id" selected>默认排序</option>
+      <option value="published_at">按发布时间</option>
+      <option value="view_count">按浏览量</option>
+      <option value="title">按标题</option>
+    </select>
+    <select id="filter-order">
+      <option value="desc">降序</option>
+      <option value="asc">升序</option>
+    </select>
+    <button class="btn-sm btn-primary" onclick="loadArticles(1)">筛选</button>
+  </div>
+
+  <!-- 列表 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title" id="list-title">全部文章</span>
+      <span style="font-size:13px;color:var(--text-muted)" id="list-count"></span>
+    </div>
+    <div class="article-list" id="article-list">
+      <div class="empty"><p>加载中...</p></div>
+    </div>
+  </div>
+
+  <!-- 分页 -->
+  <div class="pagination" id="pagination"></div>
+</section>
+
+<footer class="footer">MYCMS Frontend v1.0.1</footer>
+
+<script src="assets/js/api.js"></script>
+<script>
+var currentPage = 1;
+var totalPages = 1;
+
+function updateUI() {
+  var li = CMS.isLoggedIn();
+  document.getElementById('btn-login').style.display = li ? 'none' : '';
+  document.getElementById('btn-logout').style.display = li ? '' : 'none';
+  document.getElementById('nav-favorites').style.display = li ? '' : 'none';
+}
+
+function doLogout() { CMS.clearAuth(); updateUI(); showToast('已退出'); }
+
+function loadArticles(page) {
+  currentPage = page || 1;
+  var params = {
+    page: currentPage,
+    page_size: 10,
+    sort_by: document.getElementById('filter-sort').value,
+    sort_order: document.getElementById('filter-order').value
+  };
+  var kw = document.getElementById('filter-keyword').value.trim();
+  if (kw) params.keyword = kw;
+  var cat = getParam('category');
+  if (cat) params.category = cat;
+
+  document.getElementById('article-list').innerHTML = '<div class="empty"><p>加载中...</p></div>';
+
+  CMS.post(CMS.articleList, params).then(function(res) {
+    if (res.code !== 0) { showToast(res.msg, 'error'); return; }
+    var d = res.data;
+    totalPages = d.total_pages || 1;
+    document.getElementById('list-count').textContent = '共 ' + d.total + ' 篇';
+    document.getElementById('list-title').textContent = cat ? '分类：' + cat : '全部文章';
+
+    var html = '';
+    if (d.list && d.list.length) {
+      html = d.list.map(renderArticleItem).join('');
+    } else {
+      html = '<div class="empty"><p>暂无文章</p></div>';
+    }
+    document.getElementById('article-list').innerHTML = html;
+    renderPagination();
+  }).catch(function() {
+    document.getElementById('article-list').innerHTML = '<div class="empty"><p>加载失败</p></div>';
+  });
+}
+
+function renderPagination() {
+  var html = '';
+  html += '<button ' + (currentPage <= 1 ? 'disabled' : '') + ' onclick="loadArticles(' + (currentPage-1) + ')">上一页</button>';
+  for (var i = 1; i <= totalPages && i <= 7; i++) {
+    html += '<button class="' + (i === currentPage ? 'active' : '') + '" onclick="loadArticles(' + i + ')">' + i + '</button>';
+  }
+  if (totalPages > 7) html += '<button disabled>...</button>';
+  if (totalPages > 7) html += '<button onclick="loadArticles(' + totalPages + ')">' + totalPages + '</button>';
+  html += '<button ' + (currentPage >= totalPages ? 'disabled' : '') + ' onclick="loadArticles(' + (currentPage+1) + ')">下一页</button>';
+  document.getElementById('pagination').innerHTML = html;
+}
+
+function loadCategories() {
+  CMS.post(CMS.articleList, { page: 1, page_size: 1 }).then(function(res) {
+    if (res.code !== 0) return;
+    var cats = res.data.categories || [];
+    var active = getParam('category');
+    var html = '<a href="list.html" class="' + (active ? '' : 'active') + '">全部</a>';
+    cats.forEach(function(c) {
+      html += '<a href="list.html?category=' + encodeURIComponent(c) + '" class="' + (c === active ? 'active' : '') + '">' + escapeHtml(c) + '</a>';
+    });
+    document.getElementById('categories').innerHTML = html;
+  });
+}
+
+var cat = getParam('category');
+if (cat) document.getElementById('filter-keyword').value = '';
+
+loadCategories();
+loadArticles(1);
+updateUI();
+</script>
+</body>
+</html>

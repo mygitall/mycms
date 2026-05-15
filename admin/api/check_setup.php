@@ -19,6 +19,7 @@ if ($configured) {
     $existingConfig = include $configFile;
     if (is_array($existingConfig)) {
         $existingConfig['DB_USER'] = ''; // 不暴露数据库用户名
+        $existingConfig['DB_PASS'] = ''; // 不暴露数据库密码
     }
 } else {
     if (is_file($envFile)) {
@@ -42,7 +43,7 @@ if ($configured) {
                 'DB_PORT'   => $envMap['DB_PORT'] ?? '3306',
                 'DB_NAME'   => $envMap['DB_NAME'] ?? '',
                 'DB_USER'   => '', // 不暴露数据库用户名
-                'DB_PASS'   => $envMap['DB_PASS'] ?? '',
+                'DB_PASS'   => '', // 不暴露数据库密码
                 'DB_PREFIX' => $envMap['DB_PREFIX'] ?? 'sys_',
             ];
         }

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>搜索 - MYCMS</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="logo">MY<span>CMS</span></a>
+  <nav>
+    <a href="index.html">首页</a>
+    <a href="list.html">文章</a>
+    <a href="search.html" class="active">搜索</a>
+    <a href="favorites.html" id="nav-favorites" style="display:none">收藏</a>
+  </nav>
+  <div class="user-area" id="user-area">
+    <a href="login.html" class="btn-sm btn-outline" id="btn-login">登录</a>
+    <button class="btn-sm btn-outline" id="btn-logout" style="display:none" onclick="doLogout()">退出</button>
+  </div>
+</header>
+
+<section class="main">
+  <div class="search-hero">
+    <h2>搜索文章 &amp; 软件</h2>
+    <div class="search-input-wrap">
+      <input type="text" id="search-input" placeholder="输入关键词..." value="" onkeydown="if(event.key==='Enter')doSearch(1)">
+      <button onclick="doSearch(1)">搜索</button>
+    </div>
+  </div>
+
+  <!-- 筛选 -->
+  <div class="toolbar" style="justify-content:center">
+    <select id="search-source">
+      <option value="">全部来源</option>
+      <option value="article">仅文章</option>
+      <option value="software">仅软件</option>
+    </select>
+    <select id="search-sort">
+      <option value="relevance">按相关度</option>
+      <option value="created">按时间</option>
+      <option value="views">按热度</option>
+    </select>
+  </div>
+
+  <!-- 结果计数 -->
+  <div style="text-align:center;margin-bottom:16px;color:var(--text-muted);font-size:13px" id="result-info"></div>
+
+  <!-- 结果页已包含在 card 中 -->
+  <div class="card" id="result-card" style="display:none">
+    <div class="card-header">
+      <span class="card-title">搜索结果</span>
+      <span style="font-size:12px;color:var(--text-muted)" id="result-total"></span>
+    </div>
+    <div class="article-list" id="search-results"></div>
+  </div>
+
+  <!-- 分页 -->
+  <div class="pagination" id="pagination" style="display:none"></div>
+
+  <!-- 空状态 -->
+  <div class="empty" id="search-empty" style="display:none">
+    <div class="icon">&#128269;</div>
+    <p>输入关键词开始搜索</p>
+  </div>
+</section>
+
+<footer class="footer">MYCMS Frontend v1.0.1</footer>
+
+<script src="assets/js/api.js"></script>
+<script>
+var currentPage = 1, totalPages = 1;
+
+function updateUI() {
+  var li = CMS.isLoggedIn();
+  document.getElementById('btn-login').style.display = li ? 'none' : '';
+  document.getElementById('btn-logout').style.display = li ? '' : 'none';
+  document.getElementById('nav-favorites').style.display = li ? '' : 'none';
+}
+
+function doLogout() { CMS.clearAuth(); updateUI(); showToast('已退出'); }
+
+function doSearch(page) {
+  var kw = document.getElementById('search-input').value.trim();
+  if (!kw) { showToast('请输入关键词', 'error'); return; }
+
+  currentPage = page || 1;
+  var params = 'keyword=' + encodeURIComponent(kw) +
+    '&page=' + currentPage +
+    '&page_size=10' +
+    '&source=' + document.getElementById('search-source').value +
+    '&sort_by=' + document.getElementById('search-sort').value;
+
+  document.getElementById('search-empty').style.display = 'none';
+  document.getElementById('result-card').style.display = '';
+  document.getElementById('search-results').innerHTML = '<div class="empty"><p>搜索中...</p></div>';
+
+  fetch(CMS.searchList + '?' + params)
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+      if (res.code !== 0) { showToast(res.msg, 'error'); return; }
+      var d = res.data;
+      totalPages = d.total_pages || 0;
+      document.getElementById('result-info').textContent = '找到 ' + d.total + ' 条结果';
+      document.getElementById('result-total').textContent = '共 ' + d.total + ' 条';
+
+      var html = '';
+      if (d.list && d.list.length) {
+        d.list.forEach(function(item) {
+          var typeLabel = item.type === 'software' ? '[软件] ' : '';
+          var title = escapeHtml(typeLabel + (item.title || '无标题'));
+          var content = truncate(item.content || '', 150);
+          var date = formatDate(item.date || '');
+          var url = item.url || (CMS.BASE + '/' + item.type + '/p/' + item.id);
+          if (item.type === 'article') {
+            url = CMS.BASE + '/detail?id=' + item.id;
+          }
+          html += '<div class="item" style="cursor:pointer" onclick="location.href=\'' + url + '\'">' +
+            '<div class="thumb">' + (item.type === 'software' ? 'S' : 'A') + '</div>' +
+            '<div class="info">' +
+              '<h3>' + title + '</h3>' +
+              '<p>' + content + '</p>' +
+              '<div class="meta">' +
+                '<span>' + escapeHtml(item.subtitle || '') + '</span>' +
+                '<span>' + (item.views || 0) + ' 浏览</span>' +
+                '<span>相关度：' + (item.relevance || 0) + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        });
+      } else {
+        html = '<div class="empty"><p>无搜索结果</p></div>';
+      }
+      document.getElementById('search-results').innerHTML = html;
+      document.getElementById('result-card').style.display = '';
+      renderPagination();
+    }).catch(function() {
+      document.getElementById('search-results').innerHTML = '<div class="empty"><p>搜索失败，请稍后重试</p></div>';
+    });
+}
+
+function renderPagination() {
+  if (totalPages <= 1) { document.getElementById('pagination').style.display = 'none'; return; }
+  document.getElementById('pagination').style.display = '';
+  var html = '';
+  html += '<button ' + (currentPage <= 1 ? 'disabled' : '') + ' onclick="doSearch(' + (currentPage-1) + ')">上一页</button>';
+  for (var i = 1; i <= totalPages && i <= 5; i++) {
+    html += '<button class="' + (i === currentPage ? 'active' : '') + '" onclick="doSearch(' + i + ')">' + i + '</button>';
+  }
+  if (totalPages > 5) html += '<button disabled>...</button><button onclick="doSearch(' + totalPages + ')">' + totalPages + '</button>';
+  html += '<button ' + (currentPage >= totalPages ? 'disabled' : '') + ' onclick="doSearch(' + (currentPage+1) + ')">下一页</button>';
+  document.getElementById('pagination').innerHTML = html;
+}
+
+// URL 参数预填
+var q = getParam('q');
+if (q) {
+  document.getElementById('search-input').value = q;
+  doSearch(1);
+} else {
+  document.getElementById('search-empty').style.display = '';
+}
+
+updateUI();
+</script>
+</body>
+</html>

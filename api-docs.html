@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CMS API 接口文档 v1.0.1</title>
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --surface: #ffffff;
+      --text: #1a1a2e;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #f5a623;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --info: #3b82f6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 0;
+    }
+    /* ── 导航栏 ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .topbar .logo {
+      font-weight: 700; font-size: 18px; color: var(--text);
+    }
+    .topbar .logo span { color: var(--accent); }
+    .topbar .version {
+      background: var(--accent); color: #fff;
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 700;
+    }
+    /* ── 布局 ── */
+    .layout { display: flex; min-height: calc(100vh - 56px); }
+    .sidebar {
+      width: 240px; background: var(--surface); border-right: 1px solid var(--border);
+      padding: 20px 0; position: sticky; top: 56px; height: calc(100vh - 56px);
+      overflow-y: auto; flex-shrink: 0;
+    }
+    .sidebar .nav-group {
+      padding: 8px 20px; font-size: 11px; font-weight: 700;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;
+    }
+    .sidebar a {
+      display: block; padding: 8px 20px; font-size: 13px;
+      color: var(--text); text-decoration: none; border-left: 3px solid transparent;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background: var(--bg); color: var(--accent); border-left-color: var(--accent);
+    }
+    .main {
+      flex: 1; padding: 32px 40px; max-width: 960px;
+    }
+    /* ── 区块 ── */
+    .section { margin-bottom: 48px; }
+    .section h2 {
+      font-size: 22px; margin-bottom: 8px; padding-bottom: 12px;
+      border-bottom: 2px solid var(--accent);
+    }
+    .section h3 {
+      font-size: 17px; margin: 28px 0 12px; color: var(--text);
+      padding-left: 10px; border-left: 3px solid var(--accent);
+    }
+    .section .desc {
+      color: var(--text-muted); font-size: 13px; margin-bottom: 20px;
+    }
+    /* ── 基础信息表 ── */
+    .info-table {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 16px 20px; margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .info-table table { width: 100%; border-collapse: collapse; }
+    .info-table td { padding: 8px 12px; font-size: 13px; vertical-align: top; }
+    .info-table td:first-child {
+      width: 120px; color: var(--text-muted); font-weight: 600;
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    /* ── 端点卡片 ── */
+    .endpoint {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;
+    }
+    .endpoint .head {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .endpoint .method {
+      padding: 3px 10px; border-radius: 6px; font-size: 11px;
+      font-weight: 700; letter-spacing: 0.5px; font-family: monospace;
+    }
+    .method-get { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .method-post { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+    .method-both { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
+    .endpoint .path {
+      font-family: 'Monaco','Menlo',monospace; font-size: 13px; color: var(--accent);
+      flex: 1;
+    }
+    .endpoint .name { font-size: 13px; color: var(--text); font-weight: 600; }
+    .endpoint .body { padding: 18px 20px; }
+    .endpoint .body .label {
+      font-size: 11px; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+    }
+    .code-block {
+      background: #1a1a2e; color: #a5d6ff; padding: 14px 18px;
+      border-radius: 6px; font-family: 'Monaco','Menlo',monospace;
+      font-size: 12px; overflow-x: auto; white-space: pre;
+      line-height: 1.7; margin-bottom: 16px;
+    }
+    .code-block .key { color: #ff7b72; }
+    .code-block .str { color: #a5d6ff; }
+    .code-block .cmt { color: #6b9b6b; }
+    .code-block .num { color: #79c0ff; }
+    .tag {
+      display: inline-block; padding: 1px 7px; border-radius: 3px;
+      font-size: 10px; font-weight: 700; margin-left: 4px;
+    }
+    .tag-auth { background: #fef3c7; color: #92400e; }
+    .tag-csrf { background: #fce7f3; color: #be185d; }
+    .tag-public { background: #dcfce7; color: #166534; }
+    .tag-cors { background: #dbeafe; color: #1e40af; }
+    /* ── 响应式 ── */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ 顶栏 ═══ -->
+<div class="topbar">
+  <div class="logo">MY<span>CMS</span> · API 接口文档</div>
+  <div class="version">v1.0.1</div>
+</div>
+
+<!-- ═══ 布局 ═══ -->
+<div class="layout">
+
+<!-- ═══ 侧边导航 ═══ -->
+<nav class="sidebar">
+  <div class="nav-group">概览</div>
+  <a href="#overview">接口总览</a>
+  <a href="#auth">认证说明</a>
+  <a href="#response">响应格式</a>
+
+  <div class="nav-group">搜索模块</div>
+  <a href="#search-list">全站搜索</a>
+  <a href="#search-history">搜索历史管理</a>
+
+  <div class="nav-group">核心 API</div>
+  <a href="#api-login">用户登录</a>
+  <a href="#api-register">用户注册</a>
+  <a href="#api-logout">用户登出</a>
+  <a href="#api-csrf">CSRF Token</a>
+  <a href="#api-validate">Token 验证</a>
+  <a href="#api-list">用户列表</a>
+  <a href="#api-update">更新用户</a>
+  <a href="#api-delete">删除用户</a>
+  <a href="#api-batch">批量删除</a>
+  <a href="#api-stats">用户统计</a>
+  <a href="#api-logs">操作日志</a>
+  <a href="#api-export">导出 CSV</a>
+  <a href="#api-import">导入用户</a>
+  <a href="#api-migrate-export">迁移导出</a>
+  <a href="#api-migrate-import">迁移导入</a>
+  <a href="#api-token-expiry">Token 续期</a>
+  <a href="#api-ip-ban">IP 封禁开关</a>
+
+  <div class="nav-group">文章模块</div>
+  <a href="#article-list">文章列表</a>
+  <a href="#article-view">文章详情</a>
+  <a href="#article-create">创建文章</a>
+  <a href="#article-update">更新文章</a>
+  <a href="#article-delete">删除文章</a>
+  <a href="#article-favorite">收藏文章</a>
+  <a href="#article-unfavorite">取消收藏</a>
+  <a href="#article-fav-status">收藏状态</a>
+  <a href="#article-favorites">收藏列表</a>
+  <a href="#article-fav-stats">收藏统计</a>
+  <a href="#article-fav-admin">管理员收藏</a>
+  <a href="#article-fav-delete">管理员删收藏</a>
+
+  <div class="nav-group">软件模块</div>
+  <a href="#sw-list">软件列表</a>
+  <a href="#sw-create">创建软件</a>
+  <a href="#sw-update">更新软件</a>
+  <a href="#sw-delete">删除软件</a>
+  <a href="#sw-status">状态变更</a>
+  <a href="#sw-categories">分类列表</a>
+
+  <div class="nav-group">管理面板</div>
+  <a href="#admin-setup">安装状态检测</a>
+  <a href="#admin-save-setup">保存安装配置</a>
+  <a href="#admin-test-db">测试数据库连接</a>
+</nav>
+
+<!-- ═══ 主内容 ═══ -->
+<main class="main">
+
+<!-- ──────────────────────────────────────── -->
+<!-- 概览 -->
+<!-- ──────────────────────────────────────── -->
+<div class="section" id="overview">
+  <h2>接口总览</h2>
+  <p class="desc">MYCMS API 共 <strong>41</strong> 个接口，分为搜索、核心管理、文章、软件、管理面板五大模块。</p>
+
+  <div class="info-table">
+    <table>
+      <tr><td>基础地址</td><td><code>{base}</code> 为当前部署路径，如 <code>http://localhost/cms</code></td></tr>
+      <tr><td>请求格式</td><td>Content-Type: application/json</td></tr>
+      <tr><td>响应格式</td><td>JSON：<code>{"code":0,"msg":"success","data":{...}}</code></td></tr>
+      <tr><td>搜索接口</td><td>支持 GET/POST，已开启 CORS 跨域</td></tr>
+      <tr><td>文章列表/详情</td><td>公开接口，无需认证</td></tr>
+      <tr><td>写操作接口</td><td>需要管理员 Token + CSRF 校验</td></tr>
+    </table>
+  </div>
+
+  <h3>接口一览表</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:13px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
+    <thead>
+      <tr style="background:var(--bg);">
+        <th style="padding:10px;text-align:left;">模块</th>
+        <th style="padding:10px;text-align:left;">方法</th>
+        <th style="padding:10px;text-align:left;">路径</th>
+        <th style="padding:10px;text-align:left;">认证</th>
+        <th style="padding:10px;text-align:left;">说明</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:8px 10px;color:var(--accent);font-weight:600;">搜索</td><td style="padding:8px 10px"><span class="method method-both">GET/POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/search/api/list</td><td style="padding:8px 10px"><span class="tag tag-public">公开</span><span class="tag tag-cors">CORS</span></td><td style="padding:8px 10px;color:var(--text-muted);">全站搜索（文章+软件）</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--accent);font-weight:600;">搜索</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/admin/api/search_history</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">搜索历史管理</td></tr>
+
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/login</td><td style="padding:8px 10px"><span class="tag tag-public">公开</span></td><td style="padding:8px 10px;color:var(--text-muted);">用户登录</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/register</td><td style="padding:8px 10px"><span class="tag tag-public">公开</span></td><td style="padding:8px 10px;color:var(--text-muted);">用户注册</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/logout</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span></td><td style="padding:8px 10px;color:var(--text-muted);">用户登出</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-get">GET</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/csrf_token</td><td style="padding:8px 10px"><span class="tag tag-public">公开</span></td><td style="padding:8px 10px;color:var(--text-muted);">获取 CSRF Token</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/validate_token</td><td style="padding:8px 10px"><span class="tag tag-public">公开</span></td><td style="padding:8px 10px;color:var(--text-muted);">验证 Token 有效性</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/list</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">用户列表（分页/排序）</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/update</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">更新用户信息</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/delete</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">删除单个用户</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/batch_delete</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">批量删除用户</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/stats</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">用户统计</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/admin_logs</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">管理员操作日志</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/export</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">导出用户 CSV</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/import</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">导入用户数据</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/migrate_export</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">数据迁移导出</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/migrate_import</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">数据迁移导入</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/update_token_expiry</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">延长 Token 有效期</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--info);font-weight:600;">核心</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/api/ip_ban_toggle</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">IP 封禁开关</td></tr>
+
+      <tr><td style="padding:8px 10px;color:var(--success);font-weight:600;">文章</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/article/api/list</td><td style="padding:8px 10px"><span class="tag tag-public">公开</span><span class="tag tag-cors">CORS</span></td><td style="padding:8px 10px;color:var(--text-muted);">文章列表（分页/筛选）</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--success);font-weight:600;">文章</td><td style="padding:8px 10px"><span class="method method-both">GET/POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/article/api/view</td><td style="padding:8px 10px"><span class="tag tag-public">公开</span><span class="tag tag-cors">CORS</span></td><td style="padding:8px 10px;color:var(--text-muted);">文章详情</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--success);font-weight:600;">文章</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/article/api/create</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">创建文章</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--success);font-weight:600;">文章</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/article/api/update</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">更新文章</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--success);font-weight:600;">文章</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/article/api/delete</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">删除文章</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--success);font-weight:600;">文章</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/article/api/favorite</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">收藏文章</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--success);font-weight:600;">文章</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/article/api/unfavorite</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">取消收藏</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--success);font-weight:600;">文章</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/article/api/favorite_status</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">查询收藏状态</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--success);font-weight:600;">文章</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/article/api/favorites</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">用户收藏列表</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--success);font-weight:600;">文章</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/article/api/favorites_stats</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">收藏统计</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--success);font-weight:600;">文章</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/article/api/favorites_admin</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">管理员查看收藏</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--success);font-weight:600;">文章</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/article/api/favorites_delete</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">管理员删除收藏</td></tr>
+
+      <tr><td style="padding:8px 10px;color:var(--danger);font-weight:600;">软件</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/software/api/list</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">软件列表</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--danger);font-weight:600;">软件</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/software/api/create</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">创建软件条目</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--danger);font-weight:600;">软件</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/software/api/update</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">更新软件条目</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--danger);font-weight:600;">软件</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/software/api/delete</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">删除软件条目</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--danger);font-weight:600;">软件</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/software/api/status</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">上下架/草稿</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--danger);font-weight:600;">软件</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/software/api/categories</td><td style="padding:8px 10px"><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span></td><td style="padding:8px 10px;color:var(--text-muted);">软件分类列表</td></tr>
+
+      <tr><td style="padding:8px 10px;color:var(--text-muted);font-weight:600;">管理</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/admin/api/check_setup</td><td style="padding:8px 10px"><span class="tag tag-public">公开</span></td><td style="padding:8px 10px;color:var(--text-muted);">检查安装状态（密码已脱敏）</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--text-muted);font-weight:600;">管理</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/admin/api/save_setup</td><td style="padding:8px 10px"><span class="tag tag-public">公开</span></td><td style="padding:8px 10px;color:var(--text-muted);">保存安装配置</td></tr>
+      <tr><td style="padding:8px 10px;color:var(--text-muted);font-weight:600;">管理</td><td style="padding:8px 10px"><span class="method method-post">POST</span></td><td style="padding:8px 10px;font-family:monospace;font-size:12px;">/admin/api/test_connection</td><td style="padding:8px 10px"><span class="tag tag-public">公开</span></td><td style="padding:8px 10px;color:var(--text-muted);">测试数据库连接</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ──────────────────────────────────────── -->
+<!-- 认证说明 -->
+<!-- ──────────────────────────────────────── -->
+<div class="section" id="auth">
+  <h2>认证说明</h2>
+
+  <h3>Token 认证</h3>
+  <p class="desc">写操作接口需要有效的管理员 Token，支持三种传递方式（优先级从高到低）：</p>
+  <div class="code-block"><span class="cmt">// 方式一：Authorization 请求头（推荐）</span>
+curl -H <span class="str">"Authorization: Bearer &lt;token&gt;"</span> ...
+
+<span class="cmt">// 方式二：X-Token 请求头</span>
+curl -H <span class="str">"X-Token: &lt;token&gt;"</span> ...
+
+<span class="cmt">// 方式三：POST Body 中的 _token 字段</span>
+curl -d <span class="str">'{"_token":"&lt;token&gt;", ...}'</span> ...</div>
+
+  <h3>CSRF 校验</h3>
+  <p class="desc">所有状态变更操作（POST/DELETE/PUT/PATCH）需通过 CSRF 校验。两种方式二选一：</p>
+  <div class="code-block"><span class="cmt">// 方式一：CSRF Cookie + Header（推荐，适用于 API 调用）</span>
+<span class="cmt">// 步骤1：获取 CSRF Token（服务端会设置 Cookie）</span>
+curl -c cookies.txt <span class="str">"{base}/api/csrf_token"</span>
+
+<span class="cmt">// 步骤2：后续请求带上 Cookie 和 X-CSRF-Token 头</span>
+curl -b cookies.txt -H <span class="str">"X-CSRF-Token: &lt;csrf_token&gt;"</span> ...
+
+<span class="cmt">// 方式二：Referer/Origin 同源校验（适用于浏览器表单）</span>
+<span class="cmt">// 请求头 Referer 或 Origin 与 Host 一致时自动放行</span></div>
+
+  <h3>频率限制</h3>
+  <p class="desc">各接口有独立的频率限制，超限返回 <code>429</code> 状态码 + <code>Retry-After</code> 响应头。封禁记录存储在 <code>storage/runtime/</code> 目录。</p>
+</div>
+
+<!-- ──────────────────────────────────────── -->
+<!-- 响应格式 -->
+<!-- ──────────────────────────────────────── -->
+<div class="section" id="response">
+  <h2>统一响应格式</h2>
+  <div class="code-block">{
+  <span class="key">"code"</span>: <span class="num">0</span>,           <span class="cmt">// 0=成功, 400=参数错误, 401=未登录, 403=CSRF/权限不足</span>
+  <span class="key">"msg"</span>: <span class="str">"success"</span>,    <span class="cmt">// 429=频率限制, 500=服务器错误</span>
+  <span class="key">"data"</span>: { ... }      <span class="cmt">// 响应数据，失败时为 null</span>
+}</div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!--  搜索模块 -->
+<!-- ════════════════════════════════════════ -->
+<div class="section" id="search-list">
+  <h2>搜索模块</h2>
+
+  <!-- 全站搜索 -->
+  <div class="endpoint" id="search-list">
+    <div class="head">
+      <span class="method method-both">GET/POST</span>
+      <span class="path">{base}/search/api/list</span>
+      <span class="name">全站搜索</span>
+      <span class="tag tag-public">公开</span><span class="tag tag-cors">CORS</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{
+  <span class="key">"keyword"</span>:   <span class="str">"PHP教程"</span>,   <span class="cmt">// string，必填，≤100字符</span>
+  <span class="key">"source"</span>:    <span class="str">"article"</span>,  <span class="cmt">// string，可选：article / software / 空=全部</span>
+  <span class="key">"page"</span>:      <span class="num">1</span>,            <span class="cmt">// number，可选，默认 1</span>
+  <span class="key">"page_size"</span>: <span class="num">10</span>,           <span class="cmt">// number，可选，1-100，默认 10</span>
+  <span class="key">"sort_by"</span>:   <span class="str">"relevance"</span> <span class="cmt">// string，可选：relevance / created / views</span>
+}</div>
+      <div class="label">成功响应</div>
+      <div class="code-block">{
+  <span class="key">"code"</span>: <span class="num">0</span>, <span class="key">"msg"</span>: <span class="str">"success"</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"list"</span>: [
+      { <span class="key">"type"</span>: <span class="str">"article"</span>, <span class="key">"id"</span>: <span class="num">1</span>, <span class="key">"title"</span>: <span class="str">"PHP入门"</span>,
+        <span class="key">"category"</span>: <span class="str">"PHP"</span>, <span class="key">"tags"</span>: <span class="str">"教程,入门"</span>,
+        <span class="key">"author"</span>: <span class="str">"admin"</span>, <span class="key">"views"</span>: <span class="num">100</span>,
+        <span class="key">"url"</span>: <span class="str">"http://localhost/cms/article/p/1"</span>,
+        <span class="key">"date"</span>: <span class="str">"2026-05-15 10:00:00"</span>,
+        <span class="key">"content"</span>: <span class="str">"PHP入门教程，从零开始..."</span>,
+        <span class="key">"subtitle"</span>: <span class="str">"PHP · 教程,入门"</span>,
+        <span class="key">"relevance"</span>: <span class="num">4</span> }
+    ],
+    <span class="key">"total"</span>: <span class="num">42</span>, <span class="key">"sources"</span>: [<span class="str">"article"</span>,<span class="str">"software"</span>],
+    <span class="key">"page"</span>: <span class="num">1</span>, <span class="key">"page_size"</span>: <span class="num">10</span>, <span class="key">"total_pages"</span>: <span class="num">5</span>,
+    <span class="key">"base_path"</span>: <span class="str">"/cms"</span>, <span class="key">"base_url"</span>: <span class="str">"http://localhost/cms"</span>
+  }
+}</div>
+      <div class="label">Relevance 评分规则</div>
+      <div class="code-block"><span class="cmt">title 命中：+3 分
+其他字段命中（content / category / tags / name / description）：+1 分/字段
+多字段同时命中时分数累加
+默认排序：relevance DESC, created_at DESC</span></div>
+      <div class="label">外部调用示例（JavaScript）</div>
+      <div class="code-block">fetch(<span class="str">'{base}/search/api/list'</span>, {
+  method: <span class="str">'POST'</span>,
+  headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
+  body: JSON.stringify({ keyword: <span class="str">'PHP'</span>, page: <span class="num">1</span>, page_size: <span class="num">10</span> })
+}).then(r => r.json()).then(data => {
+  <span class="cmt">// data.list[].url 已是完整 URL，可直接使用</span>
+  data.list.forEach(item => console.log(item.title, item.url));
+});</div>
+      <div class="label">失败响应</div>
+      <div class="code-block">{ <span class="key">"code"</span>: <span class="num">400</span>, <span class="key">"msg"</span>: <span class="str">"关键词长度不能超过100个字符"</span>, <span class="key">"data"</span>: <span class="num">null</span> }
+{ <span class="key">"code"</span>: <span class="num">400</span>, <span class="key">"msg"</span>: <span class="str">"无效的数据源类型: xxx"</span>, <span class="key">"data"</span>: <span class="num">null</span> }</div>
+    </div>
+  </div>
+
+  <!-- 搜索历史 -->
+  <div class="endpoint" id="search-history">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/admin/api/search_history</span>
+      <span class="name">搜索历史管理</span>
+      <span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{
+  <span class="key">"action"</span>: <span class="str">"list"</span>,       <span class="cmt">// string，必填：list / delete / clear</span>
+  <span class="key">"_token"</span>: <span class="str">"adminToken"</span>,<span class="cmt">// string，必填，管理员 Token</span>
+  <span class="key">"page"</span>: <span class="num">1</span>,             <span class="cmt">// number，list 时必填</span>
+  <span class="key">"page_size"</span>: <span class="num">20</span>,        <span class="cmt">// number，可选，默认 20</span>
+  <span class="key">"keyword"</span>: <span class="str">"PHP"</span>,       <span class="cmt">// string，可选，关键词过滤</span>
+  <span class="key">"id"</span>: <span class="num">1</span>                 <span class="cmt">// number，delete 时必填</span>
+}</div>
+      <div class="label">成功响应</div>
+      <div class="code-block">{
+  <span class="key">"code"</span>: <span class="num">0</span>, <span class="key">"msg"</span>: <span class="str">"success"</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"list"</span>: [{ <span class="key">"id"</span>: <span class="num">1</span>, <span class="key">"keyword"</span>: <span class="str">"PHP"</span>, <span class="key">"search_count"</span>: <span class="num">5</span>, <span class="key">"last_searched_at"</span>: <span class="str">"..."</span> }],
+    <span class="key">"total"</span>: <span class="num">42</span>, <span class="key">"page"</span>: <span class="num">1</span>, <span class="key">"page_size"</span>: <span class="num">20</span>, <span class="key">"total_pages"</span>: <span class="num">3</span>,
+    <span class="key">"stats"</span>: { <span class="key">"total"</span>: <span class="num">100</span>, <span class="key">"today"</span>: <span class="num">12</span>, <span class="key">"top_keyword"</span>: <span class="str">"PHP"</span> }
+  }
+}</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!--  核心 API -->
+<!-- ════════════════════════════════════════ -->
+<div class="section" id="api-login">
+  <h2>核心 API</h2>
+
+  <!-- 登录 -->
+  <div class="endpoint" id="api-login">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/login</span>
+      <span class="name">用户登录</span>
+      <span class="tag tag-public">公开</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{
+  <span class="key">"username"</span>: <span class="str">"admin"</span>,     <span class="cmt">// string，必填</span>
+  <span class="key">"password"</span>: <span class="str">"admin123"</span>, <span class="cmt">// string，必填</span>
+  <span class="key">"device"</span>: <span class="str">"iPhone15"</span>,   <span class="cmt">// string，可选，设备标识</span>
+  <span class="key">"remember"</span>: <span class="num">true</span>        <span class="cmt">// bool，可选，记住登录（Token 有效期 30 天）</span>
+}</div>
+      <div class="label">成功响应</div>
+      <div class="code-block">{
+  <span class="key">"code"</span>: <span class="num">0</span>, <span class="key">"msg"</span>: <span class="str">"登录成功"</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"token"</span>: <span class="str">"62292df0..."</span>,
+    <span class="key">"user_id"</span>: <span class="num">1</span>, <span class="key">"username"</span>: <span class="str">"admin"</span>,
+    <span class="key">"expires_at"</span>: <span class="str">"2026-05-22 10:05:37"</span>, <span class="key">"expires_in"</span>: <span class="num">604800</span>
+  }
+}</div>
+      <div class="label">限流与安全</div>
+      <div class="code-block"><span class="cmt">// 同一 IP 5 次/5 分钟内登录失败即封禁 30 分钟
+// CSRF 校验：支持 Referer 同源自动放行
+// 密码比对采用恒定时间比较，防时序攻击</span></div>
+    </div>
+  </div>
+
+  <!-- 注册 -->
+  <div class="endpoint" id="api-register">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/register</span>
+      <span class="name">用户注册</span>
+      <span class="tag tag-public">公开</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{
+  <span class="key">"username"</span>: <span class="str">"newuser"</span>,   <span class="cmt">// string，必填，2-50字符</span>
+  <span class="key">"password"</span>: <span class="str">"Abc12345"</span>,  <span class="cmt">// string，必填，≥8位，必须包含字母+数字</span>
+  <span class="key">"device"</span>: <span class="str">"iPhone15"</span>     <span class="cmt">// string，可选</span>
+}</div>
+      <div class="label">成功响应</div>
+      <div class="code-block">{
+  <span class="key">"code"</span>: <span class="num">0</span>, <span class="key">"msg"</span>: <span class="str">"注册成功"</span>,
+  <span class="key">"data"</span>: { <span class="key">"token"</span>: <span class="str">"..."</span>, <span class="key">"user_id"</span>: <span class="num">8</span>, <span class="key">"username"</span>: <span class="str">"newuser"</span>, <span class="key">"expires_at"</span>: <span class="str">"..."</span> }
+}</div>
+      <div class="label">限流</div>
+      <div class="code-block"><span class="cmt">// 同一 IP 每小时最多注册 10 次，超限封禁 30 分钟</span></div>
+    </div>
+  </div>
+
+  <!-- 登出 -->
+  <div class="endpoint" id="api-logout">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/logout</span>
+      <span class="name">用户登出</span>
+      <span class="tag tag-auth">Token</span>
+    </div>
+    <div class="body">
+      <div class="label">说明</div>
+      <div class="code-block"><span class="cmt">// 销毁当前 Token，使该会话立即失效
+// 需要传递有效的 Token（Authorization / X-Token / _token）</span></div>
+    </div>
+  </div>
+
+  <!-- CSRF Token -->
+  <div class="endpoint" id="api-csrf">
+    <div class="head">
+      <span class="method method-get">GET</span>
+      <span class="path">{base}/api/csrf_token</span>
+      <span class="name">获取 CSRF Token</span>
+      <span class="tag tag-public">公开</span>
+    </div>
+    <div class="body">
+      <div class="label">说明</div>
+      <div class="code-block"><span class="cmt">// 返回 CSRF Token 并设置 HttpOnly Cookie
+// Token 有效期 2 小时
+// 后续写操作需在请求头中带上 X-CSRF-Token</span></div>
+      <div class="label">响应</div>
+      <div class="code-block">{ <span class="key">"code"</span>: <span class="num">0</span>, <span class="key">"msg"</span>: <span class="str">"ok"</span>, <span class="key">"data"</span>: { <span class="key">"csrf_token"</span>: <span class="str">"a1b2c3..."</span>, <span class="key">"expires_in"</span>: <span class="num">7200</span> } }</div>
+    </div>
+  </div>
+
+  <!-- Token 验证 -->
+  <div class="endpoint" id="api-validate">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/validate_token</span>
+      <span class="name">验证 Token 有效性</span>
+      <span class="tag tag-public">公开</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{ <span class="key">"token"</span>: <span class="str">"62292df0..."</span> }  <span class="cmt">// string，必填</span></div>
+      <div class="label">成功</div>
+      <div class="code-block">{ <span class="key">"code"</span>: <span class="num">0</span>, <span class="key">"msg"</span>: <span class="str">"Token 有效"</span>, <span class="key">"data"</span>: { <span class="key">"valid"</span>: <span class="num">true</span>, <span class="key">"user_id"</span>: <span class="num">1</span> } }</div>
+      <div class="label">失败</div>
+      <div class="code-block">{ <span class="key">"code"</span>: <span class="num">1001</span>, <span class="key">"msg"</span>: <span class="str">"Token 不存在或已被删除"</span>, <span class="key">"data"</span>: { <span class="key">"valid"</span>: <span class="num">false</span> } }</div>
+    </div>
+  </div>
+
+  <!-- 用户列表 -->
+  <div class="endpoint" id="api-list">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/list</span>
+      <span class="name">用户列表</span>
+      <span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{
+  <span class="key">"_token"</span>: <span class="str">"adminToken"</span>, <span class="cmt">// string，必填</span>
+  <span class="key">"page"</span>: <span class="num">1</span>,              <span class="cmt">// number，可选，默认 1</span>
+  <span class="key">"page_size"</span>: <span class="num">20</span>,         <span class="cmt">// number，可选，默认 20</span>
+  <span class="key">"sort_by"</span>: <span class="str">"id"</span>,         <span class="cmt">// string，可选：id / username / login_count / created_at</span>
+  <span class="key">"sort_order"</span>: <span class="str">"desc"</span>,    <span class="cmt">// string，可选：asc / desc</span>
+  <span class="key">"start_date"</span>: <span class="str">"2026-01-01"</span>, <span class="cmt">// string，可选，注册起始日期</span>
+  <span class="key">"end_date"</span>: <span class="str">"2026-12-31"</span>  <span class="cmt">// string，可选，注册截止日期</span>
+}</div>
+    </div>
+  </div>
+
+  <!-- 更新用户 -->
+  <div class="endpoint" id="api-update">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/update</span>
+      <span class="name">更新用户信息</span>
+      <span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{
+  <span class="key">"_token"</span>: <span class="str">"adminToken"</span>,  <span class="cmt">// string，必填</span>
+  <span class="key">"id"</span>: <span class="num">1</span>,                 <span class="cmt">// number，必填，用户ID</span>
+  <span class="key">"username"</span>: <span class="str">"newName"</span>,   <span class="cmt">// string，可选</span>
+  <span class="key">"password"</span>: <span class="str">"newPass"</span>,   <span class="cmt">// string，可选</span>
+  <span class="key">"is_super_admin"</span>: <span class="num">0</span>    <span class="cmt">// number，可选，0/1（仅超级管理员可修改）</span>
+}</div>
+    </div>
+  </div>
+
+  <!-- 删除用户 -->
+  <div class="endpoint" id="api-delete">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/delete</span>
+      <span class="name">删除用户</span>
+      <span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{ <span class="key">"_token"</span>: <span class="str">"adminToken"</span>, <span class="key">"id"</span>: <span class="num">1</span> }  <span class="cmt">// id: number，必填</span></div>
+    </div>
+  </div>
+
+  <!-- 批量删除 -->
+  <div class="endpoint" id="api-batch">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/batch_delete</span>
+      <span class="name">批量删除用户</span>
+      <span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{ <span class="key">"_token"</span>: <span class="str">"adminToken"</span>, <span class="key">"ids"</span>: [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>] }  <span class="cmt">// ids: number[]，必填</span></div>
+    </div>
+  </div>
+
+  <!-- 用户统计 -->
+  <div class="endpoint" id="api-stats">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/stats</span>
+      <span class="name">用户统计</span>
+      <span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">响应数据</div>
+      <div class="code-block"><span class="cmt">// 返回：总用户数、7天活跃、30天活跃、本月新增、今日新增</span></div>
+    </div>
+  </div>
+
+  <!-- 操作日志 -->
+  <div class="endpoint" id="api-logs">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/admin_logs</span>
+      <span class="name">管理员操作日志</span>
+      <span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{
+  <span class="key">"_token"</span>: <span class="str">"adminToken"</span>, <span class="cmt">// string，必填</span>
+  <span class="key">"page"</span>: <span class="num">1</span>,              <span class="cmt">// number，可选</span>
+  <span class="key">"page_size"</span>: <span class="num">20</span>,         <span class="cmt">// number，可选</span>
+  <span class="key">"action"</span>: <span class="str">"login"</span>        <span class="cmt">// string，可选，筛选操作类型</span>
+}</div>
+    </div>
+  </div>
+
+  <!-- 导出 -->
+  <div class="endpoint" id="api-export">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/export</span>
+      <span class="name">导出用户 CSV</span>
+      <span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">说明</div>
+      <div class="code-block"><span class="cmt">// 导出用户列表为 CSV 文件（UTF-8 BOM）
+// 支持 start_date / end_date 日期筛选
+// 最大导出 10 万条（超限拒绝）
+// 响应 Content-Type: text/csv</span></div>
+      <div class="label">请求参数</div>
+      <div class="code-block">{
+  <span class="key">"_token"</span>: <span class="str">"adminToken"</span>,
+  <span class="key">"start_date"</span>: <span class="str">"2026-01-01"</span>,  <span class="cmt">// string，可选</span>
+  <span class="key">"end_date"</span>: <span class="str">"2026-12-31"</span>,    <span class="cmt">// string，可选</span>
+  <span class="key">"sort_by"</span>: <span class="str">"id"</span>,               <span class="cmt">// string，可选</span>
+  <span class="key">"sort_order"</span>: <span class="str">"asc"</span>           <span class="cmt">// string，可选</span>
+}</div>
+    </div>
+  </div>
+
+  <!-- 导入 -->
+  <div class="endpoint" id="api-import">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/import</span>
+      <span class="name">导入用户数据</span>
+      <span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">说明</div>
+      <div class="code-block"><span class="cmt">// 上传 JSON 文件导入用户数据
+// 支持 multipart/form-data 文件上传
+// 需超级管理员权限</span></div>
+    </div>
+  </div>
+
+  <!-- 迁移 -->
+  <div class="endpoint" id="api-migrate-export">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/migrate_export</span>
+      <span class="name">数据迁移导出</span>
+      <span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">说明</div>
+      <div class="code-block"><span class="cmt">// 导出全量数据（用户+Token+日志）用于服务器迁移
+// 需超级管理员权限</span></div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="api-migrate-import">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/migrate_import</span>
+      <span class="name">数据迁移导入</span>
+      <span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">说明</div>
+      <div class="code-block"><span class="cmt">// 导入迁移数据包
+// 需超级管理员权限
+// 支持 multipart/form-data 文件上传</span></div>
+    </div>
+  </div>
+
+  <!-- Token 续期 -->
+  <div class="endpoint" id="api-token-expiry">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/update_token_expiry</span>
+      <span class="name">延长 Token 有效期</span>
+      <span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{
+  <span class="key">"_token"</span>: <span class="str">"adminToken"</span>,
+  <span class="key">"user_id"</span>: <span class="num">1</span>,          <span class="cmt">// number，必填，目标用户ID</span>
+  <span class="key">"days"</span>: <span class="num">7</span>                <span class="cmt">// number，可选，延长天数，默认 7</span>
+}</div>
+    </div>
+  </div>
+
+  <!-- IP 封禁 -->
+  <div class="endpoint" id="api-ip-ban">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/api/ip_ban_toggle</span>
+      <span class="name">IP 封禁开关</span>
+      <span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">说明</div>
+      <div class="code-block"><span class="cmt">// 全局开关 IP 自动封禁功能
+// 请求参数: { "enabled": true/false }</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!--  文章模块 -->
+<!-- ════════════════════════════════════════ -->
+<div class="section" id="article-list">
+  <h2>文章模块</h2>
+  <div class="info-table"><table>
+    <tr><td>基础路径</td><td><code>{base}/article/api</code></td></tr>
+    <tr><td>公开接口</td><td>list（列表）、view（详情）</td></tr>
+    <tr><td>认证接口</td><td>create、update、delete、favorite 系列 — 需 Token + CSRF</td></tr>
+    <tr><td>限流</td><td>创建 10次/分、更新 20次/分、删除 20次/分、收藏 30次/分</td></tr>
+  </table></div>
+
+  <div class="endpoint" id="article-list">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/article/api/list</span>
+      <span class="name">文章列表</span><span class="tag tag-public">公开</span><span class="tag tag-cors">CORS</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{
+  <span class="key">"page"</span>: <span class="num">1</span>,              <span class="cmt">// number，可选，默认 1</span>
+  <span class="key">"page_size"</span>: <span class="num">10</span>,         <span class="cmt">// number，可选，1-100，默认 10</span>
+  <span class="key">"keyword"</span>: <span class="str">"PHP"</span>,        <span class="cmt">// string，可选，标题模糊搜索</span>
+  <span class="key">"category"</span>: <span class="str">"tech"</span>,     <span class="cmt">// string，可选，分类筛选</span>
+  <span class="key">"sort_by"</span>: <span class="str">"id"</span>,        <span class="cmt">// string，可选：id/title/view_count/published_at/created_at/updated_at</span>
+  <span class="key">"sort_order"</span>: <span class="str">"desc"</span>    <span class="cmt">// string，可选：asc / desc</span>
+}</div>
+      <div class="label">说明</div>
+      <div class="code-block"><span class="cmt">// 未登录：仅返回 status=1 的已发布文章（且未过期）
+// 已登录管理员：可通过 status 参数查看草稿（status=0）
+// 自动过滤已过期文章（expires_in 计算）</span></div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="article-view">
+    <div class="head">
+      <span class="method method-both">GET/POST</span>
+      <span class="path">{base}/article/api/view</span>
+      <span class="name">文章详情</span><span class="tag tag-public">公开</span><span class="tag tag-cors">CORS</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block"><span class="cmt">// GET 方式</span>
+{base}/article/api/view?id=<span class="num">1</span>
+
+<span class="cmt">// POST JSON</span>
+{ <span class="key">"id"</span>: <span class="num">1</span> }</div>
+      <div class="label">说明</div>
+      <div class="code-block"><span class="cmt">// 仅返回 status=1 的已发布文章
+// 含防刷机制：同 IP 同文章 60 秒内最多计 1 次浏览量
+// 过期文章返回 code=410</span></div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="article-create">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/article/api/create</span>
+      <span class="name">创建文章</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{
+  <span class="key">"_token"</span>: <span class="str">"adminToken"</span>,  <span class="cmt">// string，必填</span>
+  <span class="key">"title"</span>: <span class="str">"文章标题"</span>,     <span class="cmt">// string，必填，≤255字符</span>
+  <span class="key">"content"</span>: <span class="str">"文章内容"</span>,   <span class="cmt">// string，必填，≤500万字符</span>
+  <span class="key">"category"</span>: <span class="str">"tech"</span>,    <span class="cmt">// string，可选，≤100字符</span>
+  <span class="key">"tags"</span>: <span class="str">"教程,PHP"</span>,    <span class="cmt">// string，可选，逗号分隔，≤255字符</span>
+  <span class="key">"cover_image"</span>: <span class="str">""</span>,     <span class="cmt">// string，可选，封面图URL</span>
+  <span class="key">"author_name"</span>: <span class="str">""</span>,    <span class="cmt">// string，可选，≤50字符，默认用当前管理员</span>
+  <span class="key">"status"</span>: <span class="num">1</span>,           <span class="cmt">// number，可选，0=草稿 1=发布</span>
+  <span class="key">"is_featured"</span>: <span class="num">0</span>,       <span class="cmt">// number，可选，0/1 是否精选</span>
+  <span class="key">"source_url"</span>: <span class="str">""</span>,     <span class="cmt">// string，可选，来源URL（仅限 http/https）</span>
+  <span class="key">"expires_in"</span>: <span class="num">null</span>,     <span class="cmt">// number|null，可选，有效期秒数（null=永久）</span>
+  <span class="key">"published_at"</span>: <span class="str">""</span>   <span class="cmt">// string，可选，发布时间（空=当前时间）</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="article-update">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/article/api/update</span>
+      <span class="name">更新文章</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{
+  <span class="key">"_token"</span>: <span class="str">"adminToken"</span>, <span class="cmt">// string，必填</span>
+  <span class="key">"id"</span>: <span class="num">1</span>,                <span class="cmt">// number，必填</span>
+  <span class="key">"title"</span>: <span class="str">"新标题"</span>,       <span class="cmt">// string，可选（传了才更新）</span>
+  <span class="key">"content"</span>: <span class="str">"新内容"</span>     <span class="cmt">// string，可选</span>
+  <span class="cmt">// ... 其他字段同 create</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="article-delete">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/article/api/delete</span>
+      <span class="name">删除文章</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{ <span class="key">"_token"</span>: <span class="str">"adminToken"</span>, <span class="key">"id"</span>: <span class="num">1</span> }</div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="article-favorite">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/article/api/favorite</span>
+      <span class="name">收藏文章</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{ <span class="key">"_token"</span>: <span class="str">"token"</span>, <span class="key">"article_id"</span>: <span class="num">1</span> }</div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="article-unfavorite">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/article/api/unfavorite</span>
+      <span class="name">取消收藏</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{ <span class="key">"_token"</span>: <span class="str">"token"</span>, <span class="key">"article_id"</span>: <span class="num">1</span> }</div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="article-fav-status">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/article/api/favorite_status</span>
+      <span class="name">收藏状态查询</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{
+  <span class="key">"_token"</span>: <span class="str">"token"</span>,
+  <span class="key">"article_id"</span>: <span class="num">1</span>,          <span class="cmt">// number，单个查询</span>
+  <span class="key">"article_ids"</span>: [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>]  <span class="cmt">// number[]，批量查询（最多100个）</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="article-favorites">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/article/api/favorites</span>
+      <span class="name">用户收藏列表</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{ <span class="key">"_token"</span>: <span class="str">"token"</span>, <span class="key">"user_id"</span>: <span class="num">1</span>, <span class="key">"page"</span>: <span class="num">1</span>, <span class="key">"page_size"</span>: <span class="num">20</span> }</div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="article-fav-stats">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/article/api/favorites_stats</span>
+      <span class="name">收藏统计</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">响应</div>
+      <div class="code-block"><span class="cmt">// 返回：total（总数）、user_count（收藏人数）、today_count（今日）、week_count（本周）</span></div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="article-fav-admin">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/article/api/favorites_admin</span>
+      <span class="name">管理员查看收藏</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">说明</div>
+      <div class="code-block"><span class="cmt">// 管理员视角查看所有用户收藏记录，支持分页和筛选</span></div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="article-fav-delete">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/article/api/favorites_delete</span>
+      <span class="name">管理员删除收藏</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">说明</div>
+      <div class="code-block"><span class="cmt">// 管理员强制删除指定收藏记录</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!--  软件模块 -->
+<!-- ════════════════════════════════════════ -->
+<div class="section" id="sw-list">
+  <h2>软件模块</h2>
+  <div class="info-table"><table>
+    <tr><td>基础路径</td><td><code>{base}/software/api</code></td></tr>
+    <tr><td>认证</td><td>全部接口需 Token + CSRF</td></tr>
+    <tr><td>数据库表</td><td><code>sys_software</code>、<code>sys_software_categories</code></td></tr>
+  </table></div>
+
+  <div class="endpoint" id="sw-list">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/software/api/list</span>
+      <span class="name">软件列表</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{
+  <span class="key">"_token"</span>: <span class="str">"adminToken"</span>,
+  <span class="key">"page"</span>: <span class="num">1</span>,              <span class="cmt">// number，默认 1</span>
+  <span class="key">"page_size"</span>: <span class="num">10</span>,         <span class="cmt">// number，1-100，默认 10</span>
+  <span class="key">"keyword"</span>: <span class="str">""</span>,          <span class="cmt">// string，搜索 name/version/category</span>
+  <span class="key">"category"</span>: <span class="str">"开发工具"</span>,  <span class="cmt">// string，分类筛选</span>
+  <span class="key">"os"</span>: <span class="str">"macOS"</span>,         <span class="cmt">// string，OS 筛选</span>
+  <span class="key">"status"</span>: <span class="str">"1"</span>          <span class="cmt">// string，0=下架 1=上架 2=草稿</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="sw-create">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/software/api/create</span>
+      <span class="name">创建软件</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{
+  <span class="key">"_token"</span>: <span class="str">"adminToken"</span>,  <span class="cmt">// string，必填</span>
+  <span class="key">"name"</span>: <span class="str">"软件名"</span>,       <span class="cmt">// string，必填</span>
+  <span class="key">"download_urls"</span>: <span class="str">"..."</span>, <span class="cmt">// string，必填（可换行分隔多个地址）</span>
+  <span class="key">"version"</span>: <span class="str">"1.0.0"</span>,    <span class="cmt">// string，可选</span>
+  <span class="key">"category_name"</span>: <span class="str">""</span>,  <span class="cmt">// string，可选</span>
+  <span class="key">"os_support"</span>: [<span class="str">"macOS"</span>,<span class="str">"Windows"</span>], <span class="cmt">// string[]，可选</span>
+  <span class="key">"file_size"</span>: <span class="str">""</span>,       <span class="cmt">// string，可选</span>
+  <span class="key">"description"</span>: <span class="str">""</span>,   <span class="cmt">// string，可选</span>
+  <span class="key">"changelog"</span>: <span class="str">""</span>,      <span class="cmt">// string，可选</span>
+  <span class="key">"tags"</span>: <span class="str">""</span>,            <span class="cmt">// string，可选，逗号分隔</span>
+  <span class="key">"screenshots"</span>: [<span class="str">""</span>],   <span class="cmt">// string[]，可选</span>
+  <span class="key">"status"</span>: <span class="num">2</span>,            <span class="cmt">// number，可选，0下架/1上架/2草稿</span>
+  <span class="key">"sort_order"</span>: <span class="num">0</span>         <span class="cmt">// number，可选</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="sw-update">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/software/api/update</span>
+      <span class="name">更新软件</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{ <span class="key">"_token"</span>: <span class="str">"adminToken"</span>, <span class="key">"id"</span>: <span class="num">1</span>, ... }  <span class="cmt">// 参数同 create</span></div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="sw-delete">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/software/api/delete</span>
+      <span class="name">删除软件</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{ <span class="key">"_token"</span>: <span class="str">"adminToken"</span>, <span class="key">"id"</span>: <span class="num">1</span> }</div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="sw-status">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/software/api/status</span>
+      <span class="name">状态变更</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">请求参数</div>
+      <div class="code-block">{ <span class="key">"_token"</span>: <span class="str">"adminToken"</span>, <span class="key">"id"</span>: <span class="num">1</span>, <span class="key">"status"</span>: <span class="num">1</span> }  <span class="cmt">// 0下架/1上架/2草稿</span></div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="sw-categories">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/software/api/categories</span>
+      <span class="name">软件分类列表</span><span class="tag tag-auth">Token</span><span class="tag tag-csrf">CSRF</span>
+    </div>
+    <div class="body">
+      <div class="label">响应</div>
+      <div class="code-block"><span class="cmt">// 返回所有软件分类名称，按 sort_order 排序</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!--  管理面板 -->
+<!-- ════════════════════════════════════════ -->
+<div class="section" id="admin-setup">
+  <h2>管理面板 API</h2>
+
+  <div class="endpoint" id="admin-setup">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/admin/api/check_setup</span>
+      <span class="name">检查安装状态</span><span class="tag tag-public">公开</span>
+    </div>
+    <div class="body">
+      <div class="label">说明</div>
+      <div class="code-block"><span class="cmt">// 检测系统是否已完成安装配置
+// 返回 installed（是否锁定）、configured（是否已配置）
+// 数据库密码已脱敏（不再返回明文）
+// 支持 ?force_setup=1 参数强制显示空白安装表单</span></div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="admin-save-setup">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/admin/api/save_setup</span>
+      <span class="name">保存安装配置</span><span class="tag tag-public">公开</span>
+    </div>
+    <div class="body">
+      <div class="label">说明</div>
+      <div class="code-block"><span class="cmt">// 安装向导第二步：保存数据库配置到 install/install.config.php
+// 保存成功后创建 install/install.lock 锁定安装状态</span></div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="admin-test-db">
+    <div class="head">
+      <span class="method method-post">POST</span>
+      <span class="path">{base}/admin/api/test_connection</span>
+      <span class="name">测试数据库连接</span><span class="tag tag-public">公开</span>
+    </div>
+    <div class="body">
+      <div class="label">说明</div>
+      <div class="code-block"><span class="cmt">// 安装向导第一步：测试数据库连接是否可用</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 页脚 -->
+<div style="text-align:center;padding:40px 0;color:var(--text-muted);font-size:12px;border-top:1px solid var(--border);margin-top:48px;">
+  MYCMS API 接口文档 v1.0.1 · 最后更新 2026-05-15 · 共计 41 个接口
+</div>
+
+</main>
+</div>
+
+<script>
+// 侧边栏滚动高亮
+(function() {
+  const links = document.querySelectorAll('.sidebar a');
+  const sections = [];
+  links.forEach(a => {
+    const id = a.getAttribute('href').replace('#', '');
+    const el = document.getElementById(id);
+    if (el) sections.push({ id, el, link: a });
+  });
+
+  function onScroll() {
+    let current = '';
+    sections.forEach(s => {
+      if (s.el.getBoundingClientRect().top <= 100) current = s.id;
+    });
+    links.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+})();
+</script>
+
+</body>
+</html>

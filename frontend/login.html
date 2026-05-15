@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录/注册 - MYCMS</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="logo">MY<span>CMS</span></a>
+  <nav>
+    <a href="index.html">首页</a>
+    <a href="list.html">文章</a>
+    <a href="search.html">搜索</a>
+  </nav>
+  <div style="width:80px"></div>
+</header>
+
+<section class="main">
+  <div class="auth-page">
+    <!-- 登录表单 -->
+    <div class="card" id="login-form">
+      <h2>登录</h2>
+      <div class="form-group">
+        <label>用户名</label>
+        <input type="text" id="login-username" placeholder="请输入用户名" autocomplete="username">
+        <p class="form-error" id="err-login-username">请输入用户名</p>
+      </div>
+      <div class="form-group">
+        <label>密码</label>
+        <input type="password" id="login-password" placeholder="请输入密码" autocomplete="current-password">
+        <p class="form-error" id="err-login-password">请输入密码</p>
+      </div>
+      <p class="form-error" id="err-login-msg"></p>
+      <button class="form-submit" id="btn-login-submit" onclick="doLogin()">登录</button>
+      <p class="auth-switch">
+        还没有账号？<a href="#" onclick="switchTab('register')">立即注册</a>
+      </p>
+    </div>
+
+    <!-- 注册表单 -->
+    <div class="card" id="register-form" style="display:none">
+      <h2>注册</h2>
+      <div class="form-group">
+        <label>用户名</label>
+        <input type="text" id="reg-username" placeholder="2-50个字符" autocomplete="username">
+        <p class="form-error" id="err-reg-username">用户名需 2-50 个字符</p>
+      </div>
+      <div class="form-group">
+        <label>密码</label>
+        <input type="password" id="reg-password" placeholder="至少8位，含字母+数字" autocomplete="new-password">
+        <p class="form-error" id="err-reg-password">密码需至少8位，包含字母和数字</p>
+      </div>
+      <div class="form-group">
+        <label>确认密码</label>
+        <input type="password" id="reg-password2" placeholder="再次输入密码" autocomplete="new-password">
+        <p class="form-error" id="err-reg-password2">两次密码不一致</p>
+      </div>
+      <p class="form-error" id="err-reg-msg"></p>
+      <button class="form-submit" id="btn-reg-submit" onclick="doRegister()">注册</button>
+      <p class="auth-switch">
+        已有账号？<a href="#" onclick="switchTab('login')">去登录</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">MYCMS Frontend v1.0.1</footer>
+
+<script src="assets/js/api.js"></script>
+<script>
+var redirectUrl = getParam('redirect') || (CMS.BASE + '/');
+
+function switchTab(tab) {
+  document.getElementById('login-form').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('register-form').style.display = tab === 'register' ? '' : 'none';
+  // 清空错误
+  document.querySelectorAll('.form-error').forEach(function(el) { el.style.display = 'none'; });
+}
+
+function doLogin() {
+  var username = document.getElementById('login-username').value.trim();
+  var password = document.getElementById('login-password').value;
+  var valid = true;
+
+  if (!username) { document.getElementById('err-login-username').style.display = ''; valid = false; }
+  else document.getElementById('err-login-username').style.display = 'none';
+
+  if (!password) { document.getElementById('err-login-password').style.display = ''; valid = false; }
+  else document.getElementById('err-login-password').style.display = 'none';
+
+  if (!valid) return;
+
+  var btn = document.getElementById('btn-login-submit');
+  btn.disabled = true;
+  btn.textContent = '登录中...';
+
+  CMS.post(CMS.login, { username: username, password: password }).then(function(res) {
+    btn.disabled = false;
+    btn.textContent = '登录';
+    if (res.code === 0) {
+      CMS.saveAuth(res.data.token, { user_id: res.data.user_id, username: res.data.username });
+      showToast('登录成功');
+      setTimeout(function() { location.href = redirectUrl; }, 500);
+    } else {
+      document.getElementById('err-login-msg').textContent = res.msg;
+      document.getElementById('err-login-msg').style.display = '';
+    }
+  }).catch(function() {
+    btn.disabled = false;
+    btn.textContent = '登录';
+    document.getElementById('err-login-msg').textContent = '网络错误，请检查连接';
+    document.getElementById('err-login-msg').style.display = '';
+  });
+}
+
+function doRegister() {
+  var username = document.getElementById('reg-username').value.trim();
+  var password = document.getElementById('reg-password').value;
+  var password2 = document.getElementById('reg-password2').value;
+  var valid = true;
+
+  if (username.length < 2 || username.length > 50) {
+    document.getElementById('err-reg-username').style.display = ''; valid = false;
+  } else document.getElementById('err-reg-username').style.display = 'none';
+
+  if (password.length < 8 || !/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
+    document.getElementById('err-reg-password').style.display = ''; valid = false;
+  } else document.getElementById('err-reg-password').style.display = 'none';
+
+  if (password !== password2) {
+    document.getElementById('err-reg-password2').style.display = ''; valid = false;
+  } else document.getElementById('err-reg-password2').style.display = 'none';
+
+  if (!valid) return;
+
+  var btn = document.getElementById('btn-reg-submit');
+  btn.disabled = true;
+  btn.textContent = '注册中...';
+
+  CMS.post(CMS.register, { username: username, password: password }).then(function(res) {
+    btn.disabled = false;
+    btn.textContent = '注册';
+    if (res.code === 0) {
+      CMS.saveAuth(res.data.token, { user_id: res.data.user_id, username: res.data.username });
+      showToast('注册成功，已自动登录');
+      setTimeout(function() { location.href = redirectUrl; }, 500);
+    } else {
+      document.getElementById('err-reg-msg').textContent = res.msg;
+      document.getElementById('err-reg-msg').style.display = '';
+    }
+  }).catch(function() {
+    btn.disabled = false;
+    btn.textContent = '注册';
+    document.getElementById('err-reg-msg').textContent = '网络错误';
+    document.getElementById('err-reg-msg').style.display = '';
+  });
+}
+
+// 回车提交
+document.getElementById('login-password').addEventListener('keydown', function(e) { if(e.key==='Enter') doLogin(); });
+document.getElementById('reg-password2').addEventListener('keydown', function(e) { if(e.key==='Enter') doRegister(); });
+</script>
+</body>
+</html>

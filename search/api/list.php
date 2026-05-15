@@ -24,6 +24,18 @@
  */
 require_once __DIR__ . '/../config.php';
 
+// CORS 跨域支持（允许外部网站调用搜索接口）
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+header('Content-Type: application/json; charset=utf-8');
+
+// 预检请求
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
 /**
  * 保存搜索记录（管理员）
  * @param PDO $pdo 数据库连接
@@ -59,9 +71,11 @@ function saveSearchHistory($pdo, $keyword, $userId = null) {
     }
 }
 
-$input = getSearchInput();
+// 获取数据库连接
+$pdo = getDB();
 
-// ── 解析参数 ──────────────────────────────────
+// 解析参数（使用 getSearchInput 以兼容 GET/POST/JSON Body）
+$input = getSearchInput();
 $keyword   = isset($input['keyword'])   ? trim($input['keyword'])  : '';
 $source    = isset($input['source'])    ? trim($input['source'])   : '';  // 空=全部
 $page      = isset($input['page'])      ? max(1, intval($input['page'])) : 1;
@@ -71,13 +85,23 @@ $isAdmin   = isset($input['is_admin'])  ? ($input['is_admin'] == 1) : false;
 
 // ── 无关键词时返回空 ─────────────────────────
 if ($keyword === '') {
+    // 计算基础路径
+    $scriptPath = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
+    $basePath = '';
+    if (preg_match('#^(.+)/search/api/list\.php$#', $scriptPath, $m)) {
+        $basePath = $m[1];
+    }
+    $baseUrl = defined('SECURE_DOMAIN') ? SECURE_DOMAIN . $basePath : '';
+
     jsonResponse(0, 'success', [
-        'list'       => [],
-        'total'      => 0,
-        'sources'    => array_keys(search_getSources()),
-        'page'       => 1,
-        'page_size'  => $pageSize,
-        'total_pages'=> 0,
+        'list'         => [],
+        'total'        => 0,
+        'sources'      => array_keys(search_getSources()),
+        'page'         => 1,
+        'page_size'    => $pageSize,
+        'total_pages'  => 0,
+        'base_path'    => $basePath,
+        'base_url'     => $baseUrl,
     ]);
 }
 
@@ -88,9 +112,12 @@ if (mb_strlen($keyword) > 100) {
 
 // ── 搜索历史（管理员）────────────────────────
 $searchUserId = null;
-if ($isAdmin && search_requireAdmin() !== null) {
-    $searchUserId = search_requireAdmin();
-    saveSearchHistory(getDB(), $keyword, $searchUserId);
+if ($isAdmin) {
+    $adminUserId = requireAdmin($pdo);
+    if ($adminUserId !== null) {
+        $searchUserId = $adminUserId;
+        saveSearchHistory($pdo, $keyword, $searchUserId);
+    }
 }
 
 // ── 获取数据源 ────────────────────────────────
@@ -141,7 +168,7 @@ foreach ($activeSources as $type => $cfg) {
         $whereParamKeys[] = $p;  // 记录 WHERE 参数键名
         $paramIdx++;
     }
-    $whereSQL = implode(' OR ', $likeParts);
+    $whereSQL = '(' . implode(' OR ', $likeParts) . ')';
 
     // 按类型过滤状态（仅查已发布）
     if ($type === 'article') {
@@ -294,11 +321,31 @@ try {
 
 $totalPages = $pageSize > 0 ? ceil($total / $pageSize) : 1;
 
+// ── 计算基础路径（供外部网站使用）──────────────
+$scriptPath = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
+// 从 /search/api/list.php 提取出基础路径 /search
+$basePath = '';
+if (preg_match('#^(.+)/search/api/list\.php$#', $scriptPath, $m)) {
+    $basePath = $m[1];
+}
+// 完整基础 URL（协议 + 域名 + 基础路径）
+$baseUrl = defined('SECURE_DOMAIN') ? SECURE_DOMAIN . $basePath : '';
+
+// 将相对路径转换为绝对路径
+foreach ($list as &$item) {
+    if (isset($item['url']) && strpos($item['url'], '://') === false) {
+        $item['url'] = $baseUrl . $item['url'];
+    }
+}
+unset($item);
+
 jsonResponse(0, 'success', [
-    'list'       => $list,
-    'total'      => $total,
-    'sources'    => array_keys($activeSources),
-    'page'       => $page,
-    'page_size'  => $pageSize,
-    'total_pages'=> $totalPages,
+    'list'         => $list,
+    'total'        => $total,
+    'sources'      => array_keys($activeSources),
+    'page'         => $page,
+    'page_size'    => $pageSize,
+    'total_pages'  => $totalPages,
+    'base_path'    => $basePath,     // 如 /cms
+    'base_url'     => $baseUrl,      // 如 http://localhost/cms
 ]);

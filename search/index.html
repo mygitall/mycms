@@ -500,7 +500,11 @@
 
 <script>
 // ═══ CONFIG ════════════════════════════════════════
-const BASE_PATH = window.__BASE_PATH__ || '';
+const BASE_PATH = window.__BASE_PATH__ || (function(){
+    var p = window.location.pathname;
+    var i = p.indexOf('/search');
+    return i > 0 ? p.substring(0, i) : '';
+})();
 const SEARCH_API = BASE_PATH + '/search/api/list';
 
 // ═══ STATE ════════════════════════════════════════

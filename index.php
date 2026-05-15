@@ -52,10 +52,91 @@ if ($path === '') {
     $path = '/';
 }
 
-// ── 根路径 / → 空白页 ──────────────────────────────────────
-if ($path === '/' || $path === $BASE_PATH) {
+// ── 前台页面路由映射 ──────────────────────────────
+$frontendRoutes = [
+    '/'      => 'index.html',
+    '/list'  => 'list.html',
+    '/detail'=> 'detail.html',
+    '/search'=> 'search.html',
+    '/favorites' => 'favorites.html',
+    '/login' => 'login.html',
+];
+
+/**
+ * 输出前台页面，自动替换资源路径和注入 BASE_PATH
+ */
+function serveFrontend($filePath, $basePath) {
+    if (!is_file($filePath)) {
+        header('Content-Type: text/html; charset=utf-8');
+        echo '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>MYCMS</title></head><body><h2 style="text-align:center;margin-top:80px">页面不存在</h2></body></html>';
+        exit;
+    }
+    $html = file_get_contents($filePath);
+    $bp = ($basePath === '/') ? '' : $basePath;
+
+    // 替换相对资源路径 assets/ → /cms/frontend/assets/
+    $html = str_replace('assets/', $bp . '/frontend/assets/', $html);
+
+    // 替换链接：xxx.html → 对应路由（兼容带 query string 的情况）
+    $pageRoutes = [
+        'index.html'     => $bp . '/',
+        'list.html'      => $bp . '/list',
+        'detail.html'    => $bp . '/detail',
+        'search.html'    => $bp . '/search',
+        'favorites.html' => $bp . '/favorites',
+        'login.html'     => $bp . '/login',
+    ];
+    foreach ($pageRoutes as $file => $route) {
+        // 匹配 href="xxx.html" 和 href="xxx.html?..."
+        $html = preg_replace(
+            '/href="' . preg_quote($file, '/') . '(\?[^"]*)?"/',
+            'href="' . $route . '$1"',
+            $html
+        );
+    }
+
+    // 注入 BASE_PATH
+    $inject = "<script>window.__BASE_PATH__ = " . json_encode($bp) . ";</script>";
+    if (strpos($html, '</head>') !== false) {
+        $html = str_replace('</head>', $inject . "\n</head>", $html);
+    } else {
+        $html = $inject . "\n" . $html;
+    }
+
     header('Content-Type: text/html; charset=utf-8');
-    echo '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title></title></head><body></body></html>';
+    echo $html;
+    exit;
+}
+
+// ── 根路径 / 或匹配前台路由 ─────────────────────
+$matchedRoute = null;
+foreach ($frontendRoutes as $route => $file) {
+    $fullRoute = $BASE_PATH . $route;
+    // 精确匹配（如 /cms/list）
+    if ($path === $fullRoute || ($route === '/' && $path === $BASE_PATH)) {
+        $matchedRoute = $file;
+        break;
+    }
+    // /detail 支持 /detail?id=123 格式（path 已去尾斜杠，含 query 时用 requestUri）
+    if ($route === '/detail') {
+        $pathWithQuery = isset($_SERVER['REQUEST_URI']) ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '';
+        $pathWithQuery = rtrim($pathWithQuery, '/');
+        if ($pathWithQuery === $fullRoute) {
+            $matchedRoute = $file;
+            break;
+        }
+    }
+}
+
+if ($matchedRoute) {
+    serveFrontend(__DIR__ . '/frontend/' . $matchedRoute, $BASE_PATH);
+}
+
+// 兼容旧路径：/frontend/* 重定向到新 URL
+$frontendPrefix1 = $BASE_PATH . '/frontend';
+$frontendPrefix2 = '/frontend';
+if ($path === $frontendPrefix1 || $path === $frontendPrefix2 || $path === $frontendPrefix1 . '/' || $path === $frontendPrefix2 . '/') {
+    header('Location: ' . $BASE_PATH . '/', true, 301);
     exit;
 }
 

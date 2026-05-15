@@ -6,9 +6,23 @@
 require_once __DIR__ . '/../../config/db.php';
 require_once __DIR__ . '/../config.php';
 
+// CORS 跨域支持（允许外部网站调用文章详情）
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-CSRF-Token, X-Token');
 header('Content-Type: application/json; charset=utf-8');
 
+// 预检请求
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
 $input = getInput();
+// 同时支持 GET 查询参数（GET 优先级低于 POST/JSON body）
+if (!empty($_GET)) {
+    $input = array_merge($_GET, $input);
+}
 $id = isset($input['id']) ? intval($input['id']) : 0;
 
 if ($id <= 0) {
