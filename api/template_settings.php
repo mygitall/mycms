@@ -41,10 +41,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' || $action === 'get') {
         foreach ($dirs as $dir) {
             if ($dir === '.' || $dir === '..') continue;
             if (is_dir($tplDir . '/' . $dir) && is_file($tplDir . '/' . $dir . '/index.html')) {
-                $templates[] = [
-                    'name' => $dir,
-                    'label' => $dir === 'v1' ? 'V1 经典版' : ($dir === 'v2' ? 'V2 暗夜版' : $dir),
-                ];
+                // 自动读取模板标题：从 HTML <title> 提取，或从 template.json 读取
+                $label = $dir;
+                $htmlPath = $tplDir . '/' . $dir . '/index.html';
+                $jsonPath = $tplDir . '/' . $dir . '/template.json';
+                if (is_file($jsonPath)) {
+                    $meta = json_decode(file_get_contents($jsonPath), true);
+                    if (!empty($meta['label'])) $label = $meta['label'];
+                } elseif (is_file($htmlPath)) {
+                    $html = file_get_contents($htmlPath);
+                    if (preg_match('/<title[^>]*>(.*?)<\/title>/i', $html, $m)) {
+                        $label = trim($m[1]);
+                    }
+                }
+                $templates[] = ['name' => $dir, 'label' => $label];
             }
         }
     }

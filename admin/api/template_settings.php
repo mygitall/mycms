@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' || $action === 'get') {
     $stmt->execute();
     $row = $stmt->fetch();
 
-    // 同时列出可用模板
+    // 同时列出可用模板（自动扫描 templates/ 下所有含 index.html 的子目录）
     $templates = [];
     $tplDir = __DIR__ . '/../../templates';
     if (is_dir($tplDir)) {
@@ -43,10 +43,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' || $action === 'get') {
         foreach ($dirs as $dir) {
             if ($dir === '.' || $dir === '..') continue;
             if (is_dir($tplDir . '/' . $dir) && is_file($tplDir . '/' . $dir . '/index.html')) {
-                $templates[] = [
-                    'name' => $dir,
-                    'label' => $dir === 'v1' ? 'V1 经典版' : ($dir === 'v2' ? 'V2 暗夜版' : $dir),
-                ];
+                $label = $dir;
+                $htmlPath = $tplDir . '/' . $dir . '/index.html';
+                $jsonPath = $tplDir . '/' . $dir . '/template.json';
+                if (is_file($jsonPath)) {
+                    $meta = json_decode(file_get_contents($jsonPath), true);
+                    if (!empty($meta['label'])) $label = $meta['label'];
+                } elseif (is_file($htmlPath)) {
+                    $html = file_get_contents($htmlPath);
+                    if (preg_match('/<title[^>]*>(.*?)<\/title>/i', $html, $m)) {
+                        $label = trim($m[1]);
+                    }
+                }
+                $templates[] = ['name' => $dir, 'label' => $label];
             }
         }
     }
