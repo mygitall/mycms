@@ -4538,12 +4538,18 @@ if (response.code == 401) {
         <div class="table-card">
           <div class="table-header">
             <span class="table-title">前台模板</span>
-            <span style="font-size:12px;color:var(--text-muted)" id="st-active-label">当前：加载中…</span>
+            <span style="font-size:12px;color:var(--text-muted)" id="st-active-label">加载中…</span>
           </div>
-          <div style="padding:24px">
-            <div id="st-template-list" style="display:flex;gap:16px;flex-wrap:wrap">
-              <div style="text-align:center;padding:20px;color:var(--text-muted)">加载中…</div>
-            </div>
+          <div style="padding:16px 24px;display:flex;align-items:center;gap:12px">
+            <label style="font-size:13px;font-weight:600;white-space:nowrap;color:var(--text)">选择模板</label>
+            <select id="st-template-select" style="flex:1;max-width:300px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;outline:none" onchange="onTemplateSelectChange()">
+              <option value="">加载中…</option>
+            </select>
+            <span id="st-template-desc" style="font-size:12px;color:var(--text-muted);min-width:80px"></span>
+            <button id="st-btn-switch" class="btn-filter" onclick="applyTemplateSwitch()" style="display:none;font-size:12px;white-space:nowrap">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+              应用切换
+            </button>
           </div>
         </div>
 
@@ -7125,54 +7131,66 @@ if (response.code == 401) {
             // ══════════════════════════════════════════
             const TEMPLATE_SETTINGS_API = BASE_PATH + '/api/template_settings.php';
 
+            let stTemplateData = { active: '', templates: [] };
+
             function loadTemplateSettings() {
-              const listEl = $('st-template-list');
-              if (!listEl) return;
-              listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted)">加载中…</div>';
+              const sel = $('st-template-select');
+              if (!sel) return;
+              sel.innerHTML = '<option value="">加载中…</option>';
+              $('st-active-label').textContent = '加载中…';
+              $('st-btn-switch').style.display = 'none';
 
               apiCall(TEMPLATE_SETTINGS_API, { action: 'get' }, 'GET').then(res => {
                 if (res.code !== 0) {
-                  listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--danger)">加载失败: ' + (res.msg || '') + '</div>';
+                  sel.innerHTML = '<option value="">加载失败</option>';
                   return;
                 }
                 const data = res.data;
-                const active = data.active_template;
-                const templates = data.available_templates || [];
+                stTemplateData.active = data.active_template;
+                stTemplateData.templates = data.available_templates || [];
 
-                if ($('st-active-label')) {
-                  const activeLabel = templates.find(t => t.name === active);
-                  $('st-active-label').textContent = '当前：' + (activeLabel ? activeLabel.label : active);
-                }
+                const activeTpl = stTemplateData.templates.find(t => t.name === stTemplateData.active);
+                $('st-active-label').textContent = '当前：' + (activeTpl ? activeTpl.label : stTemplateData.active);
 
-                let html = '';
-                templates.forEach(t => {
-                  const isActive = t.name === active;
-                  html += '<div style="background:var(--surface);border:2px solid ' + (isActive ? 'var(--accent)' : 'var(--border)') + ';border-radius:12px;padding:20px 24px;min-width:180px;text-align:center;position:relative;transition:border-color .2s">';
-                  if (isActive) {
-                    html += '<span style="position:absolute;top:8px;right:10px;background:var(--accent);color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">当前</span>';
-                  }
-                  html += '<div style="font-size:28px;margin-bottom:8px">' + (t.name === 'v1' ? '📄' : '🌙') + '</div>';
-                  html += '<div style="font-weight:600;font-size:15px;margin-bottom:4px">' + t.label + '</div>';
-                  html += '<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">' + t.name + '</div>';
-                  if (!isActive) {
-                    html += '<button class="btn-filter" onclick="switchTemplate(\'' + t.name + '\')" style="font-size:12px">切换至此模板</button>';
-                  } else {
-                    html += '<span style="font-size:12px;color:var(--accent);font-weight:600">已启用</span>';
-                  }
-                  html += '</div>';
+                let opts = '';
+                stTemplateData.templates.forEach(t => {
+                  const sel = t.name === stTemplateData.active ? ' selected' : '';
+                  opts += '<option value="' + t.name + '"' + sel + '>' + t.label + ' (' + t.name + ')</option>';
                 });
-                listEl.innerHTML = html;
+                sel.innerHTML = opts;
+                onTemplateSelectChange();
               }).catch(() => {
-                listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--danger)">网络错误</div>';
+                sel.innerHTML = '<option value="">网络错误</option>';
               });
             }
 
-            function switchTemplate(name) {
-              if (!confirm('确定要切换到模板「' + name + '」吗？')) return;
-              apiCall(TEMPLATE_SETTINGS_API, { action: 'set', template: name }).then(res => {
+            function onTemplateSelectChange() {
+              const sel = $('st-template-select');
+              const val = sel ? sel.value : '';
+              const isDiff = val && val !== stTemplateData.active;
+              $('st-btn-switch').style.display = isDiff ? 'inline-flex' : 'none';
+              const tpl = stTemplateData.templates.find(t => t.name === val);
+              $('st-template-desc').textContent = tpl ? '切换后将立即生效' : '';
+            }
+
+            function applyTemplateSwitch() {
+              const sel = $('st-template-select');
+              const val = sel ? sel.value : '';
+              if (!val || val === stTemplateData.active) return;
+              if (!confirm('确定将前台模板切换为「' + val + '」？切换后用户访问首页将看到新模板。')) return;
+
+              apiCall(TEMPLATE_SETTINGS_API, { action: 'set', template: val }).then(res => {
                 if (res.code === 0) {
-                  toast('模板已切换为 ' + name, 'success');
-                  loadTemplateSettings();
+                  toast('模板已切换为 ' + val, 'success');
+                  stTemplateData.active = val;
+                  $('st-active-label').textContent = '当前：' + (stTemplateData.templates.find(t => t.name === val) || {}).label || val;
+                  $('st-btn-switch').style.display = 'none';
+                  // 更新下拉选中项
+                  if (sel) {
+                    for (var i = 0; i < sel.options.length; i++) {
+                      sel.options[i].selected = sel.options[i].value === val;
+                    }
+                  }
                 } else {
                   toast(res.msg || '切换失败', 'error');
                 }
