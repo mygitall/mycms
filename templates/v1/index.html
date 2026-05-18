@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MYCMS - 首页</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
+        .topbar { background: #fff; border-bottom: 1px solid #e0e0e0; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+        .topbar .logo { font-size: 20px; font-weight: 700; color: #333; }
+        .topbar nav a { margin-left: 24px; color: #666; text-decoration: none; font-size: 14px; }
+        .topbar nav a:hover { color: #333; }
+        .hero { text-align: center; padding: 80px 24px 60px; background: #fff; }
+        .hero h1 { font-size: 40px; font-weight: 700; margin-bottom: 12px; }
+        .hero p { color: #888; font-size: 16px; max-width: 480px; margin: 0 auto 24px; }
+        .hero .btn { display: inline-block; padding: 10px 28px; background: #333; color: #fff; border-radius: 6px; text-decoration: none; font-size: 14px; margin: 0 6px; }
+        .hero .btn-outline { background: #fff; color: #333; border: 1px solid #ccc; }
+        .cards { max-width: 1080px; margin: 40px auto; padding: 0 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .card { background: #fff; border-radius: 10px; padding: 28px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+        .card h3 { font-size: 16px; margin-bottom: 8px; }
+        .card p { color: #888; font-size: 13px; }
+        .footer { text-align: center; padding: 32px; color: #aaa; font-size: 12px; }
+        .badge { position: absolute; top: 12px; right: 12px; background: #333; color: #fff; padding: 2px 10px; border-radius: 20px; font-size: 11px; }
+        @media (max-width: 768px) { .cards { grid-template-columns: 1fr; } .hero h1 { font-size: 28px; } }
+    </style>
+</head>
+<body>
+
+<div style="position:relative">
+    <span class="badge">V1 经典版</span>
+    <div class="topbar">
+        <div class="logo">MYCMS</div>
+        <nav>
+            <a href="/">首页</a>
+            <a href="/list">文章</a>
+            <a href="/search">搜索</a>
+            <a href="/favorites">收藏</a>
+            <a href="/login">登录</a>
+        </nav>
+    </div>
+
+    <div class="hero">
+        <h1>欢迎来到 MYCMS</h1>
+        <p>简洁高效的内容管理系统，轻松管理文章、软件资源与用户收藏。</p>
+        <a href="/list" class="btn">浏览内容</a>
+        <a href="/login" class="btn btn-outline">立即登录</a>
+    </div>
+
+    <div class="cards">
+        <div class="card">
+            <h3>文章管理</h3>
+            <p>支持富文本编辑、分类管理、多条件筛选与批量操作。</p>
+        </div>
+        <div class="card">
+            <h3>软件资源</h3>
+            <p>管理软件下载资源，支持版本管理、分类与下载统计。</p>
+        </div>
+        <div class="card">
+            <h3>收藏系统</h3>
+            <p>用户可收藏文章和软件，支持个性化管理和数据统计。</p>
+        </div>
+    </div>
+
+    <div class="footer">&copy; 2026 MYCMS. All rights reserved.</div>
+</div>
+
+</body>
+</html>

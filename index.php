@@ -128,7 +128,32 @@ foreach ($frontendRoutes as $route => $file) {
     }
 }
 
+/**
+ * 获取当前生效的前台模板名称
+ */
+function getActiveTemplate() {
+    try {
+        $pdo = getDB();
+        $prefix = DB_PREFIX;
+        $stmt = $pdo->prepare("SELECT config_value FROM `{$prefix}config` WHERE config_key = 'frontend_template' LIMIT 1");
+        $stmt->execute();
+        $row = $stmt->fetch();
+        return $row ? $row['config_value'] : 'v1';
+    } catch (Exception $e) {
+        return 'v1';
+    }
+}
+
 if ($matchedRoute) {
+    // 首页使用模板系统：根据配置加载 templates/{template}/index.html
+    if ($matchedRoute === 'index.html') {
+        $activeTemplate = getActiveTemplate();
+        $tplFile = __DIR__ . '/templates/' . $activeTemplate . '/index.html';
+        if (is_file($tplFile)) {
+            serveFrontend($tplFile, $BASE_PATH);
+        }
+        // fallback: 模板文件不存在时使用默认 frontend/index.html
+    }
     serveFrontend(__DIR__ . '/frontend/' . $matchedRoute, $BASE_PATH);
 }
 

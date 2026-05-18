@@ -264,6 +264,22 @@ function initDatabase($pdo) {
         INDEX `idx_expires` (`expires_at`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户认证Token表'";
     $pdo->exec($sql);
+
+    // 创建 sys_config 配置表（如果不存在）
+    $sql = "CREATE TABLE IF NOT EXISTS `{$prefix}config` (
+        `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        `config_key` VARCHAR(100) NOT NULL UNIQUE COMMENT '配置键名',
+        `config_value` TEXT DEFAULT NULL COMMENT '配置值',
+        `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+        INDEX `idx_key` (`config_key`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统配置表'";
+    $pdo->exec($sql);
+
+    // 初始化默认模板设置
+    $check = $pdo->query("SELECT 1 FROM `{$prefix}config` WHERE config_key = 'frontend_template' LIMIT 1");
+    if ($check->rowCount() === 0) {
+        $pdo->exec("INSERT INTO `{$prefix}config` (config_key, config_value) VALUES ('frontend_template', 'v1')");
+    }
 }
 
 // article 模块使用独立的 article/config.php，不在主配置中创建 articles 表

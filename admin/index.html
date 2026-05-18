@@ -4534,7 +4534,21 @@ if (response.code == 401) {
           ══════════════════════════════════════════ -->
       <div class="page" id="page-settings" style="display:none">
 
+        <!-- 前台模板切换 -->
         <div class="table-card">
+          <div class="table-header">
+            <span class="table-title">前台模板</span>
+            <span style="font-size:12px;color:var(--text-muted)" id="st-active-label">当前：加载中…</span>
+          </div>
+          <div style="padding:24px">
+            <div id="st-template-list" style="display:flex;gap:16px;flex-wrap:wrap">
+              <div style="text-align:center;padding:20px;color:var(--text-muted)">加载中…</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 系统配置表 -->
+        <div class="table-card" style="margin-top:16px">
           <div class="table-header">
             <span class="table-title">系统配置</span>
             <span style="font-size:12px;color:var(--text-muted)">管理网站全局参数</span>
@@ -7100,8 +7114,72 @@ if (response.code == 401) {
                 if (page === 'api-doc') {
                   // api-doc-panel-search 现在通过 Tab 切换逻辑控制，无需额外处理
                 }
+                if (page === 'settings') {
+                  loadTemplateSettings();
+                }
               });
             });
+
+            // ══════════════════════════════════════════
+            // 参数设置 - 模板切换
+            // ══════════════════════════════════════════
+            const TEMPLATE_SETTINGS_API = BASE_PATH + '/api/template_settings.php';
+
+            function loadTemplateSettings() {
+              const listEl = $('st-template-list');
+              if (!listEl) return;
+              listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted)">加载中…</div>';
+
+              apiCall(TEMPLATE_SETTINGS_API, { action: 'get' }, 'GET').then(res => {
+                if (res.code !== 0) {
+                  listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--danger)">加载失败: ' + (res.msg || '') + '</div>';
+                  return;
+                }
+                const data = res.data;
+                const active = data.active_template;
+                const templates = data.available_templates || [];
+
+                if ($('st-active-label')) {
+                  const activeLabel = templates.find(t => t.name === active);
+                  $('st-active-label').textContent = '当前：' + (activeLabel ? activeLabel.label : active);
+                }
+
+                let html = '';
+                templates.forEach(t => {
+                  const isActive = t.name === active;
+                  html += '<div style="background:var(--surface);border:2px solid ' + (isActive ? 'var(--accent)' : 'var(--border)') + ';border-radius:12px;padding:20px 24px;min-width:180px;text-align:center;position:relative;transition:border-color .2s">';
+                  if (isActive) {
+                    html += '<span style="position:absolute;top:8px;right:10px;background:var(--accent);color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">当前</span>';
+                  }
+                  html += '<div style="font-size:28px;margin-bottom:8px">' + (t.name === 'v1' ? '📄' : '🌙') + '</div>';
+                  html += '<div style="font-weight:600;font-size:15px;margin-bottom:4px">' + t.label + '</div>';
+                  html += '<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">' + t.name + '</div>';
+                  if (!isActive) {
+                    html += '<button class="btn-filter" onclick="switchTemplate(\'' + t.name + '\')" style="font-size:12px">切换至此模板</button>';
+                  } else {
+                    html += '<span style="font-size:12px;color:var(--accent);font-weight:600">已启用</span>';
+                  }
+                  html += '</div>';
+                });
+                listEl.innerHTML = html;
+              }).catch(() => {
+                listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--danger)">网络错误</div>';
+              });
+            }
+
+            function switchTemplate(name) {
+              if (!confirm('确定要切换到模板「' + name + '」吗？')) return;
+              apiCall(TEMPLATE_SETTINGS_API, { action: 'set', template: name }).then(res => {
+                if (res.code === 0) {
+                  toast('模板已切换为 ' + name, 'success');
+                  loadTemplateSettings();
+                } else {
+                  toast(res.msg || '切换失败', 'error');
+                }
+              }).catch(() => {
+                toast('网络错误', 'error');
+              });
+            }
 
 
 
