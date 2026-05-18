@@ -17,14 +17,24 @@
         .hero p { color: #94a3b8; font-size: 16px; max-width: 480px; margin: 0 auto 28px; position: relative; }
         .hero .btn { display: inline-block; padding: 11px 30px; background: #38bdf8; color: #0f172a; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600; margin: 0 6px; }
         .hero .btn-outline { background: transparent; color: #38bdf8; border: 1px solid #38bdf8; }
-        .cards { max-width: 1080px; margin: 48px auto; padding: 0 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .card { background: #1e293b; border-radius: 12px; padding: 28px; border: 1px solid #334155; transition: border-color .2s; }
+        .section { max-width: 1080px; margin: 0 auto; padding: 0 24px 40px; }
+        .section-title { font-size: 20px; font-weight: 700; margin: 48px 0 16px; display: flex; align-items: center; gap: 8px; }
+        .section-title .dot { width: 8px; height: 8px; border-radius: 50%; background: #38bdf8; }
+        .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .card { background: #1e293b; border-radius: 12px; padding: 24px; border: 1px solid #334155; transition: border-color .2s; }
         .card:hover { border-color: #38bdf8; }
-        .card .icon { font-size: 28px; margin-bottom: 12px; }
+        .card .meta { display: flex; gap: 10px; font-size: 11px; color: #64748b; margin-bottom: 6px; flex-wrap: wrap; }
+        .card .meta span { background: #334155; padding: 2px 8px; border-radius: 4px; }
+        .card .meta .cat { background: rgba(56,189,248,.15); color: #38bdf8; }
+        .card .meta .ver { color: #a78bfa; font-weight: 600; }
         .card h3 { font-size: 16px; margin-bottom: 8px; color: #f1f5f9; }
-        .card p { color: #94a3b8; font-size: 13px; }
+        .card h3 a { color: #f1f5f9; text-decoration: none; }
+        .card h3 a:hover { color: #38bdf8; }
+        .card p { color: #94a3b8; font-size: 13px; line-height: 1.5; }
         .footer { text-align: center; padding: 32px; color: #475569; font-size: 12px; }
         .badge { position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, #38bdf8, #a78bfa); color: #0f172a; padding: 2px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; z-index: 20; }
+        .empty { text-align: center; padding: 40px; color: #475569; font-size: 14px; }
+        .loading { text-align: center; padding: 40px; color: #64748b; }
         @media (max-width: 768px) { .cards { grid-template-columns: 1fr; } .hero h1 { font-size: 30px; } }
     </style>
 </head>
@@ -50,26 +60,106 @@
         <a href="/login" class="btn btn-outline">登录系统</a>
     </div>
 
-    <div class="cards">
-        <div class="card">
-            <div class="icon">📝</div>
-            <h3>文章管理</h3>
-            <p>富文本编辑、分类管理、多条件筛选，高效创作与发布内容。</p>
-        </div>
-        <div class="card">
-            <div class="icon">📦</div>
-            <h3>软件资源</h3>
-            <p>软件下载管理，版本追踪，分类筛选，下载量统计一应俱全。</p>
-        </div>
-        <div class="card">
-            <div class="icon">⭐</div>
-            <h3>收藏系统</h3>
-            <p>个性化收藏管理，支持文章与软件收藏，数据可视化展示。</p>
-        </div>
+    <!-- 文章列表 -->
+    <div class="section">
+        <div class="section-title"><span class="dot"></span>最新文章</div>
+        <div class="cards" id="article-list"><div class="loading">加载中…</div></div>
+    </div>
+
+    <!-- 软件列表 -->
+    <div class="section">
+        <div class="section-title"><span class="dot" style="background:#a78bfa"></span>推荐软件</div>
+        <div class="cards" id="software-list"><div class="loading">加载中…</div></div>
     </div>
 
     <div class="footer">&copy; 2026 MYCMS. Powered by V2.</div>
 </div>
+
+<script>
+(function() {
+    var bp = (window.__BASE_PATH__ || '').replace(/\/$/, '');
+    var api = bp + '/api/home.php';
+
+    function formatDate(d) {
+        if (!d) return '-';
+        var t = d.replace(' ', 'T') + 'Z';
+        var date = new Date(t);
+        if (isNaN(date.getTime())) return d.substring(0, 10);
+        var now = new Date();
+        var diff = now - date;
+        if (diff < 86400000) return '今天';
+        if (diff < 172800000) return '昨天';
+        if (diff < 604800000) return Math.floor(diff / 86400000) + '天前';
+        return d.substring(0, 10);
+    }
+
+    function escapeHtml(s) {
+        var d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    fetch(api)
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (res.code !== 0) return;
+            var data = res.data;
+
+            // 渲染文章
+            var aList = document.getElementById('article-list');
+            var articles = data.articles || [];
+            if (articles.length === 0) {
+                aList.innerHTML = '<div class="empty">暂无文章</div>';
+            } else {
+                var ah = '';
+                articles.forEach(function(a) {
+                    ah += '<div class="card">';
+                    ah += '<div class="meta">';
+                    if (a.category) ah += '<span class="cat">' + escapeHtml(a.category) + '</span>';
+                    ah += '<span>' + formatDate(a.published_at || a.updated_at || a.created_at) + '</span>';
+                    if (a.view_count) ah += '<span>' + a.view_count + ' 次阅读</span>';
+                    ah += '</div>';
+                    ah += '<h3><a href="' + bp + '/article/p/' + a.id + '">' + escapeHtml(a.title) + '</a></h3>';
+                    ah += '<p>' + escapeHtml(a.content || '') + '</p>';
+                    ah += '</div>';
+                });
+                aList.innerHTML = ah;
+            }
+
+            // 渲染软件
+            var sList = document.getElementById('software-list');
+            var software = data.software || [];
+            if (software.length === 0) {
+                sList.innerHTML = '<div class="empty">暂无软件</div>';
+            } else {
+                var sh = '';
+                software.forEach(function(s) {
+                    sh += '<div class="card">';
+                    sh += '<div class="meta">';
+                    if (s.category_name) sh += '<span class="cat">' + escapeHtml(s.category_name) + '</span>';
+                    if (s.version) sh += '<span class="ver">' + escapeHtml(s.version) + '</span>';
+                    if (s.file_size) sh += '<span>' + escapeHtml(s.file_size) + ' MB</span>';
+                    sh += '</div>';
+                    sh += '<h3>' + escapeHtml(s.name) + '</h3>';
+                    sh += '<p>' + escapeHtml((s.description || '').substring(0, 120)) + '</p>';
+                    if (s.os_support && s.os_support.length) {
+                        sh += '<div class="meta" style="margin-top:8px">';
+                        s.os_support.forEach(function(os) {
+                            sh += '<span>' + escapeHtml(os) + '</span>';
+                        });
+                        sh += '</div>';
+                    }
+                    sh += '</div>';
+                });
+                sList.innerHTML = sh;
+            }
+        })
+        .catch(function() {
+            document.getElementById('article-list').innerHTML = '<div class="empty">加载失败</div>';
+            document.getElementById('software-list').innerHTML = '<div class="empty">加载失败</div>';
+        });
+})();
+</script>
 
 </body>
 </html>
