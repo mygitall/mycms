@@ -646,6 +646,28 @@
       color: var(--text-muted);
     }
 
+    .sidebar-visit-btn {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 12px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: all .15s;
+    }
+    .sidebar-visit-btn:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+    .sidebar-visit-btn svg { width: 14px; height: 14px; }
+
     .sidebar-nav {
       flex: 1;
       padding: 12px;
@@ -2155,6 +2177,12 @@
           <h2>UserSys</h2>
           <span>v1.0.1</span>
         </div>
+        <a class="sidebar-visit-btn" id="sidebar-visit-btn" href="/" target="_blank" title="访问前台首页">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+          </svg>
+          前台
+        </a>
       </div>
 
       <nav class="sidebar-nav">
@@ -5013,6 +5041,7 @@ if (response.code == 401) {
               console.log('[BASE_PATH] 自动检测结果:', base, 'pathname:', pathname);
             })();
             const BASE_PATH = window._detectedBasePath || '';
+            const FRONTEND_URL = (BASE_PATH === '/' || BASE_PATH === '') ? '/' : (BASE_PATH + '/');
             const API_BASE  = BASE_PATH;
             const LOGIN_API    = BASE_PATH + '/api/login.php';
             const REGISTER_API = BASE_PATH + '/api/register.php';
@@ -5642,6 +5671,12 @@ if (response.code == 401) {
                 showToast('请求失败，请检查网络', 'error');
               }
             }
+
+            // 设置「访问前台」链接（适配子目录部署）
+            (function() {
+              var btn = document.getElementById('sidebar-visit-btn');
+              if (btn) btn.href = FRONTEND_URL;
+            })();
 
             // 页面加载时，先完成安装检测，再初始化其他功能
             document.addEventListener('DOMContentLoaded', async () => {
