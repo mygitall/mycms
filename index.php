@@ -33,10 +33,17 @@ if ($scriptDir === '.' || $scriptDir === '/') {
 // 注意：只在校验 SCRIPT_NAME 的基础上叠加，不覆盖已有值
 // 避免 REQUEST_URI（如 /pro/api/login）中的子路径错误覆盖 BASE_PATH
 $requestUri = isset($_SERVER['REQUEST_URI']) ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '/';
-$scriptDirFromUri = pathinfo($requestUri, PATHINFO_DIRNAME);
-// 只有当 SCRIPT_NAME 指向的是根目录文件（如 /index.php）时才从 URI 推断
-if ($scriptDirFromUri !== '.' && $scriptDirFromUri !== '/' && ($scriptDir === '.' || $scriptDir === '/')) {
-    $BASE_PATH = $scriptDirFromUri;
+// 仅当 URI 第一段不是已知路由名时，才推断为 BASE_PATH
+// 例如 /wei/article/p/9 → 推断为 /wei；/article/p/9 → 保持 /
+$uriSegments = array_values(array_filter(explode('/', $requestUri)));
+$firstUriSeg = isset($uriSegments[0]) ? $uriSegments[0] : '';
+$knownRouteNames = ['api', 'article', 'search', 'admin', 'storage', 'install',
+    'templates', 'frontend', 'config', 'wen', 'software', 'includes',
+    'performance', 'index.php', 'login.php', 'admin.php', 'article.php',
+    'reset_admin.php', 'reset_all.php', 'clear_ban.php', 'config.php', 'monitor.html'];
+if ($firstUriSeg !== '' && !in_array($firstUriSeg, $knownRouteNames, true)
+    && ($scriptDir === '.' || $scriptDir === '/')) {
+    $BASE_PATH = '/' . $firstUriSeg;
 }
 
 // ================================================================
