@@ -605,130 +605,31 @@ function renderContent(content) {
 function sanitizeHtml(html) {
   if (!html) return '';
 
-  // 第一步：剥离危险标签（正则预处理）
+  // 剥离危险标签（正则预处理）
   const dangerousTags = [
-    /<script\b[^>]*>(.*?)<\/script>/gis,
-    /<iframe\b[^>]*>(.*?)<\/iframe>/gis,
-    /<object\b[^>]*>(.*?)<\/object>/gis,
+    /<script\b[^>]*>[\s\S]*?<\/script>/gi,
+    /<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi,
+    /<object\b[^>]*>[\s\S]*?<\/object>/gi,
     /<embed\b[^>]*>/gi,
-    /<form\b[^>]*>(.*?)<\/form>/gis,
+    /<form\b[^>]*>[\s\S]*?<\/form>/gi,
     /<input\b[^>]*>/gi,
-    /<button\b[^>]*>(.*?)<\/button>/gis,
-    /<select\b[^>]*>(.*?)<\/select>/gis,
-    /<textarea\b[^>]*>(.*?)<\/textarea>/gis,
+    /<button\b[^>]*>[\s\S]*?<\/button>/gi,
+    /<select\b[^>]*>[\s\S]*?<\/select>/gi,
+    /<textarea\b[^>]*>[\s\S]*?<\/textarea>/gi,
     /<link\b[^>]*>/gi,
-    /<style\b[^>]*>(.*?)<\/style>/gis,
+    /<style\b[^>]*>[\s\S]*?<\/style>/gi,
     /<meta\b[^>]*>/gi,
     /<!--[\s\S]*?-->/g,
-    /<svg\b[^>]*>([\s\S]*?)<\/svg>/gi,
-    /<math\b[^>]*>([\s\S]*?)<\/math>/gi,
+    /<svg\b[^>]*>[\s\S]*?<\/svg>/gi,
+    /<math\b[^>]*>[\s\S]*?<\/math>/gi,
+    / on\w+\s*=\s*"[^"]*"/gi,
+    / on\w+\s*=\s*'[^']*'/gi,
+    / on\w+\s*=\s*[^\s>]*/gi,
+    /javascript\s*:/gi,
   ];
   let clean = html;
-  dangerousTags.forEach(pattern => { clean = clean.replace(pattern, ''); });
-
-  // 第二步：使用 DOMParser 清理危险属性
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(
-    '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>' + clean + '</body></html>',
-    'text/html'
-  );
-
-  const allowedTags = new Set([
-    'p','h1','h2','h3','h4','h5','h6',
-    'img','a','blockquote','pre','code',
-    'ul','ol','li','hr',
-    'table','thead','tbody','tr','th','td',
-    'span','div','br','strong','em','b','i','u','s','sup','sub',
-    'figure','figcaption',
-  ]);
-  const attrALink  = new Set(['href','title','target','rel','download']);
-  const attrImg    = new Set(['src','alt','title','width','height','class','loading']);
-  const attrCommon = new Set(['id','class','style','title','lang','dir','align']);
-
-  function walk(node) {
-    if (!node) return;
-    if (node.nodeType !== Node.ELEMENT_NODE) return;
-
-    const tag = node.nodeName.toLowerCase();
-
-    // 剥离不允许的标签（保留子节点）
-    if (!allowedTags.has(tag)) {
-      const parent = node.parentNode;
-      if (!parent) return;
-      const frag = document.createDocumentFragment();
-      while (node.firstChild) frag.appendChild(node.removeChild(node.firstChild));
-      parent.replaceChild(frag, node);
-      return;
-    }
-
-    // 清理属性
-    const toRemove = [];
-    for (let i = 0; i < node.attributes.length; i++) {
-      const attr = node.attributes[i];
-      const name = attr.name.toLowerCase();
-      let remove = false;
-
-      if (name.startsWith('on')) {
-        remove = true;
-      } else if (/^javascript:/i.test(attr.value)) {
-        remove = true;
-      } else if (/^data:(?!image\/)/i.test(attr.value) && tag !== 'img') {
-        remove = true;
-      } else {
-        if (tag === 'a') {
-          if (!attrALink.has(name)) remove = true;
-        } else if (tag === 'img') {
-          if (!attrImg.has(name)) remove = true;
-        } else {
-          if (!attrCommon.has(name)) remove = true;
-        }
-      }
-      if (remove) toRemove.push(name);
-    }
-    for (let i = 0; i < toRemove.length; i++) node.removeAttribute(toRemove[i]);
-
-    // a 标签安全处理
-    if (tag === 'a' && node.hasAttribute('href')) {
-      const href = node.getAttribute('href');
-      if (/^javascript:/i.test(href)) {
-        node.removeAttribute('href');
-      } else {
-        node.setAttribute('rel', 'noopener noreferrer');
-        const target = node.getAttribute('target');
-        if (target && /^_blank$/i.test(target)) {
-          node.setAttribute('rel', 'noopener noreferrer');
-        }
-      }
-    }
-
-    // img 标签安全处理
-    if (tag === 'img') {
-      const src = node.getAttribute('src');
-      if (src && !/^(https?:\/\/|data:image\/)/i.test(src)) {
-        node.removeAttribute('src');
-      }
-    }
-
-    // 递归子节点（safe while-loop 避免 live NodeList 干扰）
-    let child = node.firstChild;
-    while (child) {
-      const next = child.nextSibling;
-      walk(child);
-      child = next;
-    }
-  }
-
-  if (!doc.body) return clean;
-
-  walk(doc.body);
-
-  // 提取 body 内容
-  let result = '';
-  for (let i = 0; i < doc.body.childNodes.length; i++) {
-    const child = doc.body.childNodes[i];
-    result += child.outerHTML || '';
-  }
-  return result || clean;
+  dangerousTags.forEach(function(p) { clean = clean.replace(p, ''); });
+  return clean;
 }
 
 function renderError(msg) {
