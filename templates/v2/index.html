@@ -61,6 +61,26 @@
         .badge { position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, #38bdf8, #a78bfa); color: #0f172a; padding: 2px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; z-index: 20; }
         .empty { text-align: center; padding: 40px; color: #475569; font-size: 14px; }
         .loading { text-align: center; padding: 40px; color: #64748b; }
+        /* ── 登录弹窗 ── */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 200; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 32px 28px; width: 380px; max-width: 90vw; box-shadow: 0 8px 40px rgba(0,0,0,.5); position: relative; animation: modalIn .2s ease; }
+        @keyframes modalIn { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-close { position: absolute; top: 12px; right: 14px; width: 32px; height: 32px; border: none; background: none; cursor: pointer; color: #64748b; font-size: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: #334155; color: #e2e8f0; }
+        .modal h2 { font-size: 18px; margin-bottom: 6px; color: #f1f5f9; }
+        .modal .sub { font-size: 12px; color: #64748b; margin-bottom: 20px; }
+        .modal .form-group { margin-bottom: 14px; }
+        .modal label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #94a3b8; }
+        .modal input[type="text"], .modal input[type="password"] { width: 100%; padding: 10px 12px; border: 1px solid #334155; border-radius: 8px; font-size: 14px; outline: none; background: #0f172a; color: #e2e8f0; transition: border-color .15s; }
+        .modal input:focus { border-color: #38bdf8; }
+        .modal .btn-login { width: 100%; padding: 11px; background: #38bdf8; color: #0f172a; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 4px; }
+        .modal .btn-login:hover { background: #7dd3fc; }
+        .modal .btn-login:disabled { opacity: .6; cursor: not-allowed; }
+        .modal .err { color: #f87171; font-size: 12px; margin-top: 8px; text-align: center; display: none; }
+        .nav-user { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #38bdf8; cursor: default; }
+        .nav-user .logout-link { color: #64748b; cursor: pointer; font-size: 12px; margin-left: 4px; }
+        .nav-user .logout-link:hover { color: #f87171; }
         @media (max-width: 768px) {
             .cards { grid-template-columns: 1fr; } .hero h1 { font-size: 30px; }
             .search-box.open { width: calc(100vw - 100px); }
@@ -78,7 +98,11 @@
             <a href="/">首页</a>
             <a href="/list">文章</a>
             <a href="/favorites">收藏</a>
-            <a href="/login">登录</a>
+            <a href="javascript:void(0)" id="nav-login-link" onclick="openLoginModal()">登录</a>
+            <span class="nav-user" id="nav-user-info" style="display:none">
+              <span id="nav-username"></span>
+              <span class="logout-link" onclick="doLogout()">退出</span>
+            </span>
             <span class="search-wrap" id="search-wrap">
                 <button class="search-icon" id="search-btn" title="搜索">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:18px;height:18px">
@@ -95,11 +119,30 @@
 
     <div class="search-results" id="search-results"></div>
 
+    <!-- 登录弹窗 -->
+    <div class="modal-overlay" id="login-modal">
+      <div class="modal">
+        <button class="modal-close" onclick="closeLoginModal()">&times;</button>
+        <h2>用户登录</h2>
+        <p class="sub">登录后可管理收藏和个性化内容</p>
+        <div class="form-group">
+          <label>用户名</label>
+          <input type="text" id="login-username" placeholder="请输入用户名" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input type="password" id="login-password" placeholder="请输入密码" autocomplete="current-password">
+        </div>
+        <div class="err" id="login-error"></div>
+        <button class="btn-login" id="login-submit-btn" onclick="doLogin()">登 录</button>
+      </div>
+    </div>
+
     <div class="hero">
         <h1>欢迎来到 MYCMS</h1>
         <p>全新暗夜主题，更现代的设计语言，为您带来沉浸式内容管理体验。</p>
         <a href="/list" class="btn">开始探索</a>
-        <a href="/login" class="btn btn-outline">登录系统</a>
+        <a href="javascript:void(0)" class="btn btn-outline" onclick="openLoginModal()">登录系统</a>
     </div>
 
     <div class="section">
@@ -264,8 +307,97 @@
     });
 
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeSearch();
+        if (e.key === 'Escape') { closeSearch(); closeLoginModal(); }
     });
+
+    // ── 登录 ──
+    var loginApi = bp + '/api/login.php';
+
+    window.openLoginModal = function() {
+      document.getElementById('login-modal').classList.add('show');
+      document.getElementById('login-error').style.display = 'none';
+      document.getElementById('login-error').textContent = '';
+      setTimeout(function() { document.getElementById('login-username').focus(); }, 150);
+    };
+
+    window.closeLoginModal = function() {
+      document.getElementById('login-modal').classList.remove('show');
+    };
+
+    document.getElementById('login-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeLoginModal();
+    });
+
+    document.getElementById('login-password').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') doLogin();
+    });
+    document.getElementById('login-username').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('login-password').focus();
+    });
+
+    window.doLogin = function() {
+      var username = document.getElementById('login-username').value.trim();
+      var password = document.getElementById('login-password').value;
+      var errEl = document.getElementById('login-error');
+      var btn = document.getElementById('login-submit-btn');
+
+      if (!username) { showLoginErr('请输入用户名'); return; }
+      if (!password) { showLoginErr('请输入密码'); return; }
+
+      btn.disabled = true; btn.textContent = '登录中…';
+      errEl.style.display = 'none';
+
+      fetch(loginApi, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username, password: password })
+      }).then(function(r) { return r.json(); })
+        .then(function(res) {
+          btn.disabled = false; btn.textContent = '登 录';
+          if (res.code === 0) {
+            var data = res.data;
+            localStorage.setItem('cms_token', data.token);
+            localStorage.setItem('cms_username', data.username);
+            closeLoginModal();
+            updateLoginUI(data.username);
+          } else {
+            showLoginErr(res.msg || '登录失败');
+          }
+        }).catch(function() {
+          btn.disabled = false; btn.textContent = '登 录';
+          showLoginErr('网络错误，请稍后重试');
+        });
+    };
+
+    function showLoginErr(msg) {
+      var el = document.getElementById('login-error');
+      el.textContent = msg; el.style.display = 'block';
+    }
+
+    window.doLogout = function() {
+      localStorage.removeItem('cms_token');
+      localStorage.removeItem('cms_username');
+      updateLoginUI(null);
+    };
+
+    function updateLoginUI(username) {
+      var link = document.getElementById('nav-login-link');
+      var info = document.getElementById('nav-user-info');
+      var heroBtn = document.querySelector('.hero .btn-outline');
+      if (username) {
+        link.style.display = 'none';
+        info.style.display = 'flex';
+        document.getElementById('nav-username').textContent = username;
+        if (heroBtn) { heroBtn.style.display = 'none'; }
+      } else {
+        link.style.display = '';
+        info.style.display = 'none';
+        if (heroBtn) { heroBtn.style.display = ''; }
+      }
+    }
+
+    var savedUser = localStorage.getItem('cms_username');
+    if (savedUser) updateLoginUI(savedUser);
 })();
 </script>
 
