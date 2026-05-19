@@ -40,7 +40,8 @@ $firstUriSeg = isset($uriSegments[0]) ? $uriSegments[0] : '';
 $knownRouteNames = ['api', 'article', 'search', 'admin', 'storage', 'install',
     'templates', 'frontend', 'config', 'wen', 'software', 'includes',
     'performance', 'index.php', 'login.php', 'admin.php', 'article.php',
-    'reset_admin.php', 'reset_all.php', 'clear_ban.php', 'config.php', 'monitor.html'];
+    'reset_admin.php', 'reset_all.php', 'clear_ban.php', 'config.php', 'monitor.html',
+    'favorites', 'list', 'detail', 'login'];
 if ($firstUriSeg !== '' && !in_array($firstUriSeg, $knownRouteNames, true)
     && ($scriptDir === '.' || $scriptDir === '/')) {
     $BASE_PATH = '/' . $firstUriSeg;

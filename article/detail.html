@@ -717,7 +717,7 @@ function sanitizeHtml(html) {
     }
   }
 
-  walk(doc.body);
+  if (doc.body) walk(doc.body);
 
   // 提取 body 内容
   let result = '';
