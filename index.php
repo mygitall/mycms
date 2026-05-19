@@ -237,8 +237,9 @@ if (preg_match($detailPattern, $path, $m)) {
     if (is_file($file)) {
         $html = file_get_contents($file);
         $injectScript = "<script>window.__ARTICLE_ID__ = {$articleId};window.__BASE_PATH__ = " . json_encode($BASE_PATH === '/' ? '' : $BASE_PATH) . ";</script>";
-        if (strpos($html, '</body>') !== false) {
-            $html = str_replace('</body>', $injectScript . "\n</body>", $html);
+        $lastBodyPos = strrpos($html, '</body>');
+        if ($lastBodyPos !== false) {
+            $html = substr_replace($html, $injectScript . "\n</body>", $lastBodyPos, strlen('</body>'));
         } else {
             $html .= "\n" . $injectScript;
         }
@@ -273,8 +274,9 @@ if (str_starts_with($path, $articlePrefix1) || str_starts_with($path, $articlePr
         $html = file_get_contents(__DIR__ . '/article/index.html');
         $injectPath = ($BASE_PATH === '/') ? '' : $BASE_PATH;
         $injectScript = "<script>window.__BASE_PATH__ = " . json_encode($injectPath) . ";</script>";
-        if (strpos($html, '</body>') !== false) {
-            $html = str_replace('</body>', $injectScript . "\n</body>", $html);
+        $lastBodyPos = strrpos($html, '</body>');
+        if ($lastBodyPos !== false) {
+            $html = substr_replace($html, $injectScript . "\n</body>", $lastBodyPos, strlen('</body>'));
         } else {
             $html .= "\n" . $injectScript;
         }
@@ -313,8 +315,9 @@ if (str_starts_with($path, $searchPrefix1) || str_starts_with($path, $searchPref
         $html = file_get_contents(__DIR__ . '/search/index.html');
         $injectPath = ($BASE_PATH === '/') ? '' : $BASE_PATH;
         $injectScript = "<script>window.__BASE_PATH__ = " . json_encode($injectPath) . ";</script>";
-        if (strpos($html, '</body>') !== false) {
-            $html = str_replace('</body>', $injectScript . "\n</body>", $html);
+        $lastBodyPos = strrpos($html, '</body>');
+        if ($lastBodyPos !== false) {
+            $html = substr_replace($html, $injectScript . "\n</body>", $lastBodyPos, strlen('</body>'));
         } else {
             $html .= "\n" . $injectScript;
         }
