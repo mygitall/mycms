@@ -646,74 +646,75 @@ function sanitizeHtml(html) {
   const attrCommon = new Set(['id','class','style','title','lang','dir','align']);
 
   function walk(node) {
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      const tag = node.nodeName.toLowerCase();
+    if (!node) return;
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
 
-      // 剥离不允许的标签（保留子节点）
-      if (!allowedTags.has(tag)) {
-        const frag = document.createDocumentFragment();
-        while (node.firstChild) frag.appendChild(node.removeChild(node.firstChild));
-        node.parentNode.replaceChild(frag, node);
-        return;
-      }
+    const tag = node.nodeName.toLowerCase();
 
-      // 清理属性
-      const toRemove = [];
-      for (const attr of node.attributes) {
-        const name = attr.name.toLowerCase();
-        let remove = false;
+    // 剥离不允许的标签（保留子节点）
+    if (!allowedTags.has(tag)) {
+      const parent = node.parentNode;
+      if (!parent) return;
+      const frag = document.createDocumentFragment();
+      while (node.firstChild) frag.appendChild(node.removeChild(node.firstChild));
+      parent.replaceChild(frag, node);
+      return;
+    }
 
-        // 事件属性一律剥离
-        if (name.startsWith('on')) {
-          remove = true;
-        }
-        // javascript: 协议
-        else if (/^javascript:/i.test(attr.value)) {
-          remove = true;
-        }
-        // 危险 data: 链接（除 img/src 外）
-        else if (/^data:(?!image\/)/i.test(attr.value) && tag !== 'img') {
-          remove = true;
-        }
-        // 非白名单属性
-        else {
-          if (tag === 'a') {
-            if (!attrALink.has(name)) remove = true;
-          } else if (tag === 'img') {
-            if (!attrImg.has(name)) remove = true;
-          } else {
-            if (!attrCommon.has(name)) remove = true;
-          }
-        }
-        if (remove) toRemove.push(name);
-      }
-      toRemove.forEach(a => node.removeAttribute(a));
+    // 清理属性
+    const toRemove = [];
+    for (let i = 0; i < node.attributes.length; i++) {
+      const attr = node.attributes[i];
+      const name = attr.name.toLowerCase();
+      let remove = false;
 
-      // a 标签：外部链接追加安全属性
-      if (tag === 'a' && node.hasAttribute('href')) {
-        const href = node.getAttribute('href');
-        if (/^javascript:/i.test(href)) {
-          node.removeAttribute('href');
+      if (name.startsWith('on')) {
+        remove = true;
+      } else if (/^javascript:/i.test(attr.value)) {
+        remove = true;
+      } else if (/^data:(?!image\/)/i.test(attr.value) && tag !== 'img') {
+        remove = true;
+      } else {
+        if (tag === 'a') {
+          if (!attrALink.has(name)) remove = true;
+        } else if (tag === 'img') {
+          if (!attrImg.has(name)) remove = true;
         } else {
-          node.setAttribute('rel', 'noopener noreferrer');
-          const target = node.getAttribute('target');
-          if (target && /^_blank$/i.test(target)) {
-            node.setAttribute('rel', 'noopener noreferrer');
-          }
+          if (!attrCommon.has(name)) remove = true;
         }
       }
+      if (remove) toRemove.push(name);
+    }
+    for (let i = 0; i < toRemove.length; i++) node.removeAttribute(toRemove[i]);
 
-      // img 标签：只允许 data:image/* 和 http(s)://
-      if (tag === 'img' && node.hasAttribute('src')) {
-        const src = node.getAttribute('src');
-        if (!/^(https?:\/\/|data:image\/)/i.test(src)) {
-          node.removeAttribute('src');
+    // a 标签安全处理
+    if (tag === 'a' && node.hasAttribute('href')) {
+      const href = node.getAttribute('href');
+      if (/^javascript:/i.test(href)) {
+        node.removeAttribute('href');
+      } else {
+        node.setAttribute('rel', 'noopener noreferrer');
+        const target = node.getAttribute('target');
+        if (target && /^_blank$/i.test(target)) {
+          node.setAttribute('rel', 'noopener noreferrer');
         }
       }
     }
-    // 递归处理子节点
-    for (let i = 0; i < node.childNodes.length; i++) {
-      walk(node.childNodes[i]);
+
+    // img 标签安全处理
+    if (tag === 'img') {
+      const src = node.getAttribute('src');
+      if (src && !/^(https?:\/\/|data:image\/)/i.test(src)) {
+        node.removeAttribute('src');
+      }
+    }
+
+    // 递归子节点（safe while-loop 避免 live NodeList 干扰）
+    let child = node.firstChild;
+    while (child) {
+      const next = child.nextSibling;
+      walk(child);
+      child = next;
     }
   }
 
