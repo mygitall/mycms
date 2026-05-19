@@ -718,11 +718,14 @@ function sanitizeHtml(html) {
     }
   }
 
-  if (doc.body) walk(doc.body);
+  if (!doc.body) return clean;
+
+  walk(doc.body);
 
   // 提取 body 内容
   let result = '';
-  for (const child of doc.body.childNodes) {
+  for (let i = 0; i < doc.body.childNodes.length; i++) {
+    const child = doc.body.childNodes[i];
     result += child.outerHTML || '';
   }
   return result || clean;
