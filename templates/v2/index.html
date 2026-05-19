@@ -78,9 +78,29 @@
         .modal .btn-login:hover { background: #7dd3fc; }
         .modal .btn-login:disabled { opacity: .6; cursor: not-allowed; }
         .modal .err { color: #f87171; font-size: 12px; margin-top: 8px; text-align: center; display: none; }
-        .nav-user { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #38bdf8; cursor: default; }
+        .nav-user { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #38bdf8; cursor: default; position: relative; }
         .nav-user .logout-link { color: #64748b; cursor: pointer; font-size: 12px; margin-left: 4px; }
         .nav-user .logout-link:hover { color: #f87171; }
+        .nav-user .profile-trigger { cursor: pointer; font-weight: 600; padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; gap: 4px; }
+        .nav-user .profile-trigger:hover { background: rgba(56,189,248,.1); }
+        .nav-user .profile-trigger svg { width: 12px; height: 12px; }
+
+        .profile-dropdown { display: none; position: absolute; top: 100%; right: 0; margin-top: 8px; width: 320px; background: #1e293b; border: 1px solid #334155; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,.5); z-index: 150; overflow: hidden; }
+        .profile-dropdown.show { display: block; }
+        .profile-dropdown .pd-header { padding: 16px 20px; background: #263548; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 12px; }
+        .profile-dropdown .pd-avatar { width: 40px; height: 40px; border-radius: 50%; background: #38bdf8; color: #0f172a; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; flex-shrink: 0; }
+        .profile-dropdown .pd-info { flex: 1; min-width: 0; }
+        .profile-dropdown .pd-name { font-size: 14px; font-weight: 600; color: #f1f5f9; }
+        .profile-dropdown .pd-id { font-size: 11px; color: #64748b; }
+        .profile-dropdown .pd-body { max-height: 260px; overflow-y: auto; }
+        .profile-dropdown .pd-section-title { padding: 10px 20px 4px; font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 0.5px; }
+        .profile-dropdown .pd-fav-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; border-bottom: 1px solid #1a2332; text-decoration: none; color: #e2e8f0; font-size: 13px; transition: background .1s; }
+        .profile-dropdown .pd-fav-item:hover { background: #263548; }
+        .profile-dropdown .pd-fav-item .fav-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .profile-dropdown .pd-fav-item .fav-cat { font-size: 10px; color: #94a3b8; background: #334155; padding: 1px 6px; border-radius: 4px; margin-left: 8px; }
+        .profile-dropdown .pd-empty { text-align: center; padding: 20px; color: #475569; font-size: 12px; }
+        .profile-dropdown .pd-footer { padding: 10px 20px; border-top: 1px solid #334155; text-align: center; }
+        .profile-dropdown .pd-footer a { color: #38bdf8; font-size: 12px; text-decoration: none; }
         @media (max-width: 768px) {
             .cards { grid-template-columns: 1fr; } .hero h1 { font-size: 30px; }
             .search-box.open { width: calc(100vw - 100px); }
@@ -101,7 +121,23 @@
             <a href="javascript:void(0)" id="nav-login-link" onclick="openLoginModal()">登录</a>
             <span class="nav-user" id="nav-user-info" style="display:none">
               <span id="nav-username"></span>
+              <span class="profile-trigger" id="profile-trigger" onclick="toggleProfileDropdown()">
+                个人中心
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+              </span>
               <span class="logout-link" onclick="doLogout()">退出</span>
+              <div class="profile-dropdown" id="profile-dropdown">
+                <div class="pd-header">
+                  <div class="pd-avatar" id="pd-avatar">A</div>
+                  <div class="pd-info">
+                    <div class="pd-name" id="pd-name">--</div>
+                    <div class="pd-id" id="pd-uid">ID: --</div>
+                  </div>
+                </div>
+                <div class="pd-section-title">我的收藏</div>
+                <div class="pd-body" id="pd-fav-list"><div class="pd-empty">加载中…</div></div>
+                <div class="pd-footer"><a href="/favorites">查看全部收藏 →</a></div>
+              </div>
             </span>
             <span class="search-wrap" id="search-wrap">
                 <button class="search-icon" id="search-btn" title="搜索">
@@ -358,8 +394,9 @@
             var data = res.data;
             localStorage.setItem('cms_token', data.token);
             localStorage.setItem('cms_username', data.username);
+            localStorage.setItem('cms_uid', data.user_id || '');
             closeLoginModal();
-            updateLoginUI(data.username);
+            updateLoginUI(data.username, data.user_id);
           } else {
             showLoginErr(res.msg || '登录失败');
           }
@@ -377,10 +414,11 @@
     window.doLogout = function() {
       localStorage.removeItem('cms_token');
       localStorage.removeItem('cms_username');
-      updateLoginUI(null);
+      localStorage.removeItem('cms_uid');
+      updateLoginUI(null, null);
     };
 
-    function updateLoginUI(username) {
+    function updateLoginUI(username, uid) {
       var link = document.getElementById('nav-login-link');
       var info = document.getElementById('nav-user-info');
       var heroBtn = document.querySelector('.hero .btn-outline');
@@ -388,6 +426,9 @@
         link.style.display = 'none';
         info.style.display = 'flex';
         document.getElementById('nav-username').textContent = username;
+        document.getElementById('pd-name').textContent = username;
+        document.getElementById('pd-uid').textContent = 'ID: ' + (uid || '-');
+        document.getElementById('pd-avatar').textContent = (username || 'A')[0].toUpperCase();
         if (heroBtn) { heroBtn.style.display = 'none'; }
       } else {
         link.style.display = '';
@@ -396,8 +437,66 @@
       }
     }
 
+    // ── 个人中心下拉 ──
+    var favApi = bp + '/article/api/favorites.php';
+    var favLoaded = false;
+
+    window.toggleProfileDropdown = function() {
+      var dd = document.getElementById('profile-dropdown');
+      var isOpen = dd.classList.contains('show');
+      if (isOpen) {
+        dd.classList.remove('show');
+      } else {
+        dd.classList.add('show');
+        if (!favLoaded) loadProfileFavorites();
+      }
+    };
+
+    function loadProfileFavorites() {
+      var token = localStorage.getItem('cms_token') || '';
+      var listEl = document.getElementById('pd-fav-list');
+      if (!listEl) return;
+      listEl.innerHTML = '<div class="pd-empty">加载中…</div>';
+      fetch(favApi, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ _token: token, page: 1, page_size: 10 })
+      }).then(function(r) { return r.json(); })
+        .then(function(res) {
+          favLoaded = true;
+          if (res.code !== 0) {
+            listEl.innerHTML = '<div class="pd-empty">加载失败</div>';
+            return;
+          }
+          var list = res.data.list || [];
+          if (list.length === 0) {
+            listEl.innerHTML = '<div class="pd-empty">暂无收藏</div>';
+            return;
+          }
+          var h = '';
+          list.forEach(function(item) {
+            h += '<a class="pd-fav-item" href="' + bp + '/article/p/' + item.id + '">';
+            h += '<span class="fav-title">' + escapeHtml(item.title) + '</span>';
+            if (item.category) h += '<span class="fav-cat">' + escapeHtml(item.category) + '</span>';
+            h += '</a>';
+          });
+          listEl.innerHTML = h;
+        }).catch(function() {
+          listEl.innerHTML = '<div class="pd-empty">网络错误</div>';
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+      var dd = document.getElementById('profile-dropdown');
+      var trigger = document.getElementById('profile-trigger');
+      if (dd && dd.classList.contains('show') && !trigger.contains(e.target) && !dd.contains(e.target)) {
+        dd.classList.remove('show');
+      }
+    });
+
     var savedUser = localStorage.getItem('cms_username');
-    if (savedUser) updateLoginUI(savedUser);
+    var savedUid = localStorage.getItem('cms_uid');
+    if (savedUser) updateLoginUI(savedUser, savedUid);
 })();
 </script>
 
