@@ -112,6 +112,11 @@ function serveFrontend($filePath, $basePath) {
     }
 
     header('Content-Type: text/html; charset=utf-8');
+
+    // 标签系统：解析模板中的 [--tag--] 占位符
+    require_once __DIR__ . '/module/tags/config.php';
+    $html = TagHook::render($html, $filePath);
+
     echo $html;
     exit;
 }
