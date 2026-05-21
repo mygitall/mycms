@@ -458,6 +458,12 @@
 
     .form-error.show { display: block; }
 
+    /* 富文本编辑器错误状态 */
+    .tox-tinymce.editor-error {
+      border-color: var(--danger) !important;
+      box-shadow: 0 0 0 3px var(--danger-dim) !important;
+    }
+
     .btn {
       display: inline-flex;
       align-items: center;
@@ -1987,6 +1993,7 @@
       justify-content: flex-end;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.5/tinymce.min.js"></script>
 </head>
 <body>
 
@@ -7561,6 +7568,28 @@ if (response.code == 401) {
               }
             }
 
+            /* ── TinyMCE 富文本编辑器初始化 ── */
+            let tinymceReady = false;
+            tinymce.init({
+              selector: '#article-content',
+              height: 420,
+              plugins: 'lists link image code table',
+              toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | removeformat code',
+              menubar: false,
+              statusbar: true,
+              branding: false,
+              promotion: false,
+              block_formats: '段落=p;标题 1=h1;标题 2=h2;标题 3=h3;标题 4=h4;引用=blockquote;预格式化=pre',
+              font_family_formats: '默认字体=inherit;宋体=SimSun;黑体=SimHei;微软雅黑=Microsoft YaHei;楷体=KaiTi;仿宋=FangSong;Arial=arial,helvetica,sans-serif;Times New Roman=times new roman,serif;Courier New=courier new,monospace',
+              font_size_formats: '12px 14px 16px 18px 20px 24px 28px 32px 36px 48px',
+              image_title: true,
+              automatic_uploads: false,
+              content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 15px; line-height: 1.8; color: #333; }',
+              setup: function(editor) {
+                editor.on('init', function() { tinymceReady = true; });
+              }
+            });
+
             function openArticleAddModal() {
               articleEditTarget = null;
               $('article-modal-title').textContent    = '新增文章';
@@ -7571,6 +7600,7 @@ if (response.code == 401) {
               $('article-tags').value        = '';
               $('article-cover-image').value = '';
               $('article-content').value    = '';
+              if (tinymceReady) tinymce.get('article-content').setContent('');
               $('article-status').value     = '1';
               $('article-is-featured').value = '0';
               $('article-published-at').value = '';
@@ -7592,6 +7622,7 @@ if (response.code == 401) {
               $('article-tags').value       = article.tags || '';
               $('article-cover-image').value = article.cover_image || '';
               $('article-content').value   = article.content || '';
+              if (tinymceReady) tinymce.get('article-content').setContent(article.content || '');
               $('article-status').value    = article.status;
               $('article-is-featured').value = article.is_featured;
 
@@ -7628,13 +7659,19 @@ if (response.code == 401) {
               $('article-err-content').classList.remove('show');
               $('article-title').classList.remove('error');
               $('article-content').classList.remove('error');
+              if (tinymceReady) {
+                const ed = tinymce.get('article-content');
+                if (ed) ed.getContainer().querySelector('.tox-tinymce').classList.remove('editor-error');
+              }
             }
 
             function submitArticleForm() {
               clearArticleFormErrors();
 
               const title       = $('article-title').value.trim();
-              const content     = $('article-content').value.trim();
+              const editor      = tinymceReady ? tinymce.get('article-content') : null;
+              const contentRaw  = editor ? editor.getContent() : $('article-content').value;
+              const content     = contentRaw.trim();
               const category    = $('article-category').value.trim();
               const tags        = $('article-tags').value.trim();
               const coverImage  = $('article-cover-image').value.trim();
@@ -7651,6 +7688,10 @@ if (response.code == 401) {
               if (!content) {
                 $('article-content').classList.add('error');
                 $('article-err-content').classList.add('show');
+                if (tinymceReady) {
+                  const ed = tinymce.get('article-content');
+                  if (ed) ed.getContainer().querySelector('.tox-tinymce').classList.add('editor-error');
+                }
                 hasError = true;
               }
               if (hasError) return;
