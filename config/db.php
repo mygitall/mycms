@@ -996,7 +996,7 @@ function setSecurityHeaders() {
     header('Expires: 0');
 
     // Content Security Policy (CSP)
-    // 严格 CSP，只允许同源资源
+    // frame-src 允许视频平台嵌入播放
     $csp = [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
@@ -1004,6 +1004,7 @@ function setSecurityHeaders() {
         "img-src 'self' data: https://images.unsplash.com https://picsum.photos https://via.placeholder.com",
         "font-src 'self'",
         "connect-src 'self'",
+        "frame-src 'self' https://player.bilibili.com https://www.youtube.com https://player.youku.com https://v.qq.com https://open.iqiyi.com https://player.vimeo.com",
         "frame-ancestors 'none'",
         "base-uri 'self'",
         "form-action 'self'"
