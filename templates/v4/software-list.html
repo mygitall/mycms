@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>软件列表 - [--site_name--]</title>
+</head>
+<body>
+
+<h1>软件列表</h1>
+
+[--loop:software(num=50)--]
+<div>
+  <a href="[--url--]"><strong>[--name--]</strong></a>
+  <span>v[--version--]</span>
+  <span>[--category--]</span>
+  <span>评分: [--rating--]</span>
+  <p>[--summary--]</p>
+</div>
+[--/loop:software--]
+
+</body>
+</html>
