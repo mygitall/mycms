@@ -7609,11 +7609,8 @@ if (response.code == 401) {
                     { text: 'Rust',       value: 'rust' },
                     { text: 'TypeScript', value: 'typescript' }
                   ],
-                  content_css: [
-                    'https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css'
-                  ],
                   content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 15px; line-height: 1.8; color: #333; } ' +
-                    'pre[data-mce-highlight] { border-radius: 8px; }',
+                    'pre[data-mce-highlight] { background: #1e1e1e; color: #d4d4d4; border-radius: 8px; padding: 16px; overflow-x: auto; font-family: "SF Mono", Monaco, "Cascadia Code", Consolas, monospace; font-size: 13px; line-height: 1.6; }',
                   setup: function(editor) {
                     editor.on('init', function() { tinymceReady = true; });
                   }
