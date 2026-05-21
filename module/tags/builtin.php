@@ -64,7 +64,7 @@ function tag_software_detail($attrs) {
         $prefix = DB_PREFIX;
         $stmt = $pdo->prepare(
             "SELECT id, name, version, description, category_name AS category,
-                    view_count, download_count, created_at
+                    view_count, download_count, download_urls, created_at
              FROM `{$prefix}software` WHERE id = :id AND status = 1 LIMIT 1"
         );
         $stmt->execute(array(':id' => $id));
@@ -293,7 +293,7 @@ function tag_loop_software($attrs) {
         $pdo = getDB();
         $prefix = DB_PREFIX;
         $sql = "SELECT id, name, description, version, category_name AS category,
-                       view_count, download_count, created_at
+                       view_count, download_count, download_urls, created_at
                 FROM `{$prefix}software` WHERE status = 1
                 ORDER BY created_at DESC LIMIT " . min($num, 20);
         $stmt = $pdo->query($sql);
