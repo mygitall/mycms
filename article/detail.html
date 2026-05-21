@@ -605,7 +605,27 @@ function renderContent(content) {
 function sanitizeHtml(html) {
   if (!html) return '';
 
-  // 剥离危险标签（正则预处理）
+  // 信任的视频平台 iframe：先提取保护
+  const trustedVideoHosts = [
+    'player.bilibili.com',
+    'www.youtube.com',
+    'player.youku.com',
+    'v.qq.com',
+    'open.iqiyi.com',
+    'player.vimeo.com',
+    'www.douyin.com',
+  ];
+  const trustedRe = new RegExp(
+    '<iframe\\b[^>]*src="(https?:)?//(' + trustedVideoHosts.join('|').replace(/\./g, '\\.') + ')[^"]*"[^>]*>[\\s\\S]*?</iframe>',
+    'gi'
+  );
+  const preserved = [];
+  let clean = html.replace(trustedRe, function(m) {
+    preserved.push(m);
+    return '\x00IFRAME' + (preserved.length - 1) + '\x00';
+  });
+
+  // 剥离其他危险标签
   const dangerousTags = [
     /<script\b[^>]*>[\s\S]*?<\/script>/gi,
     /<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi,
@@ -627,8 +647,13 @@ function sanitizeHtml(html) {
     / on\w+\s*=\s*[^\s>]*/gi,
     /javascript\s*:/gi,
   ];
-  let clean = html;
   dangerousTags.forEach(function(p) { clean = clean.replace(p, ''); });
+
+  // 恢复受信任的视频平台 iframe
+  preserved.forEach(function(iframe, i) {
+    clean = clean.replace('\x00IFRAME' + i + '\x00', iframe);
+  });
+
   return clean;
 }
 
