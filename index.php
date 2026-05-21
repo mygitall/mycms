@@ -158,14 +158,11 @@ function getActiveTemplate() {
 }
 
 if ($matchedRoute) {
-    // 首页使用模板系统：根据配置加载 templates/{template}/index.html
-    if ($matchedRoute === 'index.html') {
-        $activeTemplate = getActiveTemplate();
-        $tplFile = __DIR__ . '/templates/' . $activeTemplate . '/index.html';
-        if (is_file($tplFile)) {
-            serveFrontend($tplFile, $BASE_PATH);
-        }
-        // fallback: 模板文件不存在时使用默认 frontend/index.html
+    // 优先使用当前模板目录下的文件，不存在则降级到 frontend/
+    $activeTemplate = getActiveTemplate();
+    $tplFile = __DIR__ . '/templates/' . $activeTemplate . '/' . $matchedRoute;
+    if (is_file($tplFile)) {
+        serveFrontend($tplFile, $BASE_PATH);
     }
     serveFrontend(__DIR__ . '/frontend/' . $matchedRoute, $BASE_PATH);
 }

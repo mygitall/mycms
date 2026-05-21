@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文章列表 - [--site_name--]</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f5f7;
+    color: #1a1a1f;
+    line-height: 1.6;
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 24px 20px; }
+  .header {
+    text-align: center;
+    padding: 40px 0 30px;
+    border-bottom: 1px solid #e5e5ea;
+    margin-bottom: 30px;
+  }
+  .header h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+  .header p { color: #888; font-size: 14px; }
+  .article-list { list-style: none; }
+  .article-item {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 20px 0;
+    border-bottom: 1px solid #eee;
+    transition: background .2s;
+  }
+  .article-item:hover { background: #fafafc; }
+  .article-item h2 {
+    font-size: 18px;
+    font-weight: 550;
+    color: #1a1a1f;
+    margin-bottom: 6px;
+  }
+  .article-item .meta {
+    font-size: 13px;
+    color: #999;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .article-item .meta span { white-space: nowrap; }
+  .article-item .summary {
+    font-size: 14px;
+    color: #666;
+    margin-top: 6px;
+    line-height: 1.7;
+  }
+  .article-item .cat-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    color: #5b6cf0;
+    background: rgba(91,108,240,0.08);
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 4px;
+  }
+  .pagination-wrap { margin-top: 32px; text-align: center; }
+  .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>文章列表</h1>
+    <p>共收录文章，持续更新中</p>
+  </div>
+
+  [--loop:articles(num=20,sort=published_at,order=DESC)--]
+  <a href="[--url--]" class="article-item">
+    <h2>[--title--]</h2>
+    <div class="meta">
+      <span class="cat-tag">[--category--]</span>
+      <span>[--published_at--]</span>
+      <span>[--view_count--] 次阅读</span>
+    </div>
+    <div class="summary">[--summary--]</div>
+  </a>
+  [--/loop:articles--]
+
+</div>
+</body>
+</html>
