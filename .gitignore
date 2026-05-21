@@ -6,5 +6,6 @@ uploads/*
 data/backups/*
 !data/backups/.gitkeep
 storage/runtime/*
+storage/cache/*
 storage/export_diag.txt
 CLAUDE.zip
