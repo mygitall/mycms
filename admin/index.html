@@ -7655,8 +7655,25 @@ if (response.code == 401) {
               $('article-category').value   = article.category || '';
               $('article-tags').value       = article.tags || '';
               $('article-cover-image').value = article.cover_image || '';
-              $('article-content').value   = article.content || '';
-              if (tinymceReady) tinymce.get('article-content').setContent(article.content || '');
+
+              // 列表 API 会 strip_tags 截断内容，编辑时需单独获取完整 HTML
+              $('article-content').value = '';
+              if (tinymceReady) tinymce.get('article-content').setContent('<p>加载中...</p>');
+              fetch(BASE_PATH + '/article/api/view.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: article.id })
+              }).then(function(r) { return r.json(); })
+                .then(function(res) {
+                  if (res.code === 0 && res.data && res.data.content) {
+                    $('article-content').value = res.data.content;
+                    if (tinymceReady) tinymce.get('article-content').setContent(res.data.content);
+                  }
+                }).catch(function() {
+                  // 降级：使用缓存内容
+                  $('article-content').value = article.content || '';
+                  if (tinymceReady) tinymce.get('article-content').setContent(article.content || '');
+                });
               $('article-status').value    = article.status;
               $('article-is-featured').value = article.is_featured;
 
