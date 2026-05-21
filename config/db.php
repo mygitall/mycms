@@ -1004,7 +1004,7 @@ function setSecurityHeaders() {
         "img-src 'self' data: https://images.unsplash.com https://picsum.photos https://via.placeholder.com",
         "font-src 'self'",
         "connect-src 'self'",
-        "frame-src 'self' https://player.bilibili.com https://www.youtube.com https://player.youku.com https://v.qq.com https://open.iqiyi.com https://player.vimeo.com",
+        "frame-src 'self' player.bilibili.com www.youtube.com player.youku.com v.qq.com open.iqiyi.com player.vimeo.com",
         "frame-ancestors 'none'",
         "base-uri 'self'",
         "form-action 'self'"
