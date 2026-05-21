@@ -7570,25 +7570,35 @@ if (response.code == 401) {
 
             /* ── TinyMCE 富文本编辑器初始化 ── */
             let tinymceReady = false;
-            tinymce.init({
-              selector: '#article-content',
-              height: 420,
-              plugins: 'lists link image code table',
-              toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | removeformat code',
-              menubar: false,
-              statusbar: true,
-              branding: false,
-              promotion: false,
-              block_formats: '段落=p;标题 1=h1;标题 2=h2;标题 3=h3;标题 4=h4;引用=blockquote;预格式化=pre',
-              font_family_formats: '默认字体=inherit;宋体=SimSun;黑体=SimHei;微软雅黑=Microsoft YaHei;楷体=KaiTi;仿宋=FangSong;Arial=arial,helvetica,sans-serif;Times New Roman=times new roman,serif;Courier New=courier new,monospace',
-              font_size_formats: '12px 14px 16px 18px 20px 24px 28px 32px 36px 48px',
-              image_title: true,
-              automatic_uploads: false,
-              content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 15px; line-height: 1.8; color: #333; }',
-              setup: function(editor) {
-                editor.on('init', function() { tinymceReady = true; });
+            (function initTinyMCE() {
+              if (typeof tinymce === 'undefined') {
+                console.warn('[TinyMCE] CDN 未加载，使用纯文本模式');
+                return;
               }
-            });
+              try {
+                tinymce.init({
+                  selector: '#article-content',
+                  height: 420,
+                  plugins: 'lists link image code table',
+                  toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | removeformat code',
+                  menubar: false,
+                  statusbar: true,
+                  branding: false,
+                  promotion: false,
+                  block_formats: '段落=p;标题 1=h1;标题 2=h2;标题 3=h3;标题 4=h4;引用=blockquote;预格式化=pre',
+                  font_family_formats: '默认字体=inherit;宋体=SimSun;黑体=SimHei;微软雅黑=Microsoft YaHei;楷体=KaiTi;仿宋=FangSong;Arial=arial,helvetica,sans-serif;Times New Roman=times new roman,serif;Courier New=courier new,monospace',
+                  font_size_formats: '12px 14px 16px 18px 20px 24px 28px 32px 36px 48px',
+                  image_title: true,
+                  automatic_uploads: false,
+                  content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 15px; line-height: 1.8; color: #333; }',
+                  setup: function(editor) {
+                    editor.on('init', function() { tinymceReady = true; });
+                  }
+                });
+              } catch(e) {
+                console.warn('[TinyMCE] 初始化失败，使用纯文本模式:', e.message);
+              }
+            })();
 
             function openArticleAddModal() {
               articleEditTarget = null;
