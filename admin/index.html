@@ -2249,6 +2249,13 @@
           </svg>
           参数设置
         </div>
+        <div class="nav-item" data-page="tags">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+          </svg>
+          占位符标签
+        </div>
 
         <div class="nav-divider"></div>
         <div class="nav-section-label">系统</div>
@@ -4612,6 +4619,35 @@ if (response.code == 401) {
           </table>
         </div>
       </div><!-- /page-settings -->
+
+      <!-- ═══ PAGE: 占位符标签参考 ═══ -->
+      <div class="page" id="page-tags" style="display:none">
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-header-left">
+              <h3>占位符标签参考</h3>
+              <p>模板中可用 [--标签名--] 语法动态渲染内容。所有标签均支持服务端渲染。</p>
+            </div>
+            <div class="table-header-right">
+              <input type="text" id="tag-search-input" class="table-search" placeholder="搜索标签..." oninput="filterTags()" style="width:220px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-size:13px;outline:none">
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width:180px">标签名</th>
+                  <th style="width:200px">语法示例</th>
+                  <th>功能说明</th>
+                </tr>
+              </thead>
+              <tbody id="tag-reference-tbody">
+                <tr><td colspan="3" style="text-align:center;padding:40px;color:var(--text-dim)">加载中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div><!-- /page-tags -->
 
         <!-- ══════════════════════════════════════════
              ADD USER MODAL
@@ -7106,6 +7142,7 @@ if (response.code == 401) {
               software:  { title: '软件管理', subtitle: '管理系统内的所有软件资源' },
               search:    { title: '搜索管理', subtitle: '全站搜索历史记录与热词统计' },
               settings:  { title: '参数设置', subtitle: '管理网站全局系统配置参数' },
+              tags:      { title: '占位符标签参考', subtitle: '模板标签语法说明 · 服务端动态渲染' },
             };
 
             function updateHeader(page) {
@@ -7137,6 +7174,7 @@ if (response.code == 401) {
                 $('page-software').style.display = page === 'software' ? 'block' : 'none';
                 $('page-search').style.display = page === 'search' ? 'block' : 'none';
                 $('page-settings').style.display = page === 'settings' ? 'block' : 'none';
+                $('page-tags').style.display = page === 'tags' ? 'block' : 'none';
 
                 // Update header
                 updateHeader(page);
@@ -7164,6 +7202,9 @@ if (response.code == 401) {
                 }
                 if (page === 'settings') {
                   loadTemplateSettings();
+                }
+                if (page === 'tags') {
+                  loadTagReference();
                 }
               });
             });
@@ -7241,8 +7282,60 @@ if (response.code == 401) {
               });
             }
 
+            // ══════════════════════════════════════════
+            // 占位符标签参考
+            // ══════════════════════════════════════════
+            const TAG_LIST_API = BASE_PATH + '/admin/api/tag_list.php';
+            let allTagsData = [];
 
+            function loadTagReference() {
+              const tbody = $('tag-reference-tbody');
+              if (!tbody) return;
+              tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:40px;color:var(--text-dim)">加载中...</td></tr>';
 
+              if (allTagsData.length > 0) {
+                renderTagTable(allTagsData);
+                return;
+              }
+
+              fetch(TAG_LIST_API)
+                .then(r => r.json())
+                .then(res => {
+                  if (res.code === 0 && Array.isArray(res.data)) {
+                    allTagsData = res.data;
+                    renderTagTable(allTagsData);
+                  }
+                })
+                .catch(() => {
+                  tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:40px;color:var(--danger)">加载失败</td></tr>';
+                });
+            }
+
+            function renderTagTable(data) {
+              const tbody = $('tag-reference-tbody');
+              if (!tbody) return;
+              const keyword = ($('tag-search-input')?.value || '').toLowerCase();
+              const filtered = keyword ? data.filter(t =>
+                t.name.toLowerCase().includes(keyword) || t.help.toLowerCase().includes(keyword)
+              ) : data;
+
+              if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:40px;color:var(--text-dim)">无匹配标签</td></tr>';
+                return;
+              }
+
+              tbody.innerHTML = filtered.map(t =>
+                '<tr>' +
+                  '<td><code style="background:var(--accent-dim);color:var(--accent);padding:3px 8px;border-radius:4px;font-size:13px">' + t.name + '</code></td>' +
+                  '<td><code style="font-size:12px;color:var(--text-2);word-break:break-all">' + escapeHtml(t.syntax) + '</code></td>' +
+                  '<td style="font-size:13px">' + escapeHtml(t.help || '-') + '</td>' +
+                '</tr>'
+              ).join('');
+            }
+
+            function filterTags() {
+              renderTagTable(allTagsData);
+            }
 
             // ══════════════════════════════════════════
             // 搜索管理

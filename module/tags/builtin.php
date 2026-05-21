@@ -222,6 +222,211 @@ function tag_breadcrumb($attrs) {
     return $html;
 }
 
+// ── [--carousel:num=5--] 轮播数据 ──
+TagRegistry::register('carousel', 'tag_carousel', '文章轮播（JSON数据块）');
+function tag_carousel($attrs) {
+    $num = isset($attrs['num']) ? (int)$attrs['num'] : 5;
+    try {
+        $pdo = getDB();
+        $sql = "SELECT id, title, category, cover_image, view_count, published_at
+                FROM articles WHERE status = 1 AND deleted_at IS NULL
+                ORDER BY published_at DESC LIMIT " . min($num, 10);
+        $stmt = $pdo->query($sql);
+        $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (empty($list)) return '[]';
+        $data = array();
+        foreach ($list as $a) {
+            $data[] = array(
+                'title'    => $a['title'],
+                'category' => $a['category'] ?: '头条',
+                'url'      => getArticleUrl($a['id']),
+                'cover'    => $a['cover_image'] ?: '',
+                'desc'     => '',
+            );
+        }
+        return json_encode($data, JSON_UNESCAPED_UNICODE);
+    } catch (Exception $e) {
+        return '[]';
+    }
+}
+
+// ── [--loop:software(num=6)--] 软件循环 ──
+TagRegistry::register('software', 'tag_loop_software', '软件循环块');
+function tag_loop_software($attrs) {
+    $num = isset($attrs['num']) ? (int)$attrs['num'] : 6;
+    try {
+        $pdo = getDB();
+        $prefix = DB_PREFIX;
+        $sql = "SELECT id, name, description, icon, version, rating, category
+                FROM `{$prefix}software` WHERE status = 1
+                ORDER BY created_at DESC LIMIT " . min($num, 20);
+        $stmt = $pdo->query($sql);
+        $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($list as &$item) {
+            $item['url'] = getBaseUrl() . '/software/p/' . $item['id'];
+            $item['summary'] = mb_substr((string)$item['description'], 0, 80);
+        }
+        unset($item);
+        return $list;
+    } catch (Exception $e) {
+        return array();
+    }
+}
+
+// ── [--loop:categories--] 分类循环 ──
+TagRegistry::register('categories', 'tag_loop_categories', '分类循环块');
+function tag_loop_categories($attrs) {
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->query("SELECT DISTINCT category, COUNT(*) AS cnt FROM articles WHERE status = 1 AND deleted_at IS NULL AND category != '' GROUP BY category ORDER BY cnt DESC LIMIT 20");
+        $cats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($cats as &$c) {
+            $c['name']  = $c['category'];
+            $c['url']   = getBaseUrl() . '/list?cat=' . urlencode($c['category']);
+        }
+        unset($c);
+        return $cats;
+    } catch (Exception $e) {
+        return array();
+    }
+}
+
+// ── [--article_detail--] 文章详情（当前页面文章） ──
+// 用于 article/detail.html 等详情页，自动读取 ?id=xxx 或注入的 __ARTICLE_ID__
+TagRegistry::register('article_detail', 'tag_article_detail', '当前文章详情');
+function tag_article_detail($attrs) {
+    $id = isset($attrs['id']) ? (int)$attrs['id'] : 0;
+    if ($id === 0) {
+        // 尝试从全局获取
+        if (isset($GLOBALS['__ARTICLE_ID__'])) {
+            $id = (int)$GLOBALS['__ARTICLE_ID__'];
+        }
+    }
+    if ($id === 0) return '<!-- article_detail: 未指定文章ID -->';
+
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->prepare("SELECT * FROM articles WHERE id = :id AND status = 1 AND deleted_at IS NULL LIMIT 1");
+        $stmt->execute(array(':id' => $id));
+        $a = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$a) return '<!-- article_detail: 文章不存在 -->';
+
+        $a['url']      = getArticleUrl($a['id']);
+        $a['summary']  = mb_substr(strip_tags((string)$a['content']), 0, 200);
+        $a['full_date'] = $a['published_at'] ?: $a['created_at'];
+        return $a;
+    } catch (Exception $e) {
+        return '<!-- article_detail: 数据加载失败 -->';
+    }
+}
+
+// ── [--related_articles:id=X,num=5--] 相关文章 ──
+TagRegistry::register('related_articles', 'tag_related_articles', '相关文章（同分类）');
+function tag_related_articles($attrs) {
+    $id  = isset($attrs['id'])  ? (int)$attrs['id']  : 0;
+    $num = isset($attrs['num']) ? (int)$attrs['num'] : 5;
+    if ($id === 0) return '';
+
+    try {
+        $pdo = getDB();
+        // 获取当前文章分类
+        $stmt = $pdo->prepare("SELECT category FROM articles WHERE id = :id LIMIT 1");
+        $stmt->execute(array(':id' => $id));
+        $cat = $stmt->fetchColumn();
+
+        if ($cat) {
+            $stmt = $pdo->prepare(
+                "SELECT id, title, category, cover_image, view_count, published_at
+                 FROM articles WHERE status = 1 AND deleted_at IS NULL AND category = :cat AND id != :id
+                 ORDER BY published_at DESC LIMIT " . min($num, 10)
+            );
+            $stmt->execute(array(':cat' => $cat, ':id' => $id));
+        } else {
+            $stmt = $pdo->prepare(
+                "SELECT id, title, category, cover_image, view_count, published_at
+                 FROM articles WHERE status = 1 AND deleted_at IS NULL AND id != :id
+                 ORDER BY published_at DESC LIMIT " . min($num, 10)
+            );
+            $stmt->execute(array(':id' => $id));
+        }
+
+        $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($list as &$item) {
+            $item['url'] = getArticleUrl($item['id']);
+            $item['summary'] = mb_substr(strip_tags((string)$item['content']), 0, 100);
+        }
+        unset($item);
+        return $list;
+    } catch (Exception $e) {
+        return array();
+    }
+}
+
+// ── [--login_form--] 登录表单 ──
+TagRegistry::register('login_form', 'tag_login_form', '登录表单');
+function tag_login_form($attrs) {
+    $action = getBaseUrl() . '/login';
+    $csrfToken = '';
+    if (isset($_COOKIE['csrf_token'])) {
+        $csrfToken = htmlspecialchars($_COOKIE['csrf_token'], ENT_QUOTES, 'UTF-8');
+    }
+    return '<form class="tag-login-form" method="POST" action="' . htmlspecialchars($action, ENT_QUOTES, 'UTF-8') . '">' .
+           '<input type="hidden" name="_token" value="' . $csrfToken . '">' .
+           '<div class="form-group"><label>用户名</label><input type="text" name="username" required></div>' .
+           '<div class="form-group"><label>密码</label><input type="password" name="password" required></div>' .
+           '<button type="submit">登 录</button>' .
+           '</form>';
+}
+
+// ── [--pagination:total=N,page=N,url=xxx--] 分页导航 ──
+TagRegistry::register('pagination', 'tag_pagination', '分页导航');
+function tag_pagination($attrs) {
+    $total     = isset($attrs['total'])     ? (int)$attrs['total']     : 0;
+    $pageSize  = isset($attrs['per_page'])  ? (int)$attrs['per_page']  : 10;
+    $page      = isset($attrs['page'])      ? (int)$attrs['page']      : 1;
+    $baseUrl   = isset($attrs['url'])       ? $attrs['url']            : '?page=';
+
+    if ($total <= $pageSize) return '';
+
+    $totalPages = (int)ceil($total / $pageSize);
+    if ($totalPages <= 1) return '';
+
+    $html = '<nav class="tag-pagination"><ul>';
+    if ($page > 1) {
+        $html .= '<li><a href="' . htmlspecialchars($baseUrl . '1', ENT_QUOTES, 'UTF-8') . '">首页</a></li>';
+        $html .= '<li><a href="' . htmlspecialchars($baseUrl . ($page - 1), ENT_QUOTES, 'UTF-8') . '">上一页</a></li>';
+    }
+    for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++) {
+        $active = ($i == $page) ? ' class="active"' : '';
+        $html .= '<li' . $active . '><a href="' . htmlspecialchars($baseUrl . $i, ENT_QUOTES, 'UTF-8') . '">' . $i . '</a></li>';
+    }
+    if ($page < $totalPages) {
+        $html .= '<li><a href="' . htmlspecialchars($baseUrl . ($page + 1), ENT_QUOTES, 'UTF-8') . '">下一页</a></li>';
+        $html .= '<li><a href="' . htmlspecialchars($baseUrl . $totalPages, ENT_QUOTES, 'UTF-8') . '">末页</a></li>';
+    }
+    $html .= '<li class="info">共 ' . $total . ' 条，' . $totalPages . ' 页</li>';
+    $html .= '</ul></nav>';
+    return $html;
+}
+
+// ── [--config:key=xxx--] 读取系统配置 ──
+TagRegistry::register('config', 'tag_config', '读取系统配置项');
+function tag_config($attrs) {
+    if (!isset($attrs['key'])) return '';
+    $key = trim($attrs['key']);
+    try {
+        $pdo = getDB();
+        $prefix = DB_PREFIX;
+        $stmt = $pdo->prepare("SELECT config_value FROM `{$prefix}config` WHERE config_key = :k LIMIT 1");
+        $stmt->execute(array(':k' => $key));
+        $val = $stmt->fetchColumn();
+        return $val !== false ? htmlspecialchars((string)$val, ENT_QUOTES, 'UTF-8') : '';
+    } catch (Exception $e) {
+        return '';
+    }
+}
+
 // ─── 工具函数 ────────────────────────────────
 
 function getBaseUrl() {

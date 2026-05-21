@@ -71,4 +71,35 @@ class TagRegistry
         }
         return $result;
     }
+
+    /**
+     * 获取标签的示例语法
+     * @param  string $name
+     * @return string
+     */
+    public static function syntax($name)
+    {
+        $syntaxes = array(
+            'site_name'          => '[--site_name--]',
+            'site_url'           => '[--site_url--]',
+            'current_year'       => '[--current_year--]',
+            'current_date'       => '[--current_date:format=Y-m-d--]',
+            'article_list'       => '[--article_list:num=10,cat=tech,sort=published_at,order=DESC--]',
+            'articles'           => '[--loop:articles(num=5,cat=tech)--]<li><a href="[--url--]">[--title--]</a></li>[--/loop:articles--]',
+            'software_list'      => '[--software_list:num=6--]',
+            'software'           => '[--loop:software(num=6)--]<div><strong>[--name--]</strong><p>[--summary--]</p></div>[--/loop:software--]',
+            'category_nav'       => '[--category_nav--]',
+            'categories'         => '[--loop:categories--]<a href="[--url--]">[--name--] ([--cnt--])</a>[--/loop:categories--]',
+            'search_form'        => '[--search_form--]',
+            'breadcrumb'         => '[--breadcrumb--]',
+            'carousel'           => '[--carousel:num=5--]',
+            'article_detail'     => '[--article_detail--]（详情页自动读取文章ID）或 [--article_detail:id=10--]',
+            'related_articles'   => '[--related_articles:id=10,num=5--]',
+            'login_form'         => '[--login_form--]',
+            'pagination'         => '[--pagination:total=100,per_page=10,page=1,url=?page=--]',
+            'config'             => '[--config:key=site_name--]',
+        );
+
+        return isset($syntaxes[$name]) ? $syntaxes[$name] : '[--' . $name . '--]';
+    }
 }

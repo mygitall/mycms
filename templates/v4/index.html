@@ -1414,7 +1414,7 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <div class="sidebar-panel">
       <div class="sidebar-panel-header">
-        <a href="#" class="nav-logo">Neo<span>Vision</span></a>
+        <a href="#" class="nav-logo">Neo<span>Visio奶奶们n</span></a>
         <button class="sidebar-close" id="sidebarClose" aria-label="关闭菜单">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -1453,7 +1453,7 @@
         <div class="nav-right">
           <a href="#" class="nav-right-link">资讯</a>
           <a href="#" class="nav-right-link">软件</a>
-          <a href="#" class="nav-right-link">电影</a>
+          <a href="#" class="nav-right-link">电影[--site_name--]  </a>
         </div>
       </div>
       <div class="nav-actions">
@@ -1498,7 +1498,7 @@
 
   <!-- ── Tag Test ── -->
   <div style="text-align:center;padding:8px;background:var(--accent);color:#fff;font-size:12px;opacity:0.7">
-    site_name: [--site_name--] | year: [--current_year--]
+    site_name: 哈哈[--site_name--] | year: [--current_year--]
   </div>
 
   <!-- ── Main Content ── -->
@@ -1530,52 +1530,19 @@
           </div>
         </div>
 
-        <!-- Category -->
+        <!-- Category（服务端标签渲染） -->
         <div class="category-card">
           <div class="category-title">内容分类</div>
           <ul class="category-list">
+            [--loop:categories--]
             <li class="category-item">
               <div class="category-item-left">
-                <div class="category-icon">&#x1F4F0;</div>
-                <span class="category-name">科技资讯</span>
+                <div class="category-icon">&#x1F4E2;</div>
+                <span class="category-name">[--name--]</span>
               </div>
-              <span class="category-count">2.3k</span>
+              <span class="category-count">[--cnt--]</span>
             </li>
-            <li class="category-item">
-              <div class="category-item-left">
-                <div class="category-icon">&#x1F3AE;</div>
-                <span class="category-name">软件工具</span>
-              </div>
-              <span class="category-count">856</span>
-            </li>
-            <li class="category-item">
-              <div class="category-item-left">
-                <div class="category-icon">&#x1F3AC;</div>
-                <span class="category-name">影视娱乐</span>
-              </div>
-              <span class="category-count">1.5k</span>
-            </li>
-            <li class="category-item">
-              <div class="category-item-left">
-                <div class="category-icon">&#x1F4CA;</div>
-                <span class="category-name">商业财经</span>
-              </div>
-              <span class="category-count">1.1k</span>
-            </li>
-            <li class="category-item">
-              <div class="category-item-left">
-                <div class="category-icon">&#x1F3C0;</div>
-                <span class="category-name">体育竞技</span>
-              </div>
-              <span class="category-count">940</span>
-            </li>
-            <li class="category-item">
-              <div class="category-item-left">
-                <div class="category-icon">&#x1F4BB;</div>
-                <span class="category-name">游戏电竞</span>
-              </div>
-              <span class="category-count">2.8k</span>
-            </li>
+            [--/loop:categories--]
           </ul>
         </div>
 
@@ -1625,94 +1592,22 @@
             </a>
           </div>
           <div class="software-grid">
-
-            <a href="#" class="software-card">
+            [--loop:software(num=6)--]
+            <a href="[--url--]" class="software-card">
               <div class="software-icon">
-                <img src="https://images.unsplash.com/photo-1611746872915-64382b5c76da?w=100&q=80" alt="Notion">
+                [--icon--]
               </div>
               <div class="software-info">
-                <div class="software-name">Notion AI</div>
-                <div class="software-desc">智能笔记与文档助手，支持 AI 写作、总结、翻译</div>
+                <div class="software-name">[--name--]</div>
+                <div class="software-desc">[--summary--]</div>
                 <div class="software-meta">
-                  <span class="software-tag">AI工具</span>
-                  <span class="software-tag free">免费</span>
-                  <span class="software-rating"><strong>4.8</strong> / 5</span>
+                  <span class="software-tag">[--category--]</span>
+                  <span class="software-tag free">v[--version--]</span>
+                  <span class="software-rating"><strong>[--rating--]</strong></span>
                 </div>
               </div>
             </a>
-
-            <a href="#" class="software-card">
-              <div class="software-icon">
-                <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=100&q=80" alt="VSCode">
-              </div>
-              <div class="software-info">
-                <div class="software-name">VS Code</div>
-                <div class="software-desc">轻量级代码编辑器，支持 140+ 编程语言与 AI 插件</div>
-                <div class="software-meta">
-                  <span class="software-tag free">免费</span>
-                  <span class="software-rating"><strong>4.9</strong> / 5</span>
-                </div>
-              </div>
-            </a>
-
-            <a href="#" class="software-card">
-              <div class="software-icon">
-                <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=100&q=80" alt="Figma">
-              </div>
-              <div class="software-info">
-                <div class="software-name">Figma</div>
-                <div class="software-desc">协作式 UI 设计工具，支持实时多人编辑与原型制作</div>
-                <div class="software-meta">
-                  <span class="software-tag">设计</span>
-                  <span class="software-tag hot">热门</span>
-                  <span class="software-rating"><strong>4.7</strong> / 5</span>
-                </div>
-              </div>
-            </a>
-
-            <a href="#" class="software-card">
-              <div class="software-icon">
-                <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=100&q=80" alt="Docker">
-              </div>
-              <div class="software-info">
-                <div class="software-name">Docker</div>
-                <div class="software-desc">容器化平台，简化应用部署与环境配置的利器</div>
-                <div class="software-meta">
-                  <span class="software-tag free">免费</span>
-                  <span class="software-rating"><strong>4.6</strong> / 5</span>
-                </div>
-              </div>
-            </a>
-
-            <a href="#" class="software-card">
-              <div class="software-icon">
-                <img src="https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=100&q=80" alt="Obsidian">
-              </div>
-              <div class="software-info">
-                <div class="software-name">Obsidian</div>
-                <div class="software-desc">本地优先的 Markdown 笔记工具，支持双向链接与图谱</div>
-                <div class="software-meta">
-                  <span class="software-tag">效率</span>
-                  <span class="software-tag free">免费</span>
-                  <span class="software-rating"><strong>4.7</strong> / 5</span>
-                </div>
-              </div>
-            </a>
-
-            <a href="#" class="software-card">
-              <div class="software-icon">
-                <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=100&q=80" alt="Linear">
-              </div>
-              <div class="software-info">
-                <div class="software-name">Linear</div>
-                <div class="software-desc">现代化项目管理工具，专为软件团队打造的 Issue 追踪系统</div>
-                <div class="software-meta">
-                  <span class="software-tag hot">热门</span>
-                  <span class="software-rating"><strong>4.8</strong> / 5</span>
-                </div>
-              </div>
-            </a>
-
+            [--/loop:software--]
           </div>
         </div>
 
