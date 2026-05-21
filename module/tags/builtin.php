@@ -50,6 +50,35 @@ TagRegistry::register('related_articles', 'tag_related_articles', '相关文章�
 TagRegistry::register('software', 'tag_loop_software', '软件循环。参数: num=数量。可用变量: [--name--][--url--][--summary--][--version--][--category--][--view_count--][--download_count--]', 'content');
 TagRegistry::register('software_list', 'tag_software_list', '软件列表直接输出HTML。参数: num=数量', 'content');
 
+// ── 软件详情 ──
+TagRegistry::register('software_detail', 'tag_software_detail', '软件详情循环。自动读取URL中的软件ID。可用变量: [--name--][--url--][--description--][--version--][--category--][--view_count--][--download_count--]', 'content');
+
+function tag_software_detail($attrs) {
+    $id = isset($attrs['id']) ? (int)$attrs['id'] : 0;
+    if ($id === 0 && isset($GLOBALS['__SOFTWARE_ID__'])) {
+        $id = (int)$GLOBALS['__SOFTWARE_ID__'];
+    }
+    if ($id === 0) return array();
+    try {
+        $pdo = getDB();
+        $prefix = DB_PREFIX;
+        $stmt = $pdo->prepare(
+            "SELECT id, name, version, description, category_name AS category,
+                    view_count, download_count, created_at
+             FROM `{$prefix}software` WHERE id = :id AND status = 1 LIMIT 1"
+        );
+        $stmt->execute(array(':id' => $id));
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            $row['url'] = getBaseUrl() . '/software/p/' . $row['id'];
+            return array($row);
+        }
+        return array();
+    } catch (Exception $e) {
+        return array();
+    }
+}
+
 // ── 分类标签 ──
 TagRegistry::register('categories', 'tag_loop_categories', '分类循环。可用变量: [--name--][--url--][--cnt--]', 'category');
 TagRegistry::register('category_nav', 'tag_category_nav', '分类导航直接输出HTML（按文章数降序）', 'category');

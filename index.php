@@ -254,6 +254,36 @@ if (preg_match($detailPattern, $path, $m)) {
     }
 }
 
+// ── /software/p/:id → 软件详情页 ─────────────────────────────────
+$swDetailPattern = '/^' . $baseForRe . '\/software\/p\/(\d+)$/';
+if (preg_match($swDetailPattern, $path, $m)) {
+    $swId = (int)$m[1];
+    $activeTemplate = getActiveTemplate();
+    $swFile = __DIR__ . '/templates/' . $activeTemplate . '/software-detail.html';
+    if (!is_file($swFile)) {
+        $swFile = __DIR__ . '/software/detail.html';
+    }
+    if (is_file($swFile)) {
+        $GLOBALS['__SOFTWARE_ID__'] = $swId;
+        $html = file_get_contents($swFile);
+        $injectScript = "<script>window.__SOFTWARE_ID__ = {$swId};window.__BASE_PATH__ = " . json_encode($BASE_PATH === '/' ? '' : $BASE_PATH) . ";</script>";
+        $lastBodyPos = strrpos($html, '</body>');
+        if ($lastBodyPos !== false) {
+            $html = substr_replace($html, $injectScript . "\n</body>", $lastBodyPos, strlen('</body>'));
+        } else {
+            $html .= "\n" . $injectScript;
+        }
+
+        // 标签渲染
+        require_once __DIR__ . '/module/tags/config.php';
+        $html = TagHook::render($html, $swFile);
+
+        header('Content-Type: text/html; charset=utf-8');
+        echo $html;
+        exit;
+    }
+}
+
 // ── /article/* → 文章模块（独立隔离）────────────────────────────
 $articlePrefix1 = $BASE_PATH . '/article/';
 $articlePrefix2 = '/article/';
