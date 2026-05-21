@@ -997,7 +997,7 @@ function setSecurityHeaders() {
 
     // Content Security Policy (CSP)
     // 视频平台 CSP 白名单
-    $videoDomains = 'player.bilibili.com www.bilibili.com www.youtube.com player.youku.com v.qq.com open.iqiyi.com player.vimeo.com';
+    $videoDomains = 'player.bilibili.com www.bilibili.com m.bilibili.com api.bilibili.com www.youtube.com player.youku.com v.qq.com open.iqiyi.com player.vimeo.com';
     $csp = [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
