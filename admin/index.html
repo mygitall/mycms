@@ -7671,7 +7671,7 @@ if (response.code == 401) {
               $('article-content').classList.remove('error');
               if (tinymceReady) {
                 const ed = tinymce.get('article-content');
-                if (ed) ed.getContainer().querySelector('.tox-tinymce').classList.remove('editor-error');
+                if (ed) ed.getContainer().classList.remove('editor-error');
               }
             }
 
@@ -7700,7 +7700,7 @@ if (response.code == 401) {
                 $('article-err-content').classList.add('show');
                 if (tinymceReady) {
                   const ed = tinymce.get('article-content');
-                  if (ed) ed.getContainer().querySelector('.tox-tinymce').classList.add('editor-error');
+                  if (ed) ed.getContainer().classList.add('editor-error');
                 }
                 hasError = true;
               }
