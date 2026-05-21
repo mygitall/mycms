@@ -7288,7 +7288,7 @@ if (response.code == 401) {
             const TAG_LIST_API = BASE_PATH + '/admin/api/tag_list.php';
             let allTagsData = [];
 
-            function loadTagReference() {
+            async function loadTagReference() {
               const tbody = $('tag-reference-tbody');
               if (!tbody) return;
               tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:40px;color:var(--text-dim)">加载中...</td></tr>';
@@ -7298,17 +7298,15 @@ if (response.code == 401) {
                 return;
               }
 
-              fetch(TAG_LIST_API)
-                .then(r => r.json())
-                .then(res => {
-                  if (res.code === 0 && Array.isArray(res.data)) {
-                    allTagsData = res.data;
-                    renderTagTable(allTagsData);
-                  }
-                })
-                .catch(() => {
-                  tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:40px;color:var(--danger)">加载失败</td></tr>';
-                });
+              try {
+                const res = await apiCall(TAG_LIST_API, {});
+                if (res.code === 0 && Array.isArray(res.data)) {
+                  allTagsData = res.data;
+                  renderTagTable(allTagsData);
+                }
+              } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:40px;color:var(--danger)">加载失败</td></tr>';
+              }
             }
 
             function renderTagTable(categories) {
