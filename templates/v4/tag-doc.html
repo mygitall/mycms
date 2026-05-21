@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>标签占位符参考文档 - MYCMS</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f7; color: #1a1a1f; line-height: 1.7; padding-bottom: 60px; }
+  .container { max-width: 900px; margin: 0 auto; padding: 24px 20px; }
+  h1 { font-size: 26px; text-align: center; padding: 30px 0 10px; border-bottom: 2px solid #e5e5ea; margin-bottom: 30px; }
+  h2 { font-size: 20px; margin: 32px 0 16px; padding: 10px 16px; background: #5b6cf0; color: #fff; border-radius: 8px; }
+  h3 { font-size: 17px; margin: 20px 0 10px; color: #333; }
+  .tag-block { background: #fff; border: 1px solid #e5e5ea; border-radius: 10px; padding: 20px 24px; margin-bottom: 16px; }
+  .tag-name { font-size: 15px; font-weight: 600; color: #5b6cf0; margin-bottom: 6px; }
+  .tag-syntax { background: #1e1e1e; color: #d4d4d4; padding: 12px 16px; border-radius: 6px; font-size: 13px; font-family: "SF Mono", Monaco, Consolas, monospace; overflow-x: auto; white-space: pre-wrap; margin: 8px 0; line-height: 1.7; }
+  .tag-desc { font-size: 14px; color: #555; margin: 6px 0; }
+  .tag-params { font-size: 13px; color: #888; margin: 4px 0; }
+  .tag-vars { font-size: 13px; color: #333; margin: 4px 0; }
+  .tag-vars code { background: rgba(91,108,240,0.08); color: #5b6cf0; padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+  .syntax-legend { background: #fffbe6; border: 1px solid #e6d88a; border-radius: 10px; padding: 20px 24px; margin-bottom: 30px; font-size: 14px; }
+  .syntax-legend table { width: 100%; border-collapse: collapse; }
+  .syntax-legend td { padding: 8px 10px; border-bottom: 1px solid #f0e6c0; vertical-align: top; }
+  .syntax-legend td:first-child { font-family: monospace; font-weight: 600; color: #c0392b; white-space: nowrap; width: 140px; }
+  .highlight { background: #fff3cd; padding: 0 4px; border-radius: 2px; font-family: monospace; }
+  .nav-toc { background: #fff; border: 1px solid #e5e5ea; border-radius: 10px; padding: 16px 20px; margin-bottom: 24px; }
+  .nav-toc a { color: #5b6cf0; text-decoration: none; margin-right: 16px; font-size: 13px; white-space: nowrap; }
+  .nav-toc a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>MYCMS 标签占位符参考文档</h1>
+
+<!-- ═══════ 语法说明 ═══════ -->
+<div class="syntax-legend">
+  <h3 style="margin-top:0">标签语法规则</h3>
+  <table>
+    <tr><td>&#91;--</td><td><b>标签开始标记</b>。所有标签必须以 <span class="highlight">&#91;--</span> 开头</td></tr>
+    <tr><td>--&#93;</td><td><b>标签结束标记</b>。所有标签必须以 <span class="highlight">--&#93;</span> 结尾</td></tr>
+    <tr><td>loop:</td><td><b>循环块开始</b>。<span class="highlight">&#91;--loop:标签名(参数)--&#93;</span> 表示开始一个循环，会遍历数据并重复输出中间的HTML</td></tr>
+    <tr><td>/loop:</td><td><b>循环块结束</b>。<span class="highlight">&#91;--/loop:标签名--&#93;</span> 表示循环到此结束</td></tr>
+    <tr><td>(key=val)</td><td><b>传递参数</b>。括号内用逗号分隔键值对，如 <span class="highlight">(num=10,cat=技术)</span></td></tr>
+    <tr><td>&#91;--xxx--&#93;</td><td><b>简单标签</b>。直接替换为对应内容（如站点名、年份等）</td></tr>
+    <tr><td>循环内&#91;--字段--&#93;</td><td><b>数据字段</b>。在循环块内部使用，输出当前这条数据的某个字段值</td></tr>
+  </table>
+</div>
+
+<!-- ═══════ 示例详解 ═══════ -->
+<div class="tag-block">
+  <h3>示例：软件列表循环详解</h3>
+  <div class="tag-syntax">&#91;--loop:software(num=50)--&#93;              ← 开始循环，传参数 num=50
+&lt;div&gt;
+  &lt;a href="&#91;--url--&#93;"&gt;                  ← &#91;--url--&#93; 输出当前软件的详情页URL
+    &lt;strong&gt;&#91;--name--&#93;&lt;/strong&gt;          ← &#91;--name--&#93; 输出软件名称
+  &lt;/a&gt;
+  &lt;span&gt;v&#91;--version--&#93;&lt;/span&gt;            ← &#91;--version--&#93; 输出版本号
+  &lt;span&gt;&#91;--category--&#93;&lt;/span&gt;            ← &#91;--category--&#93; 输出分类名
+  &lt;p&gt;&#91;--summary--&#93;&lt;/p&gt;                  ← &#91;--summary--&#93; 输出简介（前80字）
+&lt;/div&gt;
+&#91;--/loop:software--&#93;                      ← 结束循环</div>
+  <div class="tag-desc">
+    这段代码的作用：从数据库 software 表取出最多 50 条已发布软件，每条生成一个 &lt;div&gt; 块，
+    其中名称、版本、分类、简介自动替换为实际数据。
+  </div>
+</div>
+
+<!-- ═══════ 目录 ═══════ -->
+<div class="nav-toc">
+  <strong>快速导航：</strong>
+  <a href="#cat-system">系统标签</a>
+  <a href="#cat-content">内容标签</a>
+  <a href="#cat-category">分类标签</a>
+  <a href="#cat-navigation">导航标签</a>
+</div>
+
+<!-- ═══════════════════ 系统标签 ═══════════════════ -->
+<h2 id="cat-system">系统标签</h2>
+
+<div class="tag-block">
+  <div class="tag-name">site_name — 站点名称</div>
+  <div class="tag-syntax">&#91;--site_name--&#93;</div>
+  <div class="tag-desc">输出站点名称。从系统配置表读取，未设置时默认显示 "MYCMS"。</div>
+  <div class="tag-params">无参数</div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">site_url — 站点URL</div>
+  <div class="tag-syntax">&#91;--site_url--&#93;</div>
+  <div class="tag-desc">输出完整的站点URL（协议 + 域名 + 路径前缀）。如 http://localhost 或 https://example.com/cms</div>
+  <div class="tag-params">无参数</div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">current_year — 当前年份</div>
+  <div class="tag-syntax">&#91;--current_year--&#93;</div>
+  <div class="tag-desc">输出当前四位年份数字，如 2026。常用于页脚版权信息。</div>
+  <div class="tag-params">无参数</div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">current_date — 当前日期</div>
+  <div class="tag-syntax">&#91;--current_date--&#93;
+&#91;--current_date(format=Y年m月d日)--&#93;</div>
+  <div class="tag-desc">输出当前日期。默认格式 YYYY-MM-DD，可通过 format 参数自定义。</div>
+  <div class="tag-params"><b>参数：</b>format — PHP date() 格式字符串，如 Y-m-d / Y年m月d日 / m/d/Y</div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">config — 读取配置</div>
+  <div class="tag-syntax">&#91;--config(key=site_name)--&#93;</div>
+  <div class="tag-desc">读取 sys_config 表中的任意配置项的值。</div>
+  <div class="tag-params"><b>参数：</b>key — 配置项的键名（必填）</div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">search_form — 搜索表单</div>
+  <div class="tag-syntax">&#91;--search_form--&#93;</div>
+  <div class="tag-desc">输出一个搜索表单HTML（GET方式提交到 /search）。含文本框和提交按钮。</div>
+  <div class="tag-params">无参数</div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">login_form — 登录表单</div>
+  <div class="tag-syntax">&#91;--login_form--&#93;</div>
+  <div class="tag-desc">输出一个登录表单HTML（POST方式提交到 /login），含用户名、密码字段和CSRF保护。</div>
+  <div class="tag-params">无参数</div>
+</div>
+
+<!-- ═══════════════════ 内容标签 ═══════════════════ -->
+<h2 id="cat-content">内容标签（文章 + 软件）</h2>
+
+<div class="tag-block">
+  <div class="tag-name">articles — 文章列表循环</div>
+  <div class="tag-syntax">&#91;--loop:articles(num=10,cat=技术,sort=view_count,order=DESC)--&#93;
+  &lt;a href="&#91;--url--&#93;"&gt;&#91;--title--&#93;&lt;/a&gt;
+  &lt;span&gt;&#91;--category--&#93;&lt;/span&gt;
+  &lt;span&gt;&#91;--published_at--&#93;&lt;/span&gt;
+  &lt;span&gt;&#91;--view_count--&#93; 次阅读&lt;/span&gt;
+  &lt;p&gt;&#91;--summary--&#93;&lt;/p&gt;
+&#91;--/loop:articles--&#93;</div>
+  <div class="tag-desc">遍历已发布文章列表。每条文章循环输出中间HTML一次。</div>
+  <div class="tag-params"><b>参数：</b>num=数量（默认10） cat=分类筛选 sort=排序字段(view_count/created_at/published_at) order=DESC/ASC</div>
+  <div class="tag-vars"><b>可用变量：</b>
+    <code>&#91;--title--&#93;</code> 标题 &nbsp;
+    <code>&#91;--url--&#93;</code> 详情页URL &nbsp;
+    <code>&#91;--summary--&#93;</code> 内容摘要（前120字） &nbsp;
+    <code>&#91;--category--&#93;</code> 分类 &nbsp;
+    <code>&#91;--view_count--&#93;</code> 浏览量 &nbsp;
+    <code>&#91;--published_at--&#93;</code> 发布时间 &nbsp;
+    <code>&#91;--cover_image--&#93;</code> 封面图URL &nbsp;
+    <code>&#91;--author_name--&#93;</code> 作者
+  </div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">article_list — 文章列表（直接输出HTML）</div>
+  <div class="tag-syntax">&#91;--article_list(num=10)--&#93;
+&#91;--article_list(num=5,cat=技术,sort=view_count)--&#93;</div>
+  <div class="tag-desc">直接输出带 &lt;ul&gt;&lt;li&gt; 结构的文章列表HTML，无需写循环体。</div>
+  <div class="tag-params"><b>参数：</b>同 articles 标签</div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">article_detail — 文章详情</div>
+  <div class="tag-syntax">&#91;--loop:article_detail--&#93;
+  &lt;h1&gt;&#91;--title--&#93;&lt;/h1&gt;
+  &lt;div&gt;&#91;--content--&#93;&lt;/div&gt;
+  &lt;span&gt;&#91;--author_name--&#93;&lt;/span&gt;
+  &lt;span&gt;&#91;--published_at--&#93;&lt;/span&gt;
+  &lt;span&gt;&#91;--view_count--&#93; 次阅读&lt;/span&gt;
+&#91;--/loop:article_detail--&#93;</div>
+  <div class="tag-desc">用于文章详情页（detail.html）。自动读取URL中的文章ID，返回该文章的全部字段。</div>
+  <div class="tag-params">无需参数，自动从当前页面URL获取文章ID。也可手动指定：id=文章ID</div>
+  <div class="tag-vars"><b>可用变量：</b>
+    <code>&#91;--title--&#93;</code> &nbsp;
+    <code>&#91;--content--&#93;</code> 完整正文 &nbsp;
+    <code>&#91;--category--&#93;</code> &nbsp;
+    <code>&#91;--tags--&#93;</code> &nbsp;
+    <code>&#91;--view_count--&#93;</code> &nbsp;
+    <code>&#91;--author_name--&#93;</code> &nbsp;
+    <code>&#91;--published_at--&#93;</code> &nbsp;
+    <code>&#91;--cover_image--&#93;</code> &nbsp;
+    <code>&#91;--url--&#93;</code>
+  </div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">related_articles — 相关文章推荐</div>
+  <div class="tag-syntax">&#91;--loop:related_articles(num=5)--&#93;
+  &lt;li&gt;&lt;a href="&#91;--url--&#93;"&gt;&#91;--title--&#93;&lt;/a&gt;&lt;/li&gt;
+&#91;--/loop:related_articles--&#93;</div>
+  <div class="tag-desc">根据当前文章的分类，推荐同分类下的其他文章。自动排除当前文章自身。</div>
+  <div class="tag-params"><b>参数：</b>num=数量（默认5）。自动读取当前页面文章ID，也可手动指定 id=文章ID</div>
+  <div class="tag-vars"><b>可用变量：</b>
+    <code>&#91;--title--&#93;</code> &nbsp;
+    <code>&#91;--url--&#93;</code> &nbsp;
+    <code>&#91;--summary--&#93;</code> &nbsp;
+    <code>&#91;--view_count--&#93;</code> &nbsp;
+    <code>&#91;--category--&#93;</code> &nbsp;
+    <code>&#91;--cover_image--&#93;</code>
+  </div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">software — 软件列表循环</div>
+  <div class="tag-syntax">&#91;--loop:software(num=6)--&#93;
+  &lt;a href="&#91;--url--&#93;"&gt;&lt;strong&gt;&#91;--name--&#93;&lt;/strong&gt;&lt;/a&gt;
+  &lt;span&gt;v&#91;--version--&#93;&lt;/span&gt;
+  &lt;span&gt;&#91;--category--&#93;&lt;/span&gt;
+  &lt;p&gt;&#91;--summary--&#93;&lt;/p&gt;
+  &lt;span&gt;&#91;--view_count--&#93; 次浏览&lt;/span&gt;
+  &lt;span&gt;&#91;--download_count--&#93; 次下载&lt;/span&gt;
+&#91;--/loop:software--&#93;</div>
+  <div class="tag-desc">遍历已发布软件列表。每条软件循环输出中间HTML一次。</div>
+  <div class="tag-params"><b>参数：</b>num=数量（默认6）</div>
+  <div class="tag-vars"><b>可用变量：</b>
+    <code>&#91;--name--&#93;</code> 软件名 &nbsp;
+    <code>&#91;--url--&#93;</code> 详情URL &nbsp;
+    <code>&#91;--summary--&#93;</code> 简介(前80字) &nbsp;
+    <code>&#91;--version--&#93;</code> 版本号 &nbsp;
+    <code>&#91;--category--&#93;</code> 分类 &nbsp;
+    <code>&#91;--view_count--&#93;</code> 浏览量 &nbsp;
+    <code>&#91;--download_count--&#93;</code> 下载量 &nbsp;
+    <code>&#91;--download_urls--&#93;</code> 下载地址
+  </div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">software_list — 软件列表（直接输出HTML）</div>
+  <div class="tag-syntax">&#91;--software_list(num=6)--&#93;</div>
+  <div class="tag-desc">直接输出带HTML结构的软件列表，无需写循环体。</div>
+  <div class="tag-params"><b>参数：</b>num=数量</div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">software_detail — 软件详情</div>
+  <div class="tag-syntax">&#91;--loop:software_detail--&#93;
+  &lt;h1&gt;&#91;--name--&#93;&lt;/h1&gt;
+  &lt;span&gt;v&#91;--version--&#93;&lt;/span&gt;
+  &lt;span&gt;&#91;--category--&#93;&lt;/span&gt;
+  &lt;div&gt;&#91;--description--&#93;&lt;/div&gt;
+  &lt;a href="&#91;--download_urls--&#93;"&gt;下载&lt;/a&gt;
+  &lt;span&gt;&#91;--view_count--&#93; 浏览&lt;/span&gt;
+  &lt;span&gt;&#91;--download_count--&#93; 下载&lt;/span&gt;
+&#91;--/loop:software_detail--&#93;</div>
+  <div class="tag-desc">用于软件详情页（software-detail.html）。自动读取URL中的软件ID。</div>
+  <div class="tag-params">无需参数，自动从URL获取软件ID。也可手动指定：id=软件ID</div>
+  <div class="tag-vars"><b>可用变量：</b>
+    <code>&#91;--name--&#93;</code> &nbsp;
+    <code>&#91;--url--&#93;</code> &nbsp;
+    <code>&#91;--version--&#93;</code> &nbsp;
+    <code>&#91;--category--&#93;</code> &nbsp;
+    <code>&#91;--description--&#93;</code> 完整描述 &nbsp;
+    <code>&#91;--download_urls--&#93;</code> 下载地址 &nbsp;
+    <code>&#91;--view_count--&#93;</code> &nbsp;
+    <code>&#91;--download_count--&#93;</code>
+  </div>
+</div>
+
+<!-- ═══════════════════ 分类标签 ═══════════════════ -->
+<h2 id="cat-category">分类标签</h2>
+
+<div class="tag-block">
+  <div class="tag-name">categories — 分类列表循环</div>
+  <div class="tag-syntax">&#91;--loop:categories--&#93;
+  &lt;a href="&#91;--url--&#93;"&gt;&#91;--name--&#93;（&#91;--cnt--&#93;篇）&lt;/a&gt;
+&#91;--/loop:categories--&#93;</div>
+  <div class="tag-desc">遍历所有文章分类（去重）。按文章数量降序排列，最多20个。</div>
+  <div class="tag-params">无参数</div>
+  <div class="tag-vars"><b>可用变量：</b>
+    <code>&#91;--name--&#93;</code> 分类名 &nbsp;
+    <code>&#91;--url--&#93;</code> 分类链接(/list?cat=xxx) &nbsp;
+    <code>&#91;--cnt--&#93;</code> 该分类下的文章数量
+  </div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">category_nav — 分类导航（直接输出HTML）</div>
+  <div class="tag-syntax">&#91;--category_nav--&#93;</div>
+  <div class="tag-desc">直接输出带 &lt;nav&gt;&lt;ul&gt;&lt;li&gt; 结构的分类导航HTML，无需写循环体。</div>
+  <div class="tag-params">无参数</div>
+</div>
+
+<!-- ═══════════════════ 导航标签 ═══════════════════ -->
+<h2 id="cat-navigation">导航标签</h2>
+
+<div class="tag-block">
+  <div class="tag-name">breadcrumb — 面包屑导航</div>
+  <div class="tag-syntax">&#91;--breadcrumb--&#93;</div>
+  <div class="tag-desc">根据当前URL自动生成面包屑导航路径。如：首页 / 文章 / 标题</div>
+  <div class="tag-params">无参数</div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">pagination — 分页导航</div>
+  <div class="tag-syntax">&#91;--pagination(total=100,per_page=10,page=1,url=?page=)--&#93;</div>
+  <div class="tag-desc">输出分页导航条。含首页/上一页/页码/下一页/末页 + 总记录数。当前页高亮。</div>
+  <div class="tag-params"><b>参数：</b>
+    total=总记录数 &nbsp;
+    per_page=每页条数(默认10) &nbsp;
+    page=当前页码(默认1) &nbsp;
+    url=链接前缀(如 ?page= 或 /list?page=)
+  </div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">carousel — 首页轮播数据</div>
+  <div class="tag-syntax">&#91;--carousel(num=5)--&#93;</div>
+  <div class="tag-desc">返回JSON格式的轮播数据数组。每个元素含 title/category/url/cover/desc 字段。用于JS渲染轮播图。</div>
+  <div class="tag-params"><b>参数：</b>num=数量（默认5）</div>
+</div>
+
+<!-- ═══════════════════ 使用说明 ═══════════════════ -->
+<h2>使用说明</h2>
+<div class="tag-block">
+  <h3>在模板中使用标签</h3>
+  <div class="tag-desc">
+    1. 标签<strong>只能用于模板HTML文件</strong>（templates/v4/*.html），不能用于PHP文件。<br>
+    2. 标签在<strong>服务端渲染</strong>，浏览器收到的已经是替换后的HTML，对SEO友好。<br>
+    3. 模板修改后<strong>自动重新编译</strong>，无需手动清理缓存。<br>
+    4. 标签遵循<strong>「编译一次，缓存复用」</strong>机制，性能接近原生PHP include。<br>
+    5. 循环内可<strong>嵌套循环</strong>（如分类循环内嵌套文章循环），每层变量独立不冲突。
+  </div>
+  <h3>调试技巧</h3>
+  <div class="tag-desc">
+    - 如果标签不显示内容，先检查数据是否存在（后台确认有已发布的文章/软件）。<br>
+    - 查看页面源代码（Ctrl+U）确认标签是否已被替换。<br>
+    - 标签语法错误（如拼写错误）不会报错，只会输出空内容。<br>
+    - 循环标签闭标记必须严格匹配：<code>&#91;--/loop:标签名--&#93;</code> 中的标签名要和开标记一致。
+  </div>
+</div>
+
+<p style="text-align:center;color:#999;margin-top:40px;font-size:13px">MYCMS 标签占位符系统 &copy; 2026</p>
+
+</div>
+</body>
+</html>

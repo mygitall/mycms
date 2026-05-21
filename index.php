@@ -41,7 +41,7 @@ $knownRouteNames = ['api', 'article', 'search', 'admin', 'storage', 'install',
     'templates', 'frontend', 'config', 'wen', 'software', 'includes',
     'performance', 'index.php', 'login.php', 'admin.php', 'article.php',
     'reset_admin.php', 'reset_all.php', 'clear_ban.php', 'config.php', 'monitor.html',
-    'favorites', 'list', 'software-list', 'detail', 'login'];
+    'favorites', 'list', 'software-list', 'tag-doc', 'detail', 'login'];
 if ($firstUriSeg !== '' && !in_array($firstUriSeg, $knownRouteNames, true)
     && ($scriptDir === '.' || $scriptDir === '/')) {
     $BASE_PATH = '/' . $firstUriSeg;
@@ -65,6 +65,7 @@ $frontendRoutes = [
     '/'      => 'index.html',
     '/list'  => 'list.html',
     '/software-list' => 'software-list.html',
+    '/tag-doc' => 'tag-doc.html',
     '/detail'=> 'detail.html',
     '/search'=> 'search.html',
     '/favorites' => 'favorites.html',
@@ -91,6 +92,7 @@ function serveFrontend($filePath, $basePath) {
         'index.html'     => $bp . '/',
         'list.html'      => $bp . '/list',
         'software-list.html' => $bp . '/software-list',
+        'tag-doc.html' => $bp . '/tag-doc',
         'detail.html'    => $bp . '/detail',
         'search.html'    => $bp . '/search',
         'favorites.html' => $bp . '/favorites',
