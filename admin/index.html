@@ -7579,6 +7579,7 @@ if (response.code == 401) {
                 tinymce.init({
                   selector: '#article-content',
                   height: 420,
+                  schema: 'html5',
                   plugins: 'lists link image code table fullscreen wordcount searchreplace media codesample',
                   toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | hr | codesample searchreplace | removeformat code | fullscreen',
                   menubar: false,
@@ -7592,9 +7593,8 @@ if (response.code == 401) {
                   automatic_uploads: true,
                   images_upload_url: BASE_PATH + '/admin/api/upload_image.php',
                   images_upload_credentials: true,
-                  extended_valid_elements: 'iframe[src|width|height|frameborder|allowfullscreen|scrolling|style|class]',
-                  valid_elements: '*[*],iframe[src|width|height|frameborder|allowfullscreen|scrolling|style|class]',
-                  valid_children: '+body[iframe]',
+                  extended_valid_elements: 'iframe[src|width|height|frameborder|allowfullscreen|scrolling|style|class|border|framespacing]',
+                  valid_children: '+body[iframe],+div[iframe],+p[iframe]',
                   media_live_embeds: true,
                   codesample_languages: [
                     { text: 'HTML/XML',  value: 'markup' },
