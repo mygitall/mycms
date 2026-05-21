@@ -4,10 +4,12 @@
  * 系统启动时自动加载，注册所有基础标签
  */
 
-// ═══════════ 首页标签 ═══════════
+// ═══════════════════════════════════════
+// 系统标签 (system)
+// ═══════════════════════════════════════
 
 // ── [--site_name--] 站点名称 ──
-TagRegistry::register('site_name', 'tag_site_name', '站点名称', 'home');
+TagRegistry::register('site_name', 'tag_site_name', '输出站点名称，默认 MYCMS', 'system');
 function tag_site_name($attrs) {
     try {
         $pdo = getDB();
@@ -22,29 +24,43 @@ function tag_site_name($attrs) {
 }
 
 // ── [--site_url--] 站点 URL ──
-TagRegistry::register('site_url', 'tag_site_url', '站点URL', 'home');
-function tag_site_url($attrs) {
-    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
-    $base = defined('BASE_PATH') ? BASE_PATH : '';
-    return htmlspecialchars($scheme . '://' . $host . $base, ENT_QUOTES, 'UTF-8');
-}
+TagRegistry::register('site_url', 'tag_site_url', '输出完整站点URL', 'system');
+TagRegistry::register('current_year', 'tag_current_year', '输出当前年份（如2026）', 'system');
+TagRegistry::register('current_date', 'tag_current_date', '输出当前日期，支持format参数', 'system');
+TagRegistry::register('config', 'tag_config', '读取任意系统配置项', 'system');
+TagRegistry::register('search_form', 'tag_search_form', '输出搜索表单HTML', 'system');
+TagRegistry::register('login_form', 'tag_login_form', '输出登录表单HTML', 'system');
 
-// ── [--current_year--] 当前年份 ──
-TagRegistry::register('current_year', 'tag_current_year', '当前年份', 'home');
-function tag_current_year($attrs) {
-    return date('Y');
-}
+// ═══════════════════════════════════════
+// 内容标签 (content) — 文章 + 软件
+// ═══════════════════════════════════════
 
-// ── [--current_date--] 当前日期 ──
-TagRegistry::register('current_date', 'tag_current_date', '当前日期 YYYY-MM-DD', 'home');
+TagRegistry::register('articles', 'tag_loop_articles', '文章列表循环，支持 num/cat/sort/order 参数', 'content');
+TagRegistry::register('article_list', 'tag_article_list', '文章列表（直接输出HTML）', 'content');
+TagRegistry::register('article_detail', 'tag_article_detail', '文章详情数据循环', 'content');
+TagRegistry::register('related_articles', 'tag_related_articles', '相关文章推荐（同分类）', 'content');
+TagRegistry::register('software', 'tag_loop_software', '软件列表循环，支持 num 参数', 'content');
+TagRegistry::register('software_list', 'tag_software_list', '软件列表（直接输出HTML）', 'content');
+
+// ═══════════════════════════════════════
+// 分类标签 (category)
+// ═══════════════════════════════════════
+
+TagRegistry::register('categories', 'tag_loop_categories', '分类列表循环', 'category');
+TagRegistry::register('category_nav', 'tag_category_nav', '分类导航（直接输出HTML）', 'category');
+
+// ═══════════════════════════════════════
+// 导航标签 (navigation)
+// ═══════════════════════════════════════
+
+TagRegistry::register('breadcrumb', 'tag_breadcrumb', '面包屑导航', 'navigation');
+TagRegistry::register('pagination', 'tag_pagination', '分页导航条', 'navigation');
+TagRegistry::register('carousel', 'tag_carousel', '轮播数据（JSON）', 'navigation');
 function tag_current_date($attrs) {
     $format = isset($attrs['format']) ? $attrs['format'] : 'Y-m-d';
     return date($format);
 }
 
-// ── [--article_list:num=N,cat=xxx--] 文章列表 ──
-TagRegistry::register('article_list', 'tag_article_list', '文章列表（直接输出HTML）', 'home');
 function tag_article_list($attrs) {
     $num  = isset($attrs['num'])  ? (int)$attrs['num'] : 10;
     $cat  = isset($attrs['cat'])  ? trim($attrs['cat']) : '';
@@ -95,8 +111,6 @@ function tag_article_list($attrs) {
     }
 }
 
-// ── [--loop:articles(num=5,cat=)--]...[--/loop:articles--] 文章循环 ──
-TagRegistry::register('articles', 'tag_loop_articles', '文章循环块（模板内遍历文章）', 'list');
 function tag_loop_articles($attrs) {
     $num  = isset($attrs['num'])  ? (int)$attrs['num'] : 5;
     $cat  = isset($attrs['cat'])  ? trim($attrs['cat']) : '';
@@ -144,8 +158,6 @@ function tag_loop_articles($attrs) {
     }
 }
 
-// ── [--software_list:num=6--] 软件列表 ──
-TagRegistry::register('software_list', 'tag_software_list', '软件列表（直接输出HTML）', 'software');
 function tag_software_list($attrs) {
     $num = isset($attrs['num']) ? (int)$attrs['num'] : 6;
 
@@ -175,8 +187,6 @@ function tag_software_list($attrs) {
     }
 }
 
-// ── [--category_nav--] 分类导航 ──
-TagRegistry::register('category_nav', 'tag_category_nav', '分类导航（直接输出HTML列表）', 'home');
 function tag_category_nav($attrs) {
     try {
         $pdo = getDB();
@@ -198,8 +208,6 @@ function tag_category_nav($attrs) {
     }
 }
 
-// ── [--search_form--] 搜索表单 ──
-TagRegistry::register('search_form', 'tag_search_form', '搜索表单', 'common');
 function tag_search_form($attrs) {
     $action = getBaseUrl() . '/search';
     return '<form class="tag-search-form" action="' . htmlspecialchars($action, ENT_QUOTES, 'UTF-8') . '" method="GET">' .
@@ -208,8 +216,6 @@ function tag_search_form($attrs) {
            '</form>';
 }
 
-// ── [--breadcrumb--] 面包屑导航 ──
-TagRegistry::register('breadcrumb', 'tag_breadcrumb', '面包屑导航', 'list');
 function tag_breadcrumb($attrs) {
     $uri = isset($_SERVER['REQUEST_URI']) ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '/';
     $segments = array_values(array_filter(explode('/', $uri)));
@@ -224,8 +230,6 @@ function tag_breadcrumb($attrs) {
     return $html;
 }
 
-// ── [--carousel:num=5--] 轮播数据 ──
-TagRegistry::register('carousel', 'tag_carousel', '文章轮播（返回JSON数据块）', 'home');
 function tag_carousel($attrs) {
     $num = isset($attrs['num']) ? (int)$attrs['num'] : 5;
     try {
@@ -247,14 +251,15 @@ function tag_carousel($attrs) {
                 'desc'     => '',
             );
         }
-        return json_encode($data, JSON_UNESCAPED_UNICODE);
+        // PHP 5.3 兼容：无 JSON_UNESCAPED_UNICODE，用 JSON_UNESCAPED_SLASHES 或原生编码
+        return defined('JSON_UNESCAPED_UNICODE')
+            ? json_encode($data, JSON_UNESCAPED_UNICODE)
+            : json_encode($data);
     } catch (Exception $e) {
         return '[]';
     }
 }
 
-// ── [--loop:software(num=6)--] 软件循环 ──
-TagRegistry::register('software', 'tag_loop_software', '软件循环块（模板内遍历软件）', 'software');
 function tag_loop_software($attrs) {
     $num = isset($attrs['num']) ? (int)$attrs['num'] : 6;
     try {
@@ -276,8 +281,6 @@ function tag_loop_software($attrs) {
     }
 }
 
-// ── [--loop:categories--] 分类循环 ──
-TagRegistry::register('categories', 'tag_loop_categories', '分类循环块（模板内遍历分类）', 'list');
 function tag_loop_categories($attrs) {
     try {
         $pdo = getDB();
@@ -294,9 +297,7 @@ function tag_loop_categories($attrs) {
     }
 }
 
-// ── [--article_detail--] 文章详情（当前页面文章） ──
 // 用于 article/detail.html 等详情页，自动读取 ?id=xxx 或注入的 __ARTICLE_ID__
-TagRegistry::register('article_detail', 'tag_article_detail', '文章详情（自动读取当前文章ID）', 'article');
 function tag_article_detail($attrs) {
     $id = isset($attrs['id']) ? (int)$attrs['id'] : 0;
     if ($id === 0) {
@@ -323,8 +324,6 @@ function tag_article_detail($attrs) {
     }
 }
 
-// ── [--related_articles:id=X,num=5--] 相关文章 ──
-TagRegistry::register('related_articles', 'tag_related_articles', '相关文章（同分类推荐）', 'article');
 function tag_related_articles($attrs) {
     $id  = isset($attrs['id'])  ? (int)$attrs['id']  : 0;
     $num = isset($attrs['num']) ? (int)$attrs['num'] : 5;
@@ -339,14 +338,14 @@ function tag_related_articles($attrs) {
 
         if ($cat) {
             $stmt = $pdo->prepare(
-                "SELECT id, title, category, cover_image, view_count, published_at
+                "SELECT id, title, content, category, cover_image, view_count, published_at
                  FROM articles WHERE status = 1 AND deleted_at IS NULL AND category = :cat AND id != :id
                  ORDER BY published_at DESC LIMIT " . min($num, 10)
             );
             $stmt->execute(array(':cat' => $cat, ':id' => $id));
         } else {
             $stmt = $pdo->prepare(
-                "SELECT id, title, category, cover_image, view_count, published_at
+                "SELECT id, title, content, category, cover_image, view_count, published_at
                  FROM articles WHERE status = 1 AND deleted_at IS NULL AND id != :id
                  ORDER BY published_at DESC LIMIT " . min($num, 10)
             );
@@ -365,8 +364,6 @@ function tag_related_articles($attrs) {
     }
 }
 
-// ── [--login_form--] 登录表单 ──
-TagRegistry::register('login_form', 'tag_login_form', '登录表单（含CSRF Token）', 'common');
 function tag_login_form($attrs) {
     $action = getBaseUrl() . '/login';
     $csrfToken = '';
@@ -381,8 +378,6 @@ function tag_login_form($attrs) {
            '</form>';
 }
 
-// ── [--pagination:total=N,page=N,url=xxx--] 分页导航 ──
-TagRegistry::register('pagination', 'tag_pagination', '分页导航（含首页/末页/页码）', 'list');
 function tag_pagination($attrs) {
     $total     = isset($attrs['total'])     ? (int)$attrs['total']     : 0;
     $pageSize  = isset($attrs['per_page'])  ? (int)$attrs['per_page']  : 10;
@@ -412,8 +407,6 @@ function tag_pagination($attrs) {
     return $html;
 }
 
-// ── [--config:key=xxx--] 读取系统配置 ──
-TagRegistry::register('config', 'tag_config', '读取系统配置项（如 site_name）', 'common');
 function tag_config($attrs) {
     if (!isset($attrs['key'])) return '';
     $key = trim($attrs['key']);

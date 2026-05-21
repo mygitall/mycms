@@ -190,13 +190,60 @@ class TagParser
             return $attrs;
         }
 
-        $pairs = explode(',', $str);
-        foreach ($pairs as $pair) {
+        // 状态机解析，支持引号内的逗号
+        $len   = strlen($str);
+        $i     = 0;
+        $parts = array();
+        $buf   = '';
+
+        while ($i < $len) {
+            $c = $str[$i];
+
+            if ($c === '"' || $c === "'") {
+                // 进入引号模式，直到配对引号结束
+                $quote = $c;
+                $buf .= $c;
+                $i++;
+                while ($i < $len && $str[$i] !== $quote) {
+                    if ($str[$i] === '\\' && $i + 1 < $len) {
+                        $buf .= $str[$i]; // 保留反斜杠
+                        $i++;
+                    }
+                    $buf .= $str[$i];
+                    $i++;
+                }
+                if ($i < $len) {
+                    $buf .= $str[$i]; // 闭合引号
+                }
+            } elseif ($c === ',') {
+                // 分隔符
+                $parts[] = $buf;
+                $buf = '';
+            } else {
+                $buf .= $c;
+            }
+            $i++;
+        }
+        if ($buf !== '') {
+            $parts[] = $buf;
+        }
+
+        foreach ($parts as $pair) {
             $pair = trim($pair);
-            $pos  = strpos($pair, '=');
+            if ($pair === '') continue;
+
+            $pos = strpos($pair, '=');
             if ($pos !== false) {
                 $key   = trim(substr($pair, 0, $pos));
-                $value = trim(substr($pair, $pos + 1), "\"' ");
+                $value = trim(substr($pair, $pos + 1));
+                // 去掉外层的配对引号
+                if (strlen($value) >= 2) {
+                    $fc = $value[0];
+                    $lc = $value[strlen($value) - 1];
+                    if (($fc === '"' && $lc === '"') || ($fc === "'" && $lc === "'")) {
+                        $value = substr($value, 1, -1);
+                    }
+                }
                 $attrs[$key] = $value;
             } else {
                 $attrs[$pair] = true;

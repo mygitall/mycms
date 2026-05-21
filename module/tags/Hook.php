@@ -58,8 +58,20 @@ class TagHook
      */
     private static function executeCached($code)
     {
+        $output = '';
+        // 先写到临时文件，include 代替 eval（更安全的错误处理）
+        $tmpFile = TAGS_CACHE_DIR . '/_exec_' . getmypid() . '.php';
+        @file_put_contents($tmpFile, $code);
+
         ob_start();
-        eval('?>' . $code);
-        return ob_get_clean();
+        $err = @include $tmpFile;
+        if ($err === false) {
+            $errMsg = error_get_last();
+            error_log('[TagHook] 执行缓存失败: ' . ($errMsg['message'] ?? 'unknown'));
+        }
+        $output = ob_get_clean();
+        @unlink($tmpFile);
+
+        return $output;
     }
 }

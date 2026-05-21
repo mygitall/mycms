@@ -51,10 +51,32 @@ class TagCache
             return false;
         }
 
-        $cachedMtime = @file_get_contents($metaFile);
-        $currentMtime = @filemtime($templatePath);
+        $cachedData = @unserialize(@file_get_contents($metaFile));
+        if (!$cachedData || !isset($cachedData['template_mtime'])) {
+            return false;
+        }
 
-        return ($cachedMtime !== false && (int)$cachedMtime === (int)$currentMtime);
+        // 模板文件是否修改
+        if ((int)$cachedData['template_mtime'] !== (int)@filemtime($templatePath)) {
+            return false;
+        }
+
+        // 标签处理器是否修改（builtin.php + Registry.php）
+        $handlerFiles = array(
+            __DIR__ . '/builtin.php',
+            __DIR__ . '/Registry.php',
+        );
+        $cachedHandlerMtime = isset($cachedData['handler_mtime']) ? $cachedData['handler_mtime'] : 0;
+        $currentHandlerMtime = 0;
+        foreach ($handlerFiles as $f) {
+            $mt = @filemtime($f);
+            if ($mt > $currentHandlerMtime) $currentHandlerMtime = $mt;
+        }
+        if ($cachedHandlerMtime < $currentHandlerMtime) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -96,7 +118,17 @@ class TagCache
             @file_put_contents($cacheFile, $compiledCode);
         }
 
-        @file_put_contents($metaFile, @filemtime($templatePath));
+        // 保存模板 mtime + 处理器文件 mtime
+        $handlerFiles = array(__DIR__ . '/builtin.php', __DIR__ . '/Registry.php');
+        $handlerMtime = 0;
+        foreach ($handlerFiles as $f) {
+            $mt = @filemtime($f);
+            if ($mt > $handlerMtime) $handlerMtime = $mt;
+        }
+        @file_put_contents($metaFile, serialize(array(
+            'template_mtime' => @filemtime($templatePath),
+            'handler_mtime'  => $handlerMtime,
+        )));
     }
 
     /**

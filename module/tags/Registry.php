@@ -16,24 +16,26 @@ class TagRegistry
     /** @var array name => category */
     private static $categories = array();
 
-    /** 标签分类定义 */
+    /** 标签分类定义（大类 + 子类） */
     public static $CATEGORY_LABELS = array(
-        'home'     => '首页标签',
-        'list'     => '列表/分类标签',
-        'article'  => '文章标签',
-        'software' => '软件标签',
-        'common'   => '通用标签',
+        'content'    => '内容标签',
+        'category'   => '分类标签',
+        'system'     => '系统标签',
+        'navigation' => '导航标签',
     );
 
     /**
      * 注册标签
-     * @param string $name     标签名（如 article_list）
+     * @param string $name     标签名
      * @param callable $handler 处理函数
      * @param string $help      帮助说明
-     * @param string $category  分类：home/list/article/software/common
+     * @param string $category  分类：content/category/system/navigation
      */
-    public static function register($name, $handler, $help = '', $category = 'common')
+    public static function register($name, $handler, $help = '', $category = 'content')
     {
+        if (isset(self::$tags[$name])) {
+            error_log('[TagRegistry] 标签重复注册: ' . $name . '，将被覆盖');
+        }
         self::$tags[$name] = $handler;
         self::$help[$name] = $help;
         self::$categories[$name] = $category;
