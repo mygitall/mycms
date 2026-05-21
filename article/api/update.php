@@ -94,7 +94,7 @@ if (isset($input['is_featured'])) {
 if (isset($input['published_at'])) {
     $pa = trim($input['published_at']);
     if ($pa !== '' && $pa !== $article['published_at']) {
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}(:\d{2})?)?$/', $pa)) {
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2})?$/', $pa)) {
             jsonResponse(400, '发布时间格式不正确，示例：2024-12-31 或 2024-12-31 23:59', null);
         }
         $updates[] = "published_at = :pat";

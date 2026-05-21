@@ -7637,7 +7637,10 @@ if (response.code == 401) {
               if (tinymceReady) tinymce.get('article-content').setContent('');
               $('article-status').value     = '1';
               $('article-is-featured').value = '0';
-              $('article-published-at').value = '';
+              const now = new Date();
+              const pad = n => String(n).padStart(2, '0');
+              $('article-published-at').value =
+                now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate()) + 'T' + pad(now.getHours()) + ':' + pad(now.getMinutes());
               $('article-cover-preview').style.display = 'none';
               clearArticleFormErrors();
               $('article-table-card').style.display = 'none';
