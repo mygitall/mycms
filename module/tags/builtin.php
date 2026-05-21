@@ -47,7 +47,7 @@ TagRegistry::register('article_detail', 'tag_article_detail', '文章详情循�
 TagRegistry::register('related_articles', 'tag_related_articles', '相关文章（同分类推荐）。参数: num=数量。可用变量: [--title--][--url--][--summary--][--view_count--]', 'content');
 
 // ── 内容标签（软件）──
-TagRegistry::register('software', 'tag_loop_software', '软件循环。参数: num=数量。可用变量: [--name--][--url--][--summary--][--icon--][--version--][--rating--][--category--]', 'content');
+TagRegistry::register('software', 'tag_loop_software', '软件循环。参数: num=数量。可用变量: [--name--][--url--][--summary--][--version--][--category--][--view_count--][--download_count--]', 'content');
 TagRegistry::register('software_list', 'tag_software_list', '软件列表直接输出HTML。参数: num=数量', 'content');
 
 // ── 分类标签 ──
@@ -263,7 +263,8 @@ function tag_loop_software($attrs) {
     try {
         $pdo = getDB();
         $prefix = DB_PREFIX;
-        $sql = "SELECT id, name, description, icon, version, rating, category
+        $sql = "SELECT id, name, description, version, category_name AS category,
+                       view_count, download_count, created_at
                 FROM `{$prefix}software` WHERE status = 1
                 ORDER BY created_at DESC LIMIT " . min($num, 20);
         $stmt = $pdo->query($sql);

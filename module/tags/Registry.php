@@ -134,7 +134,7 @@ class TagRegistry
             'article_detail'   => '[--loop:article_detail--]<h1>[--title--]</h1><div>[--content--]</div>[--/loop:article_detail--]',
             'related_articles' => '[--loop:related_articles(num=5)--]<li>[--title--]</li>[--/loop:related_articles--]',
             // 内容标签 - 软件
-            'software'      => '[--loop:software(num=6)--]<div>[--name--] v[--version--]</div>[--/loop:software--]',
+            'software'      => '[--loop:software(num=20)--]<div><strong>[--name--]</strong> v[--version--] [--category--]</div>[--/loop:software--]',
             'software_list' => '[--software_list(num=6)--]',
             // 分类标签
             'categories'   => '[--loop:categories--]<a href="[--url--]">[--name--]（[--cnt--]篇）</a>[--/loop:categories--]',
