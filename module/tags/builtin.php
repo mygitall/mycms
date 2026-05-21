@@ -9,53 +9,33 @@
 // ═══════════════════════════════════════
 
 // ── [--site_name--] 站点名称 ──
-TagRegistry::register('site_name', 'tag_site_name', '输出站点名称，默认 MYCMS', 'system');
-function tag_site_name($attrs) {
-    try {
-        $pdo = getDB();
-        $prefix = DB_PREFIX;
-        $stmt = $pdo->prepare("SELECT config_value FROM `{$prefix}config` WHERE config_key = 'site_name' LIMIT 1");
-        $stmt->execute();
-        $row = $stmt->fetch();
-        return $row ? htmlspecialchars($row['config_value'], ENT_QUOTES, 'UTF-8') : 'MYCMS';
-    } catch (Exception $e) {
-        return 'MYCMS';
-    }
-}
+// ── 系统标签 ──
+TagRegistry::register('site_name',    'tag_site_name',    '站点名称，默认"MYCMS"', 'system');
+TagRegistry::register('site_url',     'tag_site_url',     '完整站点URL（协议+域名+路径）', 'system');
+TagRegistry::register('current_year', 'tag_current_year', '当前年份 如 2026', 'system');
+TagRegistry::register('current_date', 'tag_current_date', '当前日期，可用参数 format=Y年m月d日', 'system');
+TagRegistry::register('config',       'tag_config',       '读取任意配置项，参数 key=配置名', 'system');
+TagRegistry::register('search_form',  'tag_search_form',  '搜索表单（GET方式提交到/search）', 'system');
+TagRegistry::register('login_form',   'tag_login_form',   '登录表单（POST方式，含CSRF保护）', 'system');
 
-// ── [--site_url--] 站点 URL ──
-TagRegistry::register('site_url', 'tag_site_url', '输出完整站点URL', 'system');
-TagRegistry::register('current_year', 'tag_current_year', '输出当前年份（如2026）', 'system');
-TagRegistry::register('current_date', 'tag_current_date', '输出当前日期，支持format参数', 'system');
-TagRegistry::register('config', 'tag_config', '读取任意系统配置项', 'system');
-TagRegistry::register('search_form', 'tag_search_form', '输出搜索表单HTML', 'system');
-TagRegistry::register('login_form', 'tag_login_form', '输出登录表单HTML', 'system');
+// ── 内容标签（文章）──
+TagRegistry::register('articles', 'tag_loop_articles', '文章循环。参数: num=数量 cat=分类 sort=排序字段(view_count/created_at) order=DESC/ASC。可用变量: [--title--][--url--][--summary--][--category--][--view_count--][--published_at--][--cover_image--]', 'content');
+TagRegistry::register('article_list', 'tag_article_list', '文章列表直接输出HTML。参数同 articles', 'content');
+TagRegistry::register('article_detail', 'tag_article_detail', '文章详情循环。自动读取当前页面文章ID。可用变量: [--title--][--content--][--category--][--tags--][--view_count--][--author_name--][--published_at--][--url--]', 'content');
+TagRegistry::register('related_articles', 'tag_related_articles', '相关文章（同分类推荐）。参数: num=数量。可用变量: [--title--][--url--][--summary--][--view_count--]', 'content');
 
-// ═══════════════════════════════════════
-// 内容标签 (content) — 文章 + 软件
-// ═══════════════════════════════════════
+// ── 内容标签（软件）──
+TagRegistry::register('software', 'tag_loop_software', '软件循环。参数: num=数量。可用变量: [--name--][--url--][--summary--][--icon--][--version--][--rating--][--category--]', 'content');
+TagRegistry::register('software_list', 'tag_software_list', '软件列表直接输出HTML。参数: num=数量', 'content');
 
-TagRegistry::register('articles', 'tag_loop_articles', '文章列表循环，支持 num/cat/sort/order 参数', 'content');
-TagRegistry::register('article_list', 'tag_article_list', '文章列表（直接输出HTML）', 'content');
-TagRegistry::register('article_detail', 'tag_article_detail', '文章详情数据循环', 'content');
-TagRegistry::register('related_articles', 'tag_related_articles', '相关文章推荐（同分类）', 'content');
-TagRegistry::register('software', 'tag_loop_software', '软件列表循环，支持 num 参数', 'content');
-TagRegistry::register('software_list', 'tag_software_list', '软件列表（直接输出HTML）', 'content');
+// ── 分类标签 ──
+TagRegistry::register('categories', 'tag_loop_categories', '分类循环。可用变量: [--name--][--url--][--cnt--]', 'category');
+TagRegistry::register('category_nav', 'tag_category_nav', '分类导航直接输出HTML（按文章数降序）', 'category');
 
-// ═══════════════════════════════════════
-// 分类标签 (category)
-// ═══════════════════════════════════════
-
-TagRegistry::register('categories', 'tag_loop_categories', '分类列表循环', 'category');
-TagRegistry::register('category_nav', 'tag_category_nav', '分类导航（直接输出HTML）', 'category');
-
-// ═══════════════════════════════════════
-// 导航标签 (navigation)
-// ═══════════════════════════════════════
-
-TagRegistry::register('breadcrumb', 'tag_breadcrumb', '面包屑导航', 'navigation');
-TagRegistry::register('pagination', 'tag_pagination', '分页导航条', 'navigation');
-TagRegistry::register('carousel', 'tag_carousel', '轮播数据（JSON）', 'navigation');
+// ── 导航标签 ──
+TagRegistry::register('breadcrumb', 'tag_breadcrumb', '面包屑导航，根据当前URL自动生成路径', 'navigation');
+TagRegistry::register('pagination', 'tag_pagination', '分页导航。参数: total=总数 per_page=每页条数 page=当前页 url=链接前缀', 'navigation');
+TagRegistry::register('carousel', 'tag_carousel', '首页轮播JSON数据。参数: num=数量。返回JSON数组', 'navigation');
 function tag_current_date($attrs) {
     $format = isset($attrs['format']) ? $attrs['format'] : 'Y-m-d';
     return date($format);

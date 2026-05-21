@@ -120,24 +120,29 @@ class TagRegistry
     public static function syntax($name)
     {
         $syntaxes = array(
-            'site_name'          => '[--site_name--]',
-            'site_url'           => '[--site_url--]',
-            'current_year'       => '[--current_year--]',
-            'current_date'       => '[--current_date:format=Y-m-d--]',
-            'article_list'       => '[--article_list:num=10,cat=tech,sort=published_at,order=DESC--]',
-            'articles'           => '[--loop:articles(num=5,cat=tech)--]<li><a href="[--url--]">[--title--]</a></li>[--/loop:articles--]',
-            'software_list'      => '[--software_list:num=6--]',
-            'software'           => '[--loop:software(num=6)--]<div><strong>[--name--]</strong><p>[--summary--]</p></div>[--/loop:software--]',
-            'category_nav'       => '[--category_nav--]',
-            'categories'         => '[--loop:categories--]<a href="[--url--]">[--name--] ([--cnt--])</a>[--/loop:categories--]',
-            'search_form'        => '[--search_form--]',
-            'breadcrumb'         => '[--breadcrumb--]',
-            'carousel'           => '[--carousel:num=5--]',
-            'article_detail'     => '[--article_detail--]（详情页自动读取文章ID）或 [--article_detail:id=10--]',
-            'related_articles'   => '[--related_articles:id=10,num=5--]',
-            'login_form'         => '[--login_form--]',
-            'pagination'         => '[--pagination:total=100,per_page=10,page=1,url=?page=--]',
-            'config'             => '[--config:key=site_name--]',
+            // 系统标签
+            'site_name'    => '[--site_name--]',
+            'site_url'     => '[--site_url--]',
+            'current_year' => '[--current_year--]',
+            'current_date' => '[--current_date--] 或 [--current_date(format=Y年m月d日)--]',
+            'config'       => '[--config(key=site_name)--]',
+            'search_form'  => '[--search_form--]',
+            'login_form'   => '[--login_form--]',
+            // 内容标签 - 文章
+            'articles'         => '[--loop:articles(num=10)--]<a href="[--url--]">[--title--]</a>[--/loop:articles--]',
+            'article_list'     => '[--article_list(num=10)--] 或 [--article_list(num=5,cat=科技,sort=view_count)--]',
+            'article_detail'   => '[--loop:article_detail--]<h1>[--title--]</h1><div>[--content--]</div>[--/loop:article_detail--]',
+            'related_articles' => '[--loop:related_articles(num=5)--]<li>[--title--]</li>[--/loop:related_articles--]',
+            // 内容标签 - 软件
+            'software'      => '[--loop:software(num=6)--]<div>[--name--] v[--version--]</div>[--/loop:software--]',
+            'software_list' => '[--software_list(num=6)--]',
+            // 分类标签
+            'categories'   => '[--loop:categories--]<a href="[--url--]">[--name--]（[--cnt--]篇）</a>[--/loop:categories--]',
+            'category_nav' => '[--category_nav--]',
+            // 导航标签
+            'breadcrumb' => '[--breadcrumb--]',
+            'pagination' => '[--pagination(total=50,per_page=10,page=1,url=?page=)--]',
+            'carousel'   => '[--carousel(num=5)--]',
         );
 
         return isset($syntaxes[$name]) ? $syntaxes[$name] : '[--' . $name . '--]';
