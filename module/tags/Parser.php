@@ -156,12 +156,17 @@ class TagParser
         $attrs = array();
         $name  = $inner;
 
-        // 检查是否有参数 (xxx) 或 :key=val
+        // 格式1: name(key=val,key=val) — 括号参数
+        if (preg_match('/^([a-zA-Z_]\w*)\((.+)\)$/', $inner, $m)) {
+            $name = $m[1];
+            $attrs = self::parseAttrs($m[2]);
+            return array('name' => $name, 'attrs' => $attrs);
+        }
+
+        // 格式2: name:key=val,key=val — 冒号参数
         if (preg_match('/^([a-zA-Z_]\w*):(.+)$/', $inner, $m)) {
             $name   = $m[1];
             $params = self::parseAttrs($m[2]);
-
-            // 如果参数都在括号里，合并
             foreach ($params as $k => $v) {
                 $attrs[$k] = $v;
             }
