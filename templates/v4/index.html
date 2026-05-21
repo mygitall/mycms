@@ -408,6 +408,9 @@
     .rank-item-content {
       flex: 1;
       min-width: 0;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
     }
     .rank-item-title {
       font-size: 13px;
@@ -426,7 +429,8 @@
     .rank-item-meta {
       font-size: 11px;
       color: var(--text-3);
-      margin-top: 2px;
+      flex-shrink: 0;
+      white-space: nowrap;
       transition: color 0.4s;
     }
     .rank-item-hot {
