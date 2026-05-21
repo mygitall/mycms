@@ -7615,7 +7615,17 @@ if (response.code == 401) {
                   content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 15px; line-height: 1.8; color: #333; } ' +
                     'pre[data-mce-highlight] { background: #1e1e1e; color: #d4d4d4; border-radius: 8px; padding: 16px; overflow-x: auto; font-family: "SF Mono", Monaco, "Cascadia Code", Consolas, monospace; font-size: 13px; line-height: 1.6; }',
                   setup: function(editor) {
+                    // 强制允许 iframe（绕过 TinyMCE 默认过滤）
+                    editor.schema.addValidElements('iframe[src|width|height|frameborder|allowfullscreen|scrolling|style|class|border|framespacing]');
+                    editor.schema.addValidChildren('+body[iframe],+div[iframe],+p[iframe]');
                     editor.on('init', function() { tinymceReady = true; });
+                  },
+                  paste_preprocess: function(plugin, args) {
+                    // 粘贴时保留 iframe 不被过滤
+                    args.content = args.content.replace(
+                      /<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi,
+                      function(m) { return m; }
+                    );
                   }
                 });
               } catch(e) {
