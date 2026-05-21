@@ -7311,26 +7311,47 @@ if (response.code == 401) {
                 });
             }
 
-            function renderTagTable(data) {
+            function renderTagTable(categories) {
               const tbody = $('tag-reference-tbody');
               if (!tbody) return;
               const keyword = ($('tag-search-input')?.value || '').toLowerCase();
-              const filtered = keyword ? data.filter(t =>
-                t.name.toLowerCase().includes(keyword) || t.help.toLowerCase().includes(keyword)
-              ) : data;
 
-              if (filtered.length === 0) {
+              let html = '';
+              let totalVisible = 0;
+
+              categories.forEach(function(cat) {
+                // 搜索过滤
+                const visible = keyword
+                  ? cat.tags.filter(function(t) {
+                      return t.name.toLowerCase().includes(keyword) || t.help.toLowerCase().includes(keyword);
+                    })
+                  : cat.tags;
+
+                if (visible.length === 0) return;
+                totalVisible += visible.length;
+
+                // 分类标题行
+                html += '<tr class="tag-cat-header">' +
+                  '<td colspan="3" style="padding:16px 14px 6px;font-size:13px;font-weight:600;color:var(--accent);border-bottom:1px solid var(--border);letter-spacing:0.5px">' +
+                    '&#x1F4CC; ' + cat.label + ' <span style="font-weight:400;color:var(--text-dim);font-size:11px">（' + visible.length + ' 个）</span>' +
+                  '</td>' +
+                '</tr>';
+
+                // 标签行
+                visible.forEach(function(t) {
+                  html += '<tr>' +
+                    '<td style="padding-left:20px"><code style="background:var(--accent-dim);color:var(--accent);padding:3px 8px;border-radius:4px;font-size:13px">' + t.name + '</code></td>' +
+                    '<td><code style="font-size:12px;color:var(--text-2);word-break:break-all">' + escapeHtml(t.syntax) + '</code></td>' +
+                    '<td style="font-size:13px">' + escapeHtml(t.help || '-') + '</td>' +
+                  '</tr>';
+                });
+              });
+
+              if (totalVisible === 0) {
                 tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:40px;color:var(--text-dim)">无匹配标签</td></tr>';
-                return;
+              } else {
+                tbody.innerHTML = html;
               }
-
-              tbody.innerHTML = filtered.map(t =>
-                '<tr>' +
-                  '<td><code style="background:var(--accent-dim);color:var(--accent);padding:3px 8px;border-radius:4px;font-size:13px">' + t.name + '</code></td>' +
-                  '<td><code style="font-size:12px;color:var(--text-2);word-break:break-all">' + escapeHtml(t.syntax) + '</code></td>' +
-                  '<td style="font-size:13px">' + escapeHtml(t.help || '-') + '</td>' +
-                '</tr>'
-              ).join('');
             }
 
             function filterTags() {

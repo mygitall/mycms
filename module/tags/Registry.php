@@ -13,18 +13,30 @@ class TagRegistry
     /** @var array name => help_text */
     private static $help = array();
 
+    /** @var array name => category */
+    private static $categories = array();
+
+    /** 标签分类定义 */
+    public static $CATEGORY_LABELS = array(
+        'home'     => '首页标签',
+        'list'     => '列表/分类标签',
+        'article'  => '文章标签',
+        'software' => '软件标签',
+        'common'   => '通用标签',
+    );
+
     /**
      * 注册标签
-     * @param string   $name    标签名（如 article_list）
-     * @param callable $handler 处理函数，接收 $attrs(array)，返回 string
-     * @param string   $help    帮助说明
+     * @param string $name     标签名（如 article_list）
+     * @param callable $handler 处理函数
+     * @param string $help      帮助说明
+     * @param string $category  分类：home/list/article/software/common
      */
-    public static function register($name, $handler, $help = '')
+    public static function register($name, $handler, $help = '', $category = 'common')
     {
         self::$tags[$name] = $handler;
-        if ($help !== '') {
-            self::$help[$name] = $help;
-        }
+        self::$help[$name] = $help;
+        self::$categories[$name] = $category;
     }
 
     /**
@@ -65,8 +77,34 @@ class TagRegistry
         $result = array();
         foreach (self::$tags as $name => $handler) {
             $result[$name] = array(
-                'handler' => $handler,
-                'help'    => isset(self::$help[$name]) ? self::$help[$name] : '',
+                'handler'  => $handler,
+                'help'     => isset(self::$help[$name]) ? self::$help[$name] : '',
+                'category' => isset(self::$categories[$name]) ? self::$categories[$name] : 'common',
+                'syntax'   => self::syntax($name),
+            );
+        }
+        return $result;
+    }
+
+    /**
+     * 按分类获取标签列表
+     * @return array ['home'=>[...], 'list'=>[...], ...]
+     */
+    public static function byCategory()
+    {
+        $result = array();
+        foreach (self::$CATEGORY_LABELS as $key => $label) {
+            $result[$key] = array('label' => $label, 'tags' => array());
+        }
+        foreach (self::$tags as $name => $handler) {
+            $cat = isset(self::$categories[$name]) ? self::$categories[$name] : 'common';
+            if (!isset($result[$cat])) {
+                $result[$cat] = array('label' => $cat, 'tags' => array());
+            }
+            $result[$cat]['tags'][] = array(
+                'name'   => $name,
+                'help'   => isset(self::$help[$name]) ? self::$help[$name] : '',
+                'syntax' => self::syntax($name),
             );
         }
         return $result;

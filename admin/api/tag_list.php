@@ -19,14 +19,18 @@ if (!$adminId) {
     jsonResponse(401, 'Token无效', null);
 }
 
-$allTags = TagRegistry::all();
+$categories = TagRegistry::byCategory();
+
+// 过滤空分类
 $result = array();
-foreach ($allTags as $name => $info) {
-    $result[] = array(
-        'name'     => $name,
-        'help'     => $info['help'],
-        'syntax'   => TagRegistry::syntax($name),
-    );
+foreach ($categories as $key => $info) {
+    if (!empty($info['tags'])) {
+        $result[] = array(
+            'category'    => $key,
+            'label'       => $info['label'],
+            'tags'        => $info['tags'],
+        );
+    }
 }
 
 jsonResponse(0, 'success', $result);
