@@ -18,6 +18,28 @@ TagRegistry::register('config',       'tag_config',       '读取任意配置项
 TagRegistry::register('search_form',  'tag_search_form',  '搜索表单（GET方式提交到/search）', 'system');
 TagRegistry::register('login_form',   'tag_login_form',   '登录表单（POST方式，含CSRF保护）', 'system');
 
+function tag_site_name($attrs) {
+    try {
+        $pdo = getDB();
+        $prefix = DB_PREFIX;
+        $stmt = $pdo->prepare("SELECT config_value FROM `{$prefix}config` WHERE config_key = 'site_name' LIMIT 1");
+        $stmt->execute();
+        $row = $stmt->fetch();
+        return $row ? htmlspecialchars($row['config_value'], ENT_QUOTES, 'UTF-8') : 'MYCMS';
+    } catch (Exception $e) { return 'MYCMS'; }
+}
+function tag_site_url($attrs) {
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+    $base = defined('BASE_PATH') ? BASE_PATH : '';
+    return htmlspecialchars($scheme . '://' . $host . $base, ENT_QUOTES, 'UTF-8');
+}
+function tag_current_year($attrs) { return date('Y'); }
+function tag_current_date($attrs) {
+    $format = isset($attrs['format']) ? $attrs['format'] : 'Y-m-d';
+    return date($format);
+}
+
 // ── 内容标签（文章）──
 TagRegistry::register('articles', 'tag_loop_articles', '文章循环。参数: num=数量 cat=分类 sort=排序字段(view_count/created_at) order=DESC/ASC。可用变量: [--title--][--url--][--summary--][--category--][--view_count--][--published_at--][--cover_image--]', 'content');
 TagRegistry::register('article_list', 'tag_article_list', '文章列表直接输出HTML。参数同 articles', 'content');
@@ -36,10 +58,6 @@ TagRegistry::register('category_nav', 'tag_category_nav', '分类导航直接输
 TagRegistry::register('breadcrumb', 'tag_breadcrumb', '面包屑导航，根据当前URL自动生成路径', 'navigation');
 TagRegistry::register('pagination', 'tag_pagination', '分页导航。参数: total=总数 per_page=每页条数 page=当前页 url=链接前缀', 'navigation');
 TagRegistry::register('carousel', 'tag_carousel', '首页轮播JSON数据。参数: num=数量。返回JSON数组', 'navigation');
-function tag_current_date($attrs) {
-    $format = isset($attrs['format']) ? $attrs['format'] : 'Y-m-d';
-    return date($format);
-}
 
 function tag_article_list($attrs) {
     $num  = isset($attrs['num'])  ? (int)$attrs['num'] : 10;

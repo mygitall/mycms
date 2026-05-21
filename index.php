@@ -24,7 +24,7 @@ if (empty($scriptName) && isset($_SERVER['ORIG_SCRIPT_NAME'])) {
 // 从 SCRIPT_NAME 提取项目路径前缀（如 /wei 或 /pro 或 /）
 $scriptDir = pathinfo($scriptName, PATHINFO_DIRNAME);
 if ($scriptDir === '.' || $scriptDir === '/') {
-    $BASE_PATH = '/';
+    $BASE_PATH = '';
 } else {
     $BASE_PATH = $scriptDir; // 末尾不带斜杠，如 /wei
 }
