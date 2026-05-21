@@ -996,15 +996,17 @@ function setSecurityHeaders() {
     header('Expires: 0');
 
     // Content Security Policy (CSP)
-    // frame-src 允许视频平台嵌入播放
+    // 视频平台 CSP 白名单
+    $videoDomains = 'player.bilibili.com www.bilibili.com www.youtube.com player.youku.com v.qq.com open.iqiyi.com player.vimeo.com';
     $csp = [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
         "style-src 'self' 'unsafe-inline'",
-        "img-src 'self' data: https://images.unsplash.com https://picsum.photos https://via.placeholder.com",
+        "img-src 'self' data: https://images.unsplash.com https://picsum.photos https://via.placeholder.com {$videoDomains}",
         "font-src 'self'",
-        "connect-src 'self'",
-        "frame-src 'self' player.bilibili.com www.youtube.com player.youku.com v.qq.com open.iqiyi.com player.vimeo.com",
+        "connect-src 'self' {$videoDomains}",
+        "media-src 'self' {$videoDomains}",
+        "frame-src 'self' {$videoDomains}",
         "frame-ancestors 'none'",
         "base-uri 'self'",
         "form-action 'self'"
