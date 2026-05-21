@@ -7579,8 +7579,8 @@ if (response.code == 401) {
                 tinymce.init({
                   selector: '#article-content',
                   height: 420,
-                  plugins: 'lists link image code table fullscreen hr wordcount searchreplace',
-                  toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | hr | searchreplace | removeformat code | fullscreen',
+                  plugins: 'lists link image code table fullscreen hr wordcount searchreplace media codesample',
+                  toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | hr | codesample searchreplace | removeformat code | fullscreen',
                   menubar: false,
                   statusbar: true,
                   branding: false,
@@ -7589,8 +7589,31 @@ if (response.code == 401) {
                   font_family_formats: '默认字体=inherit;宋体=SimSun;黑体=SimHei;微软雅黑=Microsoft YaHei;楷体=KaiTi;仿宋=FangSong;Arial=arial,helvetica,sans-serif;Times New Roman=times new roman,serif;Courier New=courier new,monospace',
                   font_size_formats: '12px 14px 16px 18px 20px 24px 28px 32px 36px 48px',
                   image_title: true,
-                  automatic_uploads: false,
-                  content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 15px; line-height: 1.8; color: #333; }',
+                  automatic_uploads: true,
+                  images_upload_url: BASE_PATH + '/admin/api/upload_image.php',
+                  images_upload_credentials: true,
+                  codesample_languages: [
+                    { text: 'HTML/XML',  value: 'markup' },
+                    { text: 'JavaScript', value: 'javascript' },
+                    { text: 'CSS',        value: 'css' },
+                    { text: 'PHP',        value: 'php' },
+                    { text: 'Python',     value: 'python' },
+                    { text: 'Java',       value: 'java' },
+                    { text: 'C/C++',      value: 'c' },
+                    { text: 'SQL',        value: 'sql' },
+                    { text: 'Bash',       value: 'bash' },
+                    { text: 'JSON',       value: 'json' },
+                    { text: 'YAML',       value: 'yaml' },
+                    { text: 'Markdown',   value: 'markdown' },
+                    { text: 'Go',         value: 'go' },
+                    { text: 'Rust',       value: 'rust' },
+                    { text: 'TypeScript', value: 'typescript' }
+                  ],
+                  content_css: [
+                    'https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css'
+                  ],
+                  content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 15px; line-height: 1.8; color: #333; } ' +
+                    'pre[data-mce-highlight] { border-radius: 8px; }',
                   setup: function(editor) {
                     editor.on('init', function() { tinymceReady = true; });
                   }
