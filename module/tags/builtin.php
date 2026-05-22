@@ -9,6 +9,26 @@
 // ═══════════════════════════════════════
 
 // ── [--site_name--] 站点名称 ──
+// ── include 包含公共文件 ──
+TagRegistry::register('include', 'tag_include', '引入公共模板文件。参数: name=文件名(不含.html)', 'system');
+
+function tag_include($attrs) {
+    $name = isset($attrs['name']) ? trim($attrs['name']) : '';
+    if ($name === '') return '';
+    // 安全检查：只允许字母数字和连字符
+    if (!preg_match('/^[a-zA-Z0-9_-]+$/', $name)) return '';
+    $file = __DIR__ . '/../../templates/v4/' . $name . '.html';
+    if (!is_file($file)) {
+        $file = __DIR__ . '/../../frontend/' . $name . '.html';
+    }
+    if (is_file($file)) {
+        $html = file_get_contents($file);
+        // 递归渲染 include 内的标签
+        return TagHook::render($html, $file);
+    }
+    return '<!-- include: ' . $name . ' not found -->';
+}
+
 // ── 系统标签 ──
 TagRegistry::register('site_name',    'tag_site_name',    '站点名称，默认"MYCMS"', 'system');
 TagRegistry::register('site_url',     'tag_site_url',     '完整站点URL（协议+域名+路径）', 'system');

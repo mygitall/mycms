@@ -1,0 +1,20 @@
+<!-- ── 公共头部（header.html）── -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Neo<span>Vision</span></a>
+    <div class="nav-center">
+      <div class="nav-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:var(--text-3);flex-shrink:0">
+          <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" placeholder="搜索..." style="background:transparent;border:none;outline:none;font-size:13px;color:var(--text);width:100%;font-family:inherit">
+      </div>
+      <div class="nav-right">
+        <a href="/" class="nav-right-link">首页</a>
+        [--loop:columns(pid=0)--]
+        <a href="[--url--]" class="nav-right-link">[--name--]</a>
+        [--/loop:columns--]
+      </div>
+    </div>
+  </div>
+</nav>

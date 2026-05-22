@@ -37,6 +37,12 @@
   .nav-links{display:flex;gap:24px}
   .nav-links a{font-size:13px;color:var(--text-2);text-decoration:none;transition:color .2s}
   .nav-links a:hover{color:var(--text)}
+  .nav-center{flex:1;display:flex;align-items:center;gap:40px}
+  .nav-search{display:flex;align-items:center;gap:8px;background:var(--surface);border:0.5px solid var(--border);border-radius:100px;padding:7px 16px;width:280px;transition:border-color .3s}
+  .nav-search:focus-within{border-color:var(--border-h)}
+  .nav-right{display:flex;align-items:center;gap:28px}
+  .nav-right-link{font-size:14px;font-weight:450;color:var(--text-2);text-decoration:none;transition:color .2s}
+  .nav-right-link:hover{color:var(--text)}
 
   /* Main Layout */
   .main-layout{display:grid;grid-template-columns:1fr 300px;gap:20px;padding:28px 0 40px;align-items:start}
@@ -80,9 +86,19 @@
   .card ul ul li{border-bottom:none;padding:4px 0}
 
   /* Footer */
-  .footer{border-top:0.5px solid var(--border);padding:32px 24px;margin-top:40px;text-align:center}
-  .footer p{font-size:13px;color:var(--text-3)}
-  .footer a{color:var(--text-2);text-decoration:none}
+  .footer{border-top:0.5px solid var(--border);padding:48px 0 32px;margin-top:40px}
+  .footer-inner{max-width:1280px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;gap:40px}
+  .footer-brand{display:flex;flex-direction:column;gap:8px}
+  .footer-logo{font-size:18px;font-weight:650;color:var(--text);text-decoration:none}
+  .footer-logo span{color:var(--accent)}
+  .footer-tagline{font-size:13px;color:var(--text-3)}
+  .footer-links{display:flex;gap:48px}
+  .footer-col{display:flex;flex-direction:column;gap:10px}
+  .col-title{font-size:11px;font-weight:550;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:4px}
+  .footer-col a{font-size:13px;color:var(--text-2);text-decoration:none;transition:color .2s}
+  .footer-col a:hover{color:var(--text)}
+  .footer-bottom{max-width:1280px;margin:32px auto 0;padding:24px 24px 0;border-top:0.5px solid var(--border);text-align:center}
+  .footer-bottom p{font-size:12px;color:var(--text-3)}
 
   @media (max-width:768px){
     .main-layout{grid-template-columns:1fr}
@@ -93,17 +109,8 @@
 </head>
 <body>
 
-<!-- Nav -->
-<nav class="nav">
-  <div class="nav-inner">
-    <a href="/" class="nav-logo">Neo<span>Vision</span></a>
-    <div class="nav-links">
-      [--loop:columns(pid=0)--]
-      <a href="[--url--]">[--name--]</a>
-      [--/loop:columns--]
-    </div>
-  </div>
-</nav>
+<!-- 公共头部 -->
+[--include(name=header)--]
 
 <div class="container">
   <!-- Page Header -->
@@ -151,16 +158,8 @@
   </div>
 </div>
 
-<!-- Footer -->
-<footer class="footer">
-  <p>&copy; [--current_year--] [--site_name--]. All rights reserved.</p>
-  <p style="margin-top:8px">
-    <a href="/">首页</a> &nbsp;·&nbsp;
-    <a href="/article-list">文章</a> &nbsp;·&nbsp;
-    <a href="/software-list">软件</a> &nbsp;·&nbsp;
-    <a href="/tag-doc">标签文档</a>
-  </p>
-</footer>
+<!-- 公共底部 -->
+[--include(name=footer)--]
 
 </body>
 </html>

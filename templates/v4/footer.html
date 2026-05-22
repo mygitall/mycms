@@ -1,0 +1,27 @@
+<!-- ── 公共底部（footer.html）── -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="footer-logo">Neo<span>Vision</span></a>
+      <span class="footer-tagline">[--site_name--] · 科技前沿 · 智能洞察</span>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <div class="col-title">导航</div>
+        <a href="/">首页</a>
+        <a href="/article-list">文章列表</a>
+        <a href="/software-list">软件列表</a>
+        <a href="/tag-doc">标签文档</a>
+      </div>
+      <div class="footer-col">
+        <div class="col-title">栏目</div>
+        [--loop:columns(pid=0)--]
+        <a href="[--url--]">[--name--]</a>
+        [--/loop:columns--]
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; [--current_year--] [--site_name--]. All rights reserved.</p>
+  </div>
+</footer>
