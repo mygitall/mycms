@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>搜索 - [--site_name--]</title>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;min-height:100vh;overflow-x:hidden}
+  ::-webkit-scrollbar{width:5px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:var(--border-h);border-radius:3px}
+  .container{max-width:900px;margin:0 auto;padding:24px 20px}
+  .search-box{display:flex;gap:10px;margin:24px 0 32px}
+  .search-box input{flex:1;padding:12px 18px;background:var(--surface);border:0.5px solid var(--border);border-radius:100px;color:var(--text);font-size:15px;outline:none;font-family:inherit}
+  .search-box input:focus{border-color:var(--border-h)}
+  .search-box button{padding:12px 24px;background:var(--accent);color:#fff;border:none;border-radius:100px;font-size:14px;font-weight:550;cursor:pointer;transition:opacity .2s}
+  .search-box button:hover{opacity:.85}
+  .result-item{display:block;text-decoration:none;color:inherit;padding:16px 0;border-bottom:0.5px solid var(--border);transition:background .2s}
+  .result-item:hover{background:var(--surface-hover)}
+  .result-item h3{font-size:16px;font-weight:500;color:var(--text);margin-bottom:4px}
+  .result-item h3 em{color:var(--accent);font-style:normal}
+  .result-item .url{font-size:12px;color:var(--accent);margin-bottom:4px}
+  .result-item .desc{font-size:13px;color:var(--text-2);line-height:1.6}
+  .result-meta{font-size:11px;color:var(--text-3);margin-top:4px}
+  .empty-state{text-align:center;padding:60px 20px;color:var(--text-3)}
+  .empty-state h2{font-size:18px;margin-bottom:8px;color:var(--text-2)}
+  #loading{text-align:center;padding:40px;color:var(--text-3)}
+</style>
+</head>
+<body>
+
+[--include(name=header)--]
+
+<div class="container">
+  <div class="search-box">
+    <input type="text" id="q" placeholder="输入关键词搜索..." value="" autofocus onkeydown="if(event.key==='Enter')doSearch()">
+    <button onclick="doSearch()">搜索</button>
+  </div>
+
+  <div id="loading" style="display:none">搜索中...</div>
+  <div id="results"></div>
+</div>
+
+[--include(name=footer)--]
+
+<script>
+(function(){
+  var bp = window.__BASE_PATH__ || '';
+  var API = bp + '/search/api/list.php';
+
+  // Read ?q= from URL
+  var params = new URLSearchParams(location.search);
+  var q = params.get('q') || '';
+  var el = document.getElementById('q');
+  if (q) { el.value = q; doSearch(); }
+
+  window.doSearch = function(){
+    var kw = el.value.trim();
+    if (!kw) return;
+    // Update URL without reload
+    history.replaceState(null,'','?q='+encodeURIComponent(kw));
+    var load = document.getElementById('loading');
+    var res = document.getElementById('results');
+    load.style.display = 'block'; res.innerHTML = '';
+
+    fetch(API,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({keyword:kw,page:1,page_size:20})
+    }).then(function(r){return r.json()}).then(function(d){
+      load.style.display = 'none';
+      if (d.code!==0||!d.data||!d.data.list||d.data.list.length===0){
+        res.innerHTML = '<div class="empty-state"><h2>未找到相关结果</h2><p>尝试其他关键词</p></div>';
+        return;
+      }
+      var items = d.data.list;
+      var html = '<p style="font-size:13px;color:var(--text-3);margin-bottom:16px">找到 '+d.data.total+' 条结果</p>';
+      items.forEach(function(r){
+        var title = r.title || r.name || '';
+        var titleH = title.replace(new RegExp('('+kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<em>$1</em>');
+        var url = r.url || (r.type==='software' ? (bp+'/software/p/'+r.id) : (bp+'/article/p/'+r.id));
+        var desc = (r.desc || r.summary || '').substring(0,150);
+        html += '<a href="'+url+'" class="result-item">'
+          +'<div class="url">'+url+'</div>'
+          +'<h3>'+titleH+'</h3>'
+          +'<div class="desc">'+desc+'</div>'
+          +'<div class="result-meta">'+ (r.source||r.type||'') +'</div>'
+          +'</a>';
+      });
+      res.innerHTML = html;
+    }).catch(function(){
+      load.style.display = 'none';
+      res.innerHTML = '<div class="empty-state"><h2>搜索失败</h2><p>请稍后重试</p></div>';
+    });
+  };
+})();
+</script>
+
+</body>
+</html>
