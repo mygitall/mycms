@@ -44,7 +44,8 @@
     <tr><td>(key=val)</td><td><b>传递参数</b>。括号内用逗号分隔键值对，如 <span class="highlight">(num=10,cat=技术)</span></td></tr>
     <tr><td>&#91;--xxx--&#93;</td><td><b>简单标签</b>。直接替换为对应内容（如站点名、年份等）</td></tr>
     <tr><td>循环内&#91;--字段--&#93;</td><td><b>数据字段</b>。在循环块内部使用，输出当前这条数据的某个字段值</td></tr>
-  </table>
+  <tr><td>[--include(name=xxx)--]</td><td><b>引入公共模板片段</b>。包含 templates/v4/xxx.html 的内容，并递归渲染其中的标签</td></tr>
+</table>
 </div>
 
 <!-- ═══════ 示例详解 ═══════ -->
@@ -128,6 +129,21 @@
   <div class="tag-syntax">&#91;--login_form--&#93;</div>
   <div class="tag-desc">输出一个登录表单HTML（POST方式提交到 /login），含用户名、密码字段和CSRF保护。</div>
   <div class="tag-params">无参数</div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">include — 引入公共模板</div>
+  <div class="tag-syntax">&#91;--include(name=header)--&#93;
+&#91;--include(name=footer)--&#93;</div>
+  <div class="tag-desc">引入 templates/v4/ 下的公共模板文件。常用于引入公共头部、公共底部。引入的文件内仍然可以使用占位符标签，include 支持递归渲染。</div>
+  <div class="tag-params"><b>参数：</b>name=文件名（不含.html后缀，只允许字母数字和连字符）</div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">column_info — 当前栏目名</div>
+  <div class="tag-syntax">&#91;--column_info--&#93;</div>
+  <div class="tag-desc">读取URL参数 ?col=ID，返回对应栏目的名称。用于共享模板 article-list.html 中动态显示栏目标题。</div>
+  <div class="tag-params">无参数，自动从URL读取</div>
 </div>
 
 <!-- ═══════════════════ 内容标签 ═══════════════════ -->
