@@ -92,7 +92,7 @@ function tag_loop_columns($attrs) {
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         // 模板名 → 路由映射
         $templateRoutes = array(
-            'list.html'           => '/list',
+            'list.html'           => '/article-list',
             'software-list.html'  => '/software-list',
             'index.html'          => '/',
             'detail.html'         => '/detail',
@@ -113,7 +113,7 @@ function tag_loop_columns($attrs) {
                 $item['url'] = getBaseUrl() . $templateRoutes[$item['template']];
             } else {
                 // 列表页 默认
-                $item['url'] = getBaseUrl() . '/list?col=' . $item['id'];
+                $item['url'] = getBaseUrl() . '/article-list?col=' . $item['id'];
             }
         }
         unset($item);
@@ -535,7 +535,7 @@ function buildColumnTreeHtml($rows, $parentId, $class) {
         } elseif ($col['template'] === 'list.html' || $col['template'] === '') {
             $url = getBaseUrl() . '/article-list';
         } else {
-            $url = getBaseUrl() . '/list?col=' . $col['id'];
+            $url = getBaseUrl() . '/article-list?col=' . $col['id'];
         }
         $url = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
 
