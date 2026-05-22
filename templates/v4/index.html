@@ -1503,11 +1503,22 @@
 
   <!-- ── Column Navigation ── -->
   <div style="max-width:1280px;margin:0 auto;padding:8px 24px;display:flex;align-items:center;gap:24px;font-size:13px;color:var(--text-2);border-bottom:0.5px solid var(--border)">
-    <span style="font-weight:550;color:var(--text)">栏目导航</span>
-    [--loop:columns(pid=0)--]
-    <a href="[--url--]" style="color:var(--text-2);text-decoration:none;transition:color 0.2s">[--name--]</a>
-    [--/loop:columns--]
+    <span style="font-weight:550;color:var(--text);flex-shrink:0">栏目导航</span>
+    <nav style="display:flex;gap:20px;align-items:center" class="column-nav">
+      [--column_tree--]
+    </nav>
   </div>
+
+  <style>
+    .column-nav ul { list-style:none; display:flex; gap:20px; margin:0; padding:0; }
+    .column-nav li { position:relative; }
+    .column-nav a { color:var(--text-2); text-decoration:none; font-size:13px; transition:color 0.2s; }
+    .column-nav a:hover { color:var(--accent); }
+    .column-nav li ul { display:none; position:absolute; top:100%; left:0; background:var(--bg); border:0.5px solid var(--border); border-radius:8px; padding:8px 0; min-width:120px; flex-direction:column; gap:0; z-index:50; }
+    .column-nav li:hover > ul { display:flex; }
+    .column-nav li ul a { display:block; padding:6px 16px; white-space:nowrap; }
+    .column-nav li ul a:hover { background:var(--surface-hover); }
+  </style>
 
   <!-- ── Main Content ── -->
   <div class="container">

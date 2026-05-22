@@ -131,6 +131,7 @@ TagRegistry::register('category_nav', 'tag_category_nav', '分类导航直接输
 TagRegistry::register('breadcrumb', 'tag_breadcrumb', '面包屑导航，根据当前URL自动生成路径', 'navigation');
 TagRegistry::register('pagination', 'tag_pagination', '分页导航。参数: total=总数 per_page=每页条数 page=当前页 url=链接前缀', 'navigation');
 TagRegistry::register('carousel', 'tag_carousel', '首页轮播JSON数据。参数: num=数量。返回JSON数组', 'navigation');
+TagRegistry::register('column_tree', 'tag_column_tree', '栏目树（自动递归显示所有层级）。参数: pid=起始父ID(默认0) class=ul的CSS类名', 'navigation');
 
 function tag_article_list($attrs) {
     $num  = isset($attrs['num'])  ? (int)$attrs['num'] : 10;
@@ -492,6 +493,59 @@ function tag_config($attrs) {
     } catch (Exception $e) {
         return '';
     }
+}
+
+// ── [--column_tree--] 栏目树（自动递归所有层级）──
+function tag_column_tree($attrs) {
+    $pid   = isset($attrs['pid'])   ? (int)$attrs['pid']   : 0;
+    $class = isset($attrs['class']) ? htmlspecialchars($attrs['class'], ENT_QUOTES, 'UTF-8') : '';
+    try {
+        $pdo = getDB();
+        $prefix = DB_PREFIX;
+        $stmt = $pdo->query("SELECT * FROM `{$prefix}columns` ORDER BY parent_id ASC, sort_order ASC, id ASC");
+        $all = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return buildColumnTreeHtml($all, $pid, $class);
+    } catch (Exception $e) {
+        return '';
+    }
+}
+
+function buildColumnTreeHtml($rows, $parentId, $class) {
+    $html = '';
+    $children = array();
+    foreach ($rows as $row) {
+        if ((int)$row['parent_id'] === $parentId) {
+            $children[] = $row;
+        }
+    }
+    if (empty($children)) return '';
+
+    $cls = $class ? ' class="' . $class . '"' : '';
+    $html .= '<ul' . $cls . '>';
+    foreach ($children as $col) {
+        $name = htmlspecialchars($col['name'], ENT_QUOTES, 'UTF-8');
+        // 生成 URL
+        if ($col['type'] === 'link') {
+            $url = $col['url'];
+            if ($url !== '' && $url[0] === '/') $url = getBaseUrl() . $url;
+        } elseif ($col['type'] === 'page') {
+            $url = getBaseUrl() . '/page/' . $col['id'];
+        } elseif ($col['template'] === 'software-list.html') {
+            $url = getBaseUrl() . '/software-list';
+        } elseif ($col['template'] === 'list.html' || $col['template'] === '') {
+            $url = getBaseUrl() . '/article-list';
+        } else {
+            $url = getBaseUrl() . '/list?col=' . $col['id'];
+        }
+        $url = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+
+        $html .= '<li><a href="' . $url . '">' . $name . '</a>';
+        // 递归子栏目
+        $html .= buildColumnTreeHtml($rows, (int)$col['id'], '');
+        $html .= '</li>';
+    }
+    $html .= '</ul>';
+    return $html;
 }
 
 // ─── 工具函数 ────────────────────────────────
