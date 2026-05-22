@@ -90,12 +90,29 @@ function tag_loop_columns($attrs) {
         $stmt = $pdo->prepare("SELECT id, parent_id, name, type, template, url, sort_order FROM `{$prefix}columns` WHERE parent_id = :pid ORDER BY sort_order ASC, id ASC");
         $stmt->execute(array(':pid' => $pid));
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // 模板名 → 路由映射
+        $templateRoutes = array(
+            'list.html'           => '/list',
+            'software-list.html'  => '/software-list',
+            'index.html'          => '/',
+            'detail.html'         => '/detail',
+            'search.html'         => '/search',
+        );
         foreach ($list as &$item) {
             if ($item['type'] === 'link') {
+                // 外链：用 url 字段，如果以 / 开头则补全域名
                 $item['url'] = $item['url'];
+                if ($item['url'] !== '' && $item['url'][0] === '/') {
+                    $item['url'] = getBaseUrl() . $item['url'];
+                }
             } elseif ($item['type'] === 'page') {
+                // 单页
                 $item['url'] = getBaseUrl() . '/page/' . $item['id'];
+            } elseif ($item['template'] !== '' && isset($templateRoutes[$item['template']])) {
+                // 列表页 + 指定了已知模板 → 用模板路由
+                $item['url'] = getBaseUrl() . $templateRoutes[$item['template']];
             } else {
+                // 列表页 默认
                 $item['url'] = getBaseUrl() . '/list?col=' . $item['id'];
             }
         }
