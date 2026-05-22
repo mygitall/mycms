@@ -42,6 +42,11 @@ $knownRouteNames = ['api', 'article', 'search', 'admin', 'storage', 'install',
     'performance', 'index.php', 'login.php', 'admin.php', 'article.php',
     'reset_admin.php', 'reset_all.php', 'clear_ban.php', 'config.php', 'monitor.html',
     'favorites', 'article-list', 'drone-list', 'software-list', 'tag-doc', 'detail', 'login'];
+// 动态：如果 templates/v4/xxx.html 存在，也视为已知路由
+if (!in_array($firstUriSeg, $knownRouteNames, true)
+    && is_file(__DIR__ . '/templates/v4/' . $firstUriSeg . '.html')) {
+    $knownRouteNames[] = $firstUriSeg;
+}
 if ($firstUriSeg !== '' && !in_array($firstUriSeg, $knownRouteNames, true)
     && ($scriptDir === '.' || $scriptDir === '/')) {
     $BASE_PATH = '/' . $firstUriSeg;
