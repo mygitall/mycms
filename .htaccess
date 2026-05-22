@@ -5,6 +5,7 @@ DirectorySlash Off
 
 # 前台路由精确匹配
 RewriteRule ^search$ index.php [L,QSA]
+RewriteRule ^list$ /article-list [R=301,L]
 RewriteRule ^article-list$ index.php [L,QSA]
 RewriteRule ^drone-list$ index.php [L,QSA]
 RewriteRule ^software-list$ index.php [L,QSA]
