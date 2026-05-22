@@ -1790,64 +1790,11 @@
         _viewportMeta.setAttribute('content', _viewportContent);
       });
 
-      /* ── Theme Toggle ── */
-      const toggle = document.getElementById('themeToggle');
-      const saved = localStorage.getItem('theme');
-      if (saved === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-      }
-
-      toggle.addEventListener('click', function() {
-        const current = document.documentElement.getAttribute('data-theme');
-        const next = current === 'light' ? '' : 'light';
-        if (next) {
-          document.documentElement.setAttribute('data-theme', next);
-          localStorage.setItem('theme', next);
-        } else {
-          document.documentElement.removeAttribute('data-theme');
-          localStorage.removeItem('theme');
-        }
-      });
-
-      /* ── Sidebar Drawer ── */
-      const hamburgerBtn = document.getElementById('hamburgerBtn');
-      const sidebarDrawer = document.getElementById('sidebarDrawer');
-      const sidebarClose = document.getElementById('sidebarClose');
-      const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-      function openSidebar() {
-        sidebarDrawer.classList.add('open');
-        document.body.style.overflow = 'hidden';
-      }
-
-      function closeSidebar() {
-        sidebarDrawer.classList.remove('open');
-        document.body.style.overflow = '';
-      }
-
-      hamburgerBtn.addEventListener('click', openSidebar);
-      sidebarClose.addEventListener('click', closeSidebar);
-      sidebarOverlay.addEventListener('click', closeSidebar);
-
-      /* ── Mobile Search Toggle ── */
-      const mobileSearchBtn = document.getElementById('mobileSearchBtn');
-      const mobileSearchDrop = document.getElementById('mobileSearchDrop');
-
-      if (mobileSearchBtn && mobileSearchDrop) {
-        mobileSearchBtn.addEventListener('click', function() {
-          mobileSearchDrop.classList.toggle('open');
-          if (mobileSearchDrop.classList.contains('open')) {
-            mobileSearchDrop.querySelector('input').focus();
-          }
-        });
-
-        // 点击页面其他地方关闭搜索栏
-        document.addEventListener('click', function(e) {
-          if (!mobileSearchDrop.contains(e.target) && e.target !== mobileSearchBtn && !mobileSearchBtn.contains(e.target)) {
-            mobileSearchDrop.classList.remove('open');
-          }
-        });
-      }
+      /* ── Theme init (toggle handled by header.html) ── */
+      (function(){
+        var saved = localStorage.getItem('theme');
+        if (saved === 'light') document.documentElement.setAttribute('data-theme', 'light');
+      })();
 
       /* ── Carousel ── */
       const track = document.getElementById('carouselTrack');
