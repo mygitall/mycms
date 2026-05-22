@@ -71,7 +71,7 @@
 <nav class="nav">
   <div class="nav-inner">
     <!-- Mobile: search icon -->
-    <button class="mobile-search-btn" id="mobileSearchBtn" aria-label="搜索" onclick="toggleMobileSearch()">
+    <button class="mobile-search-btn" id="header-mobileSearchBtn" aria-label="搜索" onclick="headerTogglemobilesearch()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px">
         <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
@@ -92,31 +92,31 @@
       </div>
     </div>
     <!-- Theme + Hamburger -->
-    <button class="theme-toggle" id="themeToggle" aria-label="切换主题" onclick="toggleTheme()">
+    <button class="theme-toggle" id="header-themeToggle" aria-label="切换主题" onclick="headerToggletheme()">
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
     </button>
-    <button class="hamburger" id="hamburgerBtn" aria-label="打开菜单" onclick="openSidebar()">
+    <button class="hamburger" id="header-hamburgerBtn" aria-label="打开菜单" onclick="headerOpensidebar()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
   </div>
 </nav>
 
 <!-- Mobile Search Drop -->
-<div class="mobile-search-drop" id="mobileSearchDrop">
+<div class="mobile-search-drop" id="header-mobileSearchDrop">
   <div class="mobile-search-drop-inner">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;color:var(--text-3);flex-shrink:0"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-    <input type="text" placeholder="搜索..." id="mobileSearchInput" onkeydown="if(event.key==='Enter'){location.href='/search?q='+encodeURIComponent(this.value)}">
+    <input type="text" placeholder="搜索..." id="header-mobileSearchInput" onkeydown="if(event.key==='Enter'){location.href='/search?q='+encodeURIComponent(this.value)}">
   </div>
 </div>
 
 <!-- Mobile Sidebar -->
-<div class="sidebar-drawer" id="sidebarDrawer">
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="sidebar-drawer" id="header-sidebarDrawer">
+  <div class="sidebar-overlay" id="header-sidebarOverlay" onclick="headerClosesidebar()"></div>
   <div class="sidebar-panel">
     <div class="sidebar-panel-header">
       <a href="/" class="nav-logo">Neo<span>Vision</span></a>
-      <button class="sidebar-close" onclick="closeSidebar()">
+      <button class="sidebar-close" onclick="headerClosesidebar()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </button>
     </div>
@@ -138,27 +138,27 @@
   var saved = localStorage.getItem('theme');
   if (saved === 'light') document.documentElement.setAttribute('data-theme', 'light');
   else if (!saved) localStorage.setItem('theme', 'dark');
-  window.toggleTheme = function(){
+  window.headerToggleTheme = function(){
     var cur = document.documentElement.getAttribute('data-theme');
     var next = cur === 'light' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
   };
-  window.toggleMobileSearch = function(){
-    document.getElementById('mobileSearchDrop').classList.toggle('open');
+  window.headerToggleMobileSearch = function(){
+    document.getElementById('header-mobileSearchDrop').classList.toggle('open');
   };
-  window.openSidebar = function(){
-    document.getElementById('sidebarDrawer').classList.add('open');
+  window.headerOpenSidebar = function(){
+    document.getElementById('header-sidebarDrawer').classList.add('open');
     document.body.style.overflow = 'hidden';
   };
-  window.closeSidebar = function(){
-    document.getElementById('sidebarDrawer').classList.remove('open');
+  window.headerCloseSidebar = function(){
+    document.getElementById('header-sidebarDrawer').classList.remove('open');
     document.body.style.overflow = '';
   };
   // Click outside to close mobile search
   document.addEventListener('click', function(e){
-    var drop = document.getElementById('mobileSearchDrop');
-    var btn = document.getElementById('mobileSearchBtn');
+    var drop = document.getElementById('header-mobileSearchDrop');
+    var btn = document.getElementById('header-mobileSearchBtn');
     if (drop && btn && !drop.contains(e.target) && e.target !== btn && !btn.contains(e.target)){
       drop.classList.remove('open');
     }
