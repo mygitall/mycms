@@ -68,7 +68,7 @@ if ($path === '') {
 // ── 前台页面路由映射 ──────────────────────────────
 $frontendRoutes = [
     '/'      => 'index.html',
-    '/article-list' => 'list.html',
+    '/article-list' => 'article-list.html',
     '/drone-list' => 'drone-list.html',
     '/software-list' => 'software-list.html',
     '/tag-doc' => 'tag-doc.html',
@@ -97,6 +97,7 @@ function serveFrontend($filePath, $basePath) {
     $pageRoutes = [
         'index.html'     => $bp . '/',
         'article-list.html' => $bp . '/article-list',
+        'list.html' => $bp . '/article-list',
         'drone-list.html' => $bp . '/drone-list',
         'software-list.html' => $bp . '/software-list',
         'tag-doc.html' => $bp . '/tag-doc',
