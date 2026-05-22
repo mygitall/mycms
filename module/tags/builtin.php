@@ -91,28 +91,18 @@ function tag_loop_columns($attrs) {
         $stmt->execute(array(':pid' => $pid));
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         // 模板名 → 路由映射
-        $templateRoutes = array(
-            'list.html'           => '/article-list',
-            'software-list.html'  => '/software-list',
-            'index.html'          => '/',
-            'detail.html'         => '/detail',
-            'search.html'         => '/search',
-        );
         foreach ($list as &$item) {
             if ($item['type'] === 'link') {
-                // 外链：用 url 字段，如果以 / 开头则补全域名
                 $item['url'] = $item['url'];
                 if ($item['url'] !== '' && $item['url'][0] === '/') {
                     $item['url'] = getBaseUrl() . $item['url'];
                 }
             } elseif ($item['type'] === 'page') {
-                // 单页
                 $item['url'] = getBaseUrl() . '/page/' . $item['id'];
-            } elseif ($item['template'] !== '' && isset($templateRoutes[$item['template']])) {
-                // 列表页 + 指定了已知模板 → 用模板路由
-                $item['url'] = getBaseUrl() . $templateRoutes[$item['template']];
+            } elseif ($item['template'] !== '' && substr($item['template'], -5) === '.html') {
+                // 模板名 xxx.html → 路由 /xxx
+                $item['url'] = getBaseUrl() . '/' . substr($item['template'], 0, -5);
             } else {
-                // 列表页 默认
                 $item['url'] = getBaseUrl() . '/article-list?col=' . $item['id'];
             }
         }
