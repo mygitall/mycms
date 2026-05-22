@@ -115,6 +115,22 @@ function tag_loop_columns($attrs) {
     }
 }
 
+// ── column_info ──
+TagRegistry::register('column_info', 'tag_column_info', '读取当前栏目的名称和ID（URL参数?col=ID）', 'category');
+
+function tag_column_info($attrs) {
+    $id = isset($_GET['col']) ? (int)$_GET['col'] : 0;
+    if ($id === 0) return '';
+    try {
+        $pdo = getDB();
+        $prefix = DB_PREFIX;
+        $stmt = $pdo->prepare("SELECT id, name FROM `{$prefix}columns` WHERE id = :id LIMIT 1");
+        $stmt->execute(array(':id' => $id));
+        $col = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $col ? htmlspecialchars($col['name'], ENT_QUOTES, 'UTF-8') : '';
+    } catch (Exception $e) { return ''; }
+}
+
 // ── 分类标签 ──
 TagRegistry::register('categories', 'tag_loop_categories', '分类循环。可用变量: [--name--][--url--][--cnt--]', 'category');
 TagRegistry::register('category_nav', 'tag_category_nav', '分类导航直接输出HTML（按文章数降序）', 'category');
@@ -187,6 +203,17 @@ function tag_loop_articles($attrs) {
 
     try {
         $pdo = getDB();
+        // col 参数：自动读取 URL ?col=ID，查栏目名作为分类筛选
+        if (isset($attrs['col'])) {
+            $colId = isset($_GET['col']) ? (int)$_GET['col'] : 0;
+            if ($colId > 0) {
+                $prefix = DB_PREFIX;
+                $stmt = $pdo->prepare("SELECT name FROM `{$prefix}columns` WHERE id = :id LIMIT 1");
+                $stmt->execute(array(':id' => $colId));
+                $colName = $stmt->fetchColumn();
+                if ($colName) $cat = $colName;
+            }
+        }
         $where = "WHERE status = 1 AND deleted_at IS NULL";
         $params = array();
 
