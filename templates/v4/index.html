@@ -1451,9 +1451,9 @@
           <input type="text" placeholder="搜索资讯、软件、电影..." aria-label="搜索">
         </div>
         <div class="nav-right">
-          <a href="#" class="nav-right-link">资讯</a>
-          <a href="#" class="nav-right-link">软件</a>
-          <a href="#" class="nav-right-link">电影</a>
+          [--loop:columns(pid=0)--]
+          <a href="[--url--]" class="nav-right-link">[--name--]</a>
+          [--/loop:columns--]
         </div>
       </div>
       <div class="nav-actions">
@@ -1503,7 +1503,7 @@
 
   <!-- ── Column Navigation ── -->
   <div style="max-width:1280px;margin:0 auto;padding:8px 24px;display:flex;align-items:center;gap:24px;font-size:13px;color:var(--text-2);border-bottom:0.5px solid var(--border)">
-    <span style="font-weight:550;color:var(--text);flex-shrink:0">栏目导航</span>
+    <span style="font-weight:550;color:var(--text);flex-shrink:0">栏目导把航</span>
     <nav style="display:flex;gap:20px;align-items:center" class="column-nav">
       [--column_tree--]
     </nav>
