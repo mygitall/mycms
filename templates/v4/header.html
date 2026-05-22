@@ -1,10 +1,12 @@
-<!-- ── 公共头部（header.html）── -->
+<!-- ═══════════════ 公共头部 header.html（含移动端适配）═══════════════ -->
 <style>
+  /* ── Theme Vars ── */
   :root {
     --bg: #08080b; --surface: rgba(255,255,255,0.025); --surface-hover: rgba(255,255,255,0.035);
     --border: rgba(255,255,255,0.06); --border-h: rgba(255,255,255,0.10);
     --text: #e4e4eb; --text-2: #8b8b96; --text-3: #5c5c66;
     --accent: #7b8cff; --accent-2: #c49bff; --nav-bg: rgba(8,8,11,0.7);
+    --radius: 16px; --radius-sm: 10px; --radius-xs: 6px;
   }
   [data-theme="light"] {
     --bg: #f5f5f7; --surface: rgba(0,0,0,0.02); --surface-hover: rgba(0,0,0,0.03);
@@ -12,21 +14,75 @@
     --text: #1a1a1f; --text-2: #6b6b73; --text-3: #9b9ba3;
     --accent: #5b6cf0; --accent-2: #8b5cf0; --nav-bg: rgba(245,245,247,0.7);
   }
+
+  /* ── Nav ── */
+  .nav{position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:var(--nav-bg);border-bottom:0.5px solid var(--border)}
+  .nav-inner{max-width:1280px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}
+  .nav-logo{font-size:18px;font-weight:650;color:var(--text);text-decoration:none;flex-shrink:0}
+  .nav-logo span{color:var(--accent)}
+  .nav-center{flex:1;display:flex;align-items:center;gap:40px}
+  .nav-search{display:flex;align-items:center;gap:8px;background:var(--surface);border:0.5px solid var(--border);border-radius:100px;padding:7px 16px;width:280px;transition:border-color .3s}
+  .nav-search:focus-within{border-color:var(--border-h)}
+  .nav-search svg{width:14px;height:14px;color:var(--text-3);flex-shrink:0}
+  .nav-search input{background:transparent;border:none;outline:none;font-size:13px;color:var(--text);width:100%;font-family:inherit}
+  .nav-right{display:flex;align-items:center;gap:28px}
+  .nav-right-link{font-size:14px;font-weight:450;color:var(--text-2);text-decoration:none;transition:color .2s}
+  .nav-right-link:hover{color:var(--text)}
+
+  /* ── Theme Toggle ── */
   .theme-toggle{width:36px;height:36px;border-radius:50%;border:0.5px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-2);transition:border-color .3s,background .3s;flex-shrink:0}
   .theme-toggle:hover{border-color:var(--border-h);background:var(--surface-hover)}
   .theme-toggle svg{width:15px;height:15px}
   .icon-moon{display:block}.icon-sun{display:none}
   [data-theme="light"] .icon-moon{display:none}[data-theme="light"] .icon-sun{display:block}
+
+  /* ── Mobile ── */
+  .hamburger{display:none;width:36px;height:36px;border-radius:50%;border:0.5px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;align-items:center;justify-content:center;padding:0}
+  .mobile-search-btn{display:none}
+  .mobile-search-drop{display:none;position:fixed;top:56px;left:0;right:0;z-index:99;backdrop-filter:blur(20px);background:var(--nav-bg);border-bottom:0.5px solid var(--border);padding:12px 16px;transform:translateY(-120%);opacity:0;transition:transform .25s ease,opacity .25s ease;pointer-events:none}
+  .mobile-search-drop.open{transform:translateY(0);opacity:1;pointer-events:auto}
+  .mobile-search-drop-inner{display:flex;align-items:center;gap:10px;background:var(--surface);border:0.5px solid var(--border);border-radius:100px;padding:9px 16px}
+  .mobile-search-drop-inner input{background:transparent;border:none;outline:none;font-size:16px;color:var(--text);width:100%;font-family:inherit}
+  .sidebar-drawer{display:none}
+  .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
+  .sidebar-drawer.open .sidebar-overlay{opacity:1;pointer-events:auto}
+  .sidebar-panel{position:fixed;top:0;left:0;width:280px;height:100vh;background:var(--bg);border-right:0.5px solid var(--border);z-index:201;transform:translateX(-100%);transition:transform .3s ease;display:flex;flex-direction:column}
+  .sidebar-drawer.open .sidebar-panel{transform:translateX(0)}
+  .sidebar-panel-header{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:56px;border-bottom:0.5px solid var(--border);flex-shrink:0}
+  .sidebar-close{width:36px;height:36px;border-radius:50%;border:0.5px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+  .sidebar-nav-mobile{display:flex;flex-direction:column;padding:16px 20px;gap:4px}
+  .sidebar-nav-mobile a{font-size:15px;color:var(--text-2);text-decoration:none;padding:10px 12px;border-radius:8px;transition:color .2s,background .2s}
+  .sidebar-nav-mobile a:hover{color:var(--text);background:var(--surface)}
+
+  @media (max-width:560px){
+    .nav-center{flex:0;padding:0;gap:0}
+    .nav-search{display:none}
+    .nav-inner{position:relative;justify-content:space-between}
+    .nav-logo{position:absolute;left:50%;transform:translateX(-50%)}
+    .nav-right{display:none}
+    .mobile-search-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:0.5px solid var(--border);background:var(--surface);color:var(--text-2);cursor:pointer;flex-shrink:0}
+    .mobile-search-drop{display:block}
+    .hamburger{display:flex}
+    .sidebar-drawer{display:block}
+  }
 </style>
+
+<!-- Desktop Nav -->
 <nav class="nav">
   <div class="nav-inner">
+    <!-- Mobile: search icon -->
+    <button class="mobile-search-btn" id="mobileSearchBtn" aria-label="搜索" onclick="toggleMobileSearch()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px">
+        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </button>
+    <!-- Logo -->
     <a href="/" class="nav-logo">Neo<span>Vision</span></a>
+    <!-- Desktop nav -->
     <div class="nav-center">
       <div class="nav-search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:var(--text-3);flex-shrink:0">
-          <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <input type="text" placeholder="搜索..." style="background:transparent;border:none;outline:none;font-size:13px;color:var(--text);width:100%;font-family:inherit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" placeholder="搜索..." onkeydown="if(event.key==='Enter'){location.href='/search?q='+encodeURIComponent(this.value)}">
       </div>
       <div class="nav-right">
         <a href="/" class="nav-right-link">首页</a>
@@ -35,12 +91,48 @@
         [--/loop:columns--]
       </div>
     </div>
+    <!-- Theme + Hamburger -->
     <button class="theme-toggle" id="themeToggle" aria-label="切换主题" onclick="toggleTheme()">
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
     </button>
+    <button class="hamburger" id="hamburgerBtn" aria-label="打开菜单" onclick="openSidebar()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
   </div>
 </nav>
+
+<!-- Mobile Search Drop -->
+<div class="mobile-search-drop" id="mobileSearchDrop">
+  <div class="mobile-search-drop-inner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;color:var(--text-3);flex-shrink:0"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    <input type="text" placeholder="搜索..." id="mobileSearchInput" onkeydown="if(event.key==='Enter'){location.href='/search?q='+encodeURIComponent(this.value)}">
+  </div>
+</div>
+
+<!-- Mobile Sidebar -->
+<div class="sidebar-drawer" id="sidebarDrawer">
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+  <div class="sidebar-panel">
+    <div class="sidebar-panel-header">
+      <a href="/" class="nav-logo">Neo<span>Vision</span></a>
+      <button class="sidebar-close" onclick="closeSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <nav class="sidebar-nav-mobile">
+      <a href="/">首页</a>
+      [--loop:columns(pid=0)--]
+      <a href="[--url--]">[--name--]</a>
+      [--/loop:columns--]
+      <a href="/article-list">文章列表</a>
+      <a href="/software-list">软件列表</a>
+      <a href="/tag-doc">标签文档</a>
+    </nav>
+  </div>
+</div>
+
+<!-- Theme + Mobile JS -->
 <script>
 (function(){
   var saved = localStorage.getItem('theme');
@@ -52,5 +144,24 @@
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
   };
+  window.toggleMobileSearch = function(){
+    document.getElementById('mobileSearchDrop').classList.toggle('open');
+  };
+  window.openSidebar = function(){
+    document.getElementById('sidebarDrawer').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+  window.closeSidebar = function(){
+    document.getElementById('sidebarDrawer').classList.remove('open');
+    document.body.style.overflow = '';
+  };
+  // Click outside to close mobile search
+  document.addEventListener('click', function(e){
+    var drop = document.getElementById('mobileSearchDrop');
+    var btn = document.getElementById('mobileSearchBtn');
+    if (drop && btn && !drop.contains(e.target) && e.target !== btn && !btn.contains(e.target)){
+      drop.classList.remove('open');
+    }
+  });
 })();
 </script>
