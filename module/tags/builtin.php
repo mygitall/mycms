@@ -136,7 +136,7 @@ function tag_loop_columns($attrs) {
 }
 
 // ── column_info ──
-TagRegistry::register('column_info', 'tag_column_info', '读取当前栏目的名称和ID（URL参数?col=ID）', 'category');
+TagRegistry::register('column_info', 'tag_column_info', '读取当前栏目的名称和ID（URL参数?col=ID）', 'system');
 
 function tag_column_info($attrs) {
     $id = isset($_GET['col']) ? (int)$_GET['col'] : 0;
@@ -217,7 +217,7 @@ function tag_loop_articles($attrs) {
     $sort = isset($attrs['sort']) ? trim($attrs['sort']) : 'created_at';
     $order= isset($attrs['order']) ? trim($attrs['order']) : 'DESC';
 
-    $allowedSort = array('id', 'title', 'view_count', 'published_at', 'created_at');
+    $allowedSort = array('id', 'title', 'view_count', 'published_at', 'created_at', 'updated_at');
     if (!in_array($sort, $allowedSort)) $sort = 'created_at';
     $order = (strtoupper($order) === 'ASC') ? 'ASC' : 'DESC';
 
@@ -275,7 +275,7 @@ function tag_software_list($attrs) {
     try {
         $pdo = getDB();
         $prefix = DB_PREFIX;
-        $sql = "SELECT id, name, description, icon, version, rating
+        $sql = "SELECT id, name, description, version, category_name AS category, view_count, download_count
                 FROM `{$prefix}software`
                 WHERE status = 1
                 ORDER BY created_at DESC
@@ -321,10 +321,10 @@ function tag_category_nav($attrs) {
 
 function tag_search_form($attrs) {
     $action = getBaseUrl() . '/search';
-    return '<form class="tag-search-form" action="' . htmlspecialchars($action, ENT_QUOTES, 'UTF-8') . '" method="GET">' .
-           '<input type="text" name="q" placeholder="搜索文章..." required>' .
-           '<button type="submit">搜索</button>' .
-           '</form>';
+    return '<form class="tag-search-form" action="' . htmlspecialchars($action, ENT_QUOTES, 'UTF-8') . '" method="GET">'
+           . '<input type="text" name="q" placeholder="搜索文章..." required>'
+           . '<button type="submit">搜索</button>'
+           . '</form>';
 }
 
 function tag_breadcrumb($attrs) {
@@ -332,10 +332,11 @@ function tag_breadcrumb($attrs) {
     $segments = array_values(array_filter(explode('/', $uri)));
     $html = '<nav class="tag-breadcrumb"><a href="' . getBaseUrl() . '/">首页</a>';
     $path = '';
+    $base = getBaseUrl();
     foreach ($segments as $seg) {
         $path .= '/' . $seg;
         $label = htmlspecialchars(urldecode($seg), ENT_QUOTES, 'UTF-8');
-        $html .= ' / <a href="' . $path . '">' . $label . '</a>';
+        $html .= ' / <a href="' . htmlspecialchars($base . $path, ENT_QUOTES, 'UTF-8') . '">' . $label . '</a>';
     }
     $html .= '</nav>';
     return $html;
@@ -422,15 +423,15 @@ function tag_article_detail($attrs) {
 
     try {
         $pdo = getDB();
-        $stmt = $pdo->prepare("SELECT * FROM articles WHERE id = :id AND status = 1 AND deleted_at IS NULL LIMIT 1");
+        $stmt = $pdo->prepare("SELECT id, title, content, category, tags, cover_image, view_count, author_name, published_at, created_at FROM articles WHERE id = :id AND status = 1 AND deleted_at IS NULL LIMIT 1");
         $stmt->execute(array(':id' => $id));
         $a = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$a) return '<!-- article_detail: 文章不存在 -->';
+        if (!$a) return array();
 
         $a['url']      = getArticleUrl($a['id']);
         $a['summary']  = mb_substr(strip_tags((string)$a['content']), 0, 200);
         $a['full_date'] = $a['published_at'] ?: $a['created_at'];
-        return $a;
+        return array($a);
     } catch (Exception $e) {
         return '<!-- article_detail: 数据加载失败 -->';
     }
@@ -590,7 +591,10 @@ function buildColumnTreeHtml($rows, $parentId, $class) {
 // ─── 工具函数 ────────────────────────────────
 
 function getBaseUrl() {
-    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+            || (isset($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on');
+    $scheme = $isHttps ? 'https' : 'http';
     $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
     $base = defined('BASE_PATH') ? rtrim(BASE_PATH, '/') : '';
     return $scheme . '://' . $host . $base;

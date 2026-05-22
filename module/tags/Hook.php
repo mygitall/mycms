@@ -67,7 +67,7 @@ class TagHook
         $err = @include $tmpFile;
         if ($err === false) {
             $errMsg = error_get_last();
-            error_log('[TagHook] 执行缓存失败: ' . ($errMsg['message'] ?? 'unknown'));
+            error_log('[TagHook] 执行缓存失败: ' . (isset($errMsg['message']) ? $errMsg['message'] : 'unknown'));
         }
         $output = ob_get_clean();
         @unlink($tmpFile);

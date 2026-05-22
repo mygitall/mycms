@@ -128,6 +128,7 @@ class TagRegistry
             'config'       => '[--config(key=site_name)--]',
             'search_form'  => '[--search_form--]',
             'login_form'   => '[--login_form--]',
+            'include'      => '[--include(name=header)--] 引入公共模板，也可 [--include(name=footer)--]',
             // 内容标签 - 文章
             'articles'         => '[--loop:articles(num=10)--]<a href="[--url--]">[--title--]</a>[--/loop:articles--]',
             'article_list'     => '[--article_list(num=10)--] 或 [--article_list(num=5,cat=科技,sort=view_count)--]',
@@ -136,13 +137,17 @@ class TagRegistry
             // 内容标签 - 软件
             'software'      => '[--loop:software(num=20)--]<div><strong>[--name--]</strong> v[--version--] [--category--]</div>[--/loop:software--]',
             'software_list' => '[--software_list(num=6)--]',
+            'software_detail' => '[--loop:software_detail--]<h1>[--name--]</h1><div>[--description--]</div>[--/loop:software_detail--]',
             // 分类标签
             'categories'   => '[--loop:categories--]<a href="[--url--]">[--name--]（[--cnt--]篇）</a>[--/loop:categories--]',
             'category_nav' => '[--category_nav--]',
+            'columns'      => '[--loop:columns(pid=0)--]<a href="[--url--]">[--name--]</a>[--/loop:columns--]',
+            'column_info'  => '[--column_info--] 读取URL参数?col=ID对应的栏目名',
             // 导航标签
             'breadcrumb' => '[--breadcrumb--]',
             'pagination' => '[--pagination(total=50,per_page=10,page=1,url=?page=)--]',
             'carousel'   => '[--carousel(num=5)--]',
+            'column_tree' => '[--column_tree--] 或 [--column_tree(pid=0)--] 自动递归所有层级',
         );
 
         return isset($syntaxes[$name]) ? $syntaxes[$name] : '[--' . $name . '--]';

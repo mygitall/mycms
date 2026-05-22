@@ -106,29 +106,31 @@ class TagCache
         $cacheFile = self::cacheFile($templatePath);
         $metaFile  = self::metaFile($templatePath);
 
-        // flock 并发保护
-        $fp = @fopen($cacheFile, 'c+');
-        if ($fp && @flock($fp, LOCK_EX)) {
-            @ftruncate($fp, 0);
-            @rewind($fp);
-            @fwrite($fp, $compiledCode);
-            @flock($fp, LOCK_UN);
-            @fclose($fp);
-        } else {
-            @file_put_contents($cacheFile, $compiledCode);
-        }
-
-        // 保存模板 mtime + 处理器文件 mtime
+        // 构建 meta 数据
         $handlerFiles = array(__DIR__ . '/builtin.php', __DIR__ . '/Registry.php');
         $handlerMtime = 0;
         foreach ($handlerFiles as $f) {
             $mt = @filemtime($f);
             if ($mt > $handlerMtime) $handlerMtime = $mt;
         }
-        @file_put_contents($metaFile, serialize(array(
+        $metaData = serialize(array(
             'template_mtime' => @filemtime($templatePath),
             'handler_mtime'  => $handlerMtime,
-        )));
+        ));
+
+        // flock 并发保护：cache + meta 在同一锁内写入
+        $fp = @fopen($cacheFile, 'c+');
+        if ($fp && @flock($fp, LOCK_EX)) {
+            @ftruncate($fp, 0);
+            @rewind($fp);
+            @fwrite($fp, $compiledCode);
+            @file_put_contents($metaFile, $metaData);
+            @flock($fp, LOCK_UN);
+            @fclose($fp);
+        } else {
+            @file_put_contents($cacheFile, $compiledCode);
+            @file_put_contents($metaFile, $metaData);
+        }
     }
 
     /**

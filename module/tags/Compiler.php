@@ -13,6 +13,7 @@ class TagCompiler
      */
     public static function compile($astNodes)
     {
+        self::$depth = 0;
         $code = '';
         foreach ($astNodes as $node) {
             $code .= self::compileNode($node);
@@ -132,6 +133,11 @@ PHP;
 
         if ($node['type'] === TagParser::TAG) {
             $name = $node['name'];
+            // HTML 内容字段不转义（content/description/download_urls）
+            $htmlFields = array('content', 'description', 'download_urls');
+            if (in_array($name, $htmlFields)) {
+                return "if (isset({$itemVar}['{$name}'])) { echo {$itemVar}['{$name}']; }\n";
+            }
             return "if (isset({$itemVar}['{$name}'])) { echo htmlspecialchars({$itemVar}['{$name}'], ENT_QUOTES, 'UTF-8'); }\n";
         }
 
