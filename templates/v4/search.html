@@ -48,17 +48,11 @@
 (function(){
   var bp = window.__BASE_PATH__ || '';
   var API = bp + '/search/api/list.php';
-
-  // Read ?q= from URL
-  var params = new URLSearchParams(location.search);
-  var q = params.get('q') || '';
   var el = document.getElementById('q');
-  if (q) { el.value = q; doSearch(); }
 
-  window.doSearch = function(){
+  function doSearch(){
     var kw = el.value.trim();
     if (!kw) return;
-    // Update URL without reload
     history.replaceState(null,'','?q='+encodeURIComponent(kw));
     var load = document.getElementById('loading');
     var res = document.getElementById('results');
@@ -78,14 +72,15 @@
       var html = '<p style="font-size:13px;color:var(--text-3);margin-bottom:16px">找到 '+d.data.total+' 条结果</p>';
       items.forEach(function(r){
         var title = r.title || r.name || '';
-        var titleH = title.replace(new RegExp('('+kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<em>$1</em>');
+        var kwEsc = kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+        var titleH = title.replace(new RegExp('('+kwEsc+')','gi'),'<em>$1</em>');
         var url = r.url || (r.type==='software' ? (bp+'/software/p/'+r.id) : (bp+'/article/p/'+r.id));
-        var desc = (r.desc || r.summary || '').substring(0,150);
+        var desc = (r.content || r.subtitle || '').substring(0,150);
         html += '<a href="'+url+'" class="result-item">'
           +'<div class="url">'+url+'</div>'
           +'<h3>'+titleH+'</h3>'
           +'<div class="desc">'+desc+'</div>'
-          +'<div class="result-meta">'+ (r.source||r.type||'') +'</div>'
+          +'<div class="result-meta">'+ (r.subtitle||r.type||'') +'</div>'
           +'</a>';
       });
       res.innerHTML = html;
@@ -93,7 +88,14 @@
       load.style.display = 'none';
       res.innerHTML = '<div class="empty-state"><h2>搜索失败</h2><p>请稍后重试</p></div>';
     });
-  };
+  }
+
+  window.doSearch = doSearch;
+
+  // Read ?q= from URL and auto-search
+  var params = new URLSearchParams(location.search);
+  var q = params.get('q') || '';
+  if (q) { el.value = q; doSearch(); }
 })();
 </script>
 
