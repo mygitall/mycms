@@ -39,6 +39,17 @@ if ($action === 'list') {
     jsonResponse(0, 'success', array('tree' => $tree, 'flat' => $all));
 }
 
+// ── 获取栏目名列表（供下拉选择用）──
+if ($action === 'names') {
+    $stmt = $pdo->query("SELECT id, parent_id, name FROM `{$prefix}columns` ORDER BY parent_id ASC, sort_order ASC, id ASC");
+    $all = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // 构建带层级前缀的列表
+    $tree = buildColumnTree($all, 0);
+    $flat = array();
+    flattenColumnNames($tree, '', $flat);
+    jsonResponse(0, 'success', $flat);
+}
+
 // ── 新增栏目 ──
 if ($action === 'create') {
     $parentId  = isset($input['parent_id'])  ? (int)$input['parent_id']  : 0;
@@ -140,6 +151,20 @@ if ($action === 'delete') {
 }
 
 jsonResponse(400, '未知操作: ' . $action, null);
+
+// ── 工具函数：构建栏目名平铺列表 ──
+function flattenColumnNames($tree, $prefix, &$result) {
+    foreach ($tree as $col) {
+        $result[] = array(
+            'id'   => (int)$col['id'],
+            'name' => $col['name'],
+            'label'=> $prefix . $col['name'],
+        );
+        if (!empty($col['children'])) {
+            flattenColumnNames($col['children'], $prefix . '　├ ', $result);
+        }
+    }
+}
 
 // ── 工具函数：构建栏目树 ──
 function buildColumnTree($rows, $parentId) {

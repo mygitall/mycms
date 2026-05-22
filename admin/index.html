@@ -2640,9 +2640,10 @@
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
               <div class="form-group">
-                <label class="form-label">分类</label>
-                <input type="text" id="article-category" class="form-input" placeholder="如：技术随笔" list="article-category-list">
-                <datalist id="article-category-list"></datalist>
+                <label class="form-label">所属栏目</label>
+                <select id="article-category" class="form-input" style="padding:10px 14px">
+                  <option value="">不归属任何栏目</option>
+                </select>
               </div>
               <div class="form-group">
                 <label class="form-label">标签</label>
@@ -7960,6 +7961,35 @@ if (response.code == 401) {
               }
             })();
 
+            let columnOptionsLoaded = false;
+            let columnOptionsList = [];
+
+            function loadColumnOptions() {
+              const sel = $('article-category');
+              if (!sel) return;
+              if (columnOptionsLoaded) {
+                setCategoryValue(sel);
+                return;
+              }
+              apiCall(COLUMNS_API, { action: 'names' }).then(res => {
+                if (res.code === 0 && Array.isArray(res.data)) {
+                  columnOptionsList = res.data;
+                  columnOptionsLoaded = true;
+                  sel.innerHTML = '<option value="">不归属任何栏目</option>';
+                  columnOptionsList.forEach(c => {
+                    sel.innerHTML += '<option value="' + escapeHtml(c.name) + '">' + escapeHtml(c.label) + '</option>';
+                  });
+                  setCategoryValue(sel);
+                }
+              });
+            }
+
+            function setCategoryValue(sel) {
+              if (articleEditTarget && articleEditTarget.category) {
+                sel.value = articleEditTarget.category;
+              }
+            }
+
             function openArticleAddModal() {
               articleEditTarget = null;
               $('article-modal-title').textContent    = '新增文章';
@@ -7979,6 +8009,7 @@ if (response.code == 401) {
                 now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate()) + 'T' + pad(now.getHours()) + ':' + pad(now.getMinutes());
               $('article-cover-preview').style.display = 'none';
               clearArticleFormErrors();
+              loadColumnOptions();
               $('article-table-card').style.display = 'none';
               $('article-form-card').classList.add('show');
             }
@@ -8034,6 +8065,7 @@ if (response.code == 401) {
               }
 
               clearArticleFormErrors();
+              loadColumnOptions();
               $('article-table-card').style.display = 'none';
               $('article-form-card').classList.add('show');
             }
