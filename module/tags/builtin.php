@@ -99,9 +99,11 @@ function tag_loop_columns($attrs) {
                 }
             } elseif ($item['type'] === 'page') {
                 $item['url'] = getBaseUrl() . '/page/' . $item['id'];
-            } elseif ($item['template'] !== '' && substr($item['template'], -5) === '.html') {
-                // 模板名 xxx.html → 路由 /xxx
-                $item['url'] = getBaseUrl() . '/' . substr($item['template'], 0, -5);
+            } elseif ($item['template'] !== '') {
+                // 模板名自动纠错：/xxx /xxx.html xxx → 统一为 /xxx
+                $tpl = trim($item['template'], '/');
+                if (substr($tpl, -5) === '.html') $tpl = substr($tpl, 0, -5);
+                $item['url'] = getBaseUrl() . '/' . $tpl;
             } else {
                 $item['url'] = getBaseUrl() . '/article-list?col=' . $item['id'];
             }
