@@ -41,7 +41,7 @@ $knownRouteNames = ['api', 'article', 'search', 'admin', 'storage', 'install',
     'templates', 'frontend', 'config', 'wen', 'software', 'includes',
     'performance', 'index.php', 'login.php', 'admin.php', 'article.php',
     'reset_admin.php', 'reset_all.php', 'clear_ban.php', 'config.php', 'monitor.html',
-    'favorites', 'article-list', 'list', 'software-list', 'tag-doc', 'detail', 'login'];
+    'favorites', 'article-list', 'software-list', 'tag-doc', 'detail', 'login'];
 if ($firstUriSeg !== '' && !in_array($firstUriSeg, $knownRouteNames, true)
     && ($scriptDir === '.' || $scriptDir === '/')) {
     $BASE_PATH = '/' . $firstUriSeg;
@@ -64,7 +64,6 @@ if ($path === '') {
 $frontendRoutes = [
     '/'      => 'index.html',
     '/article-list' => 'list.html',
-    '/list'  => 'list.html',
     '/software-list' => 'software-list.html',
     '/tag-doc' => 'tag-doc.html',
     '/detail'=> 'detail.html',
@@ -92,7 +91,6 @@ function serveFrontend($filePath, $basePath) {
     $pageRoutes = [
         'index.html'     => $bp . '/',
         'article-list.html' => $bp . '/article-list',
-        'list.html'      => $bp . '/list',
         'software-list.html' => $bp . '/software-list',
         'tag-doc.html' => $bp . '/tag-doc',
         'detail.html'    => $bp . '/detail',

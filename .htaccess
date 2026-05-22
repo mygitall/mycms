@@ -6,7 +6,6 @@ DirectorySlash Off
 # 前台路由精确匹配
 RewriteRule ^search$ index.php [L,QSA]
 RewriteRule ^article-list$ index.php [L,QSA]
-RewriteRule ^list$ index.php [L,QSA]
 RewriteRule ^software-list$ index.php [L,QSA]
 RewriteRule ^tag-doc$ index.php [L,QSA]
 RewriteRule ^detail$ index.php [L,QSA]
