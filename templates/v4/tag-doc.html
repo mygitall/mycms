@@ -72,6 +72,8 @@
   <a href="#cat-system">系统标签</a>
   <a href="#cat-content">内容标签</a>
   <a href="#cat-category">分类标签</a>
+  <a href="#cat-category">分类标签</a>
+  <a href="#cat-column">栏目标签</a>
   <a href="#cat-navigation">导航标签</a>
 </div>
 
@@ -284,6 +286,36 @@
 </div>
 
 <!-- ═══════════════════ 导航标签 ═══════════════════ -->
+<!-- ═══════════════════ 栏目标签 ═══════════════════ -->
+<h2 id="cat-column">栏目标签</h2>
+
+<div class="tag-block">
+  <div class="tag-name">columns — 栏目列表循环</div>
+  <div class="tag-syntax">&#91;--loop:columns(pid=0)--&#93;
+  &lt;a href="&#91;--url--&#93;"&gt;&#91;--name--&#93;&lt;/a&gt;
+  &lt;span&gt;&#91;--type--&#93;&lt;/span&gt;
+&#91;--/loop:columns--&#93;</div>
+  <div class="tag-desc">遍历指定父栏目下的子栏目。pid=0 为顶级栏目，pid=栏目ID 为该栏目下的子栏目。不自动递归。</div>
+  <div class="tag-params"><b>参数：</b>pid=父栏目ID（默认0=顶级）</div>
+  <div class="tag-vars"><b>可用变量：</b>
+    <code>&#91;--id--&#93;</code> 栏目ID &nbsp;
+    <code>&#91;--name--&#93;</code> 栏目名称 &nbsp;
+    <code>&#91;--url--&#93;</code> 栏目链接 &nbsp;
+    <code>&#91;--type--&#93;</code> 类型(list/page/link) &nbsp;
+    <code>&#91;--parent_id--&#93;</code> 父栏目ID
+  </div>
+</div>
+
+<div class="tag-block">
+  <div class="tag-name">column_tree — 栏目树（自动递归所有层级）</div>
+  <div class="tag-syntax">&#91;--column_tree--&#93;
+&#91;--column_tree(pid=0)--&#93;
+&#91;--column_tree(pid=0,class=nav-list)--&#93;</div>
+  <div class="tag-desc">自动递归渲染完整栏目树（含所有子栏目）。输出 &lt;ul&gt;&lt;li&gt; 结构的HTML。适合导航菜单。</div>
+  <div class="tag-params"><b>参数：</b>pid=起始父ID(默认0=顶级) class=ul的CSS类名</div>
+</div>
+
+
 <h2 id="cat-navigation">导航标签</h2>
 
 <div class="tag-block">
