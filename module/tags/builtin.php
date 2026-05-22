@@ -93,8 +93,8 @@ function tag_loop_columns($attrs) {
         foreach ($list as &$item) {
             if ($item['type'] === 'link') {
                 $item['url'] = $item['url'];
-            } elseif ($item['template']) {
-                $item['url'] = getBaseUrl() . '/' . $item['template'];
+            } elseif ($item['type'] === 'page') {
+                $item['url'] = getBaseUrl() . '/page/' . $item['id'];
             } else {
                 $item['url'] = getBaseUrl() . '/list?col=' . $item['id'];
             }
