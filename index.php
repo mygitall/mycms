@@ -384,6 +384,20 @@ if (str_starts_with($path, $searchPrefix1) || str_starts_with($path, $searchPref
     exit;
 }
 
+// ── 动态模板匹配：/xxx → templates/{active}/xxx.html ─────────
+// 栏目绑定了自定义模板后自动生效，无需手动加路由
+$cleanPath = trim($path, '/');
+if ($cleanPath !== '' && preg_match('/^[a-zA-Z0-9_-]+$/', $cleanPath)) {
+    $activeTemplate = getActiveTemplate();
+    $dynFile = __DIR__ . '/templates/' . $activeTemplate . '/' . $cleanPath . '.html';
+    if (!is_file($dynFile)) {
+        $dynFile = __DIR__ . '/frontend/' . $cleanPath . '.html';
+    }
+    if (is_file($dynFile)) {
+        serveFrontend($dynFile, $BASE_PATH);
+    }
+}
+
 // ── 其他路径 → 404 ──────────────────────────────────────────────
 http_response_code(404);
 header('Content-Type: text/html; charset=utf-8');
