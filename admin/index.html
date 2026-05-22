@@ -4595,30 +4595,86 @@ if (response.code == 401) {
           </div>
         </div>
 
-        <!-- 系统配置表 -->
+        <!-- 栏目管理 -->
         <div class="table-card" style="margin-top:16px">
           <div class="table-header">
-            <span class="table-title">系统配置</span>
-            <span style="font-size:12px;color:var(--text-muted)">管理网站全局参数</span>
+            <span class="table-title">栏目管理</span>
+            <span style="font-size:12px;color:var(--text-muted)">管理系统栏目（列表页/单页/外链）</span>
+            <button class="btn btn-primary" onclick="openColumnAddModal(0)" style="width:auto;padding:6px 14px;font-size:12px;margin-left:auto">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:13px;height:13px">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              增加栏目
+            </button>
           </div>
           <table>
             <thead>
               <tr>
-                <th style="width:200px">参数名</th>
-                <th>参数值</th>
-                <th style="width:160px">说明</th>
-                <th style="width:100px">状态</th>
-                <th style="width:80px">操作</th>
+                <th style="width:70px">ID</th>
+                <th>栏目名称</th>
+                <th style="width:90px">类型</th>
+                <th style="width:140px">模板</th>
+                <th style="width:70px">排序</th>
+                <th style="width:120px">操作</th>
               </tr>
             </thead>
-            <tbody id="st-table-body">
-              <tr>
-                <td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">参数设置功能开发中…</td>
-              </tr>
+            <tbody id="column-table-body">
+              <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">加载中…</td></tr>
             </tbody>
           </table>
         </div>
       </div><!-- /page-settings -->
+
+      <!-- ═══ 栏目编辑弹窗 ═══ -->
+      <div class="modal-overlay" id="column-modal" style="display:none" onclick="if(event.target===this)closeColumnModal()">
+        <div class="modal" style="max-width:480px">
+          <div class="modal-header">
+            <h3 id="column-modal-title">新增栏目</h3>
+            <button class="modal-close" onclick="closeColumnModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="col-id">
+            <div class="form-group">
+              <label class="form-label">上级栏目</label>
+              <select id="col-parent-id" class="form-input" style="padding:10px 14px">
+                <option value="0">顶级栏目</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">栏目名称 *</label>
+              <input type="text" id="col-name" class="form-input" placeholder="请输入栏目名称" maxlength="100">
+              <p class="form-error" id="col-err-name">名称不能为空</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">栏目类型</label>
+              <select id="col-type" class="form-input" style="padding:10px 14px" onchange="onColTypeChange()">
+                <option value="list">列表页</option>
+                <option value="page">单页</option>
+                <option value="link">外链</option>
+              </select>
+            </div>
+            <div class="form-group" id="col-tpl-group">
+              <label class="form-label">绑定模板</label>
+              <input type="text" id="col-template" class="form-input" placeholder="如 list.html（留空自动匹配）">
+            </div>
+            <div class="form-group" id="col-url-group" style="display:none">
+              <label class="form-label">外链URL</label>
+              <input type="text" id="col-url" class="form-input" placeholder="https://...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">排序</label>
+              <input type="number" id="col-sort-order" class="form-input" value="0" min="0" style="width:120px">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeColumnModal()">取消</button>
+            <button class="btn btn-primary" onclick="submitColumnForm()" id="col-submit-btn">
+              <span class="spinner" style="display:none"></span>
+              <span class="btn-text">保存</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- ═══ PAGE: 占位符标签参考 ═══ -->
       <div class="page" id="page-tags" style="display:none">
@@ -7141,7 +7197,7 @@ if (response.code == 401) {
               migrate:   { title: '迁移与备份', subtitle: '数据库完整备份 · 一键迁移到新服务器' },
               software:  { title: '软件管理', subtitle: '管理系统内的所有软件资源' },
               search:    { title: '搜索管理', subtitle: '全站搜索历史记录与热词统计' },
-              settings:  { title: '参数设置', subtitle: '管理网站全局系统配置参数' },
+              settings:  { title: '参数设置', subtitle: '前台模板切换 · 栏目管理' },
               tags:      { title: '占位符标签参考', subtitle: '模板标签语法说明 · 服务端动态渲染' },
             };
 
@@ -7202,6 +7258,7 @@ if (response.code == 401) {
                 }
                 if (page === 'settings') {
                   loadTemplateSettings();
+                  loadColumns();
                 }
                 if (page === 'tags') {
                   loadTagReference();
@@ -7280,6 +7337,173 @@ if (response.code == 401) {
               }).catch(() => {
                 toast('网络错误', 'error');
               });
+            }
+
+            // ══════════════════════════════════════════
+            // 栏目管理
+            // ══════════════════════════════════════════
+            const COLUMNS_API = API_BASE + '/admin/api/columns.php';
+            let colEditTarget = null;
+            let colFlatList = [];
+
+            function loadColumns() {
+              const tbody = $('column-table-body');
+              if (!tbody) return;
+              tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">加载中…</td></tr>';
+              apiCall(COLUMNS_API, { action: 'list' }).then(res => {
+                if (res.code === 0 && res.data) {
+                  colFlatList = res.data.flat || [];
+                  renderColumnTree(res.data.tree || [], tbody, 0);
+                }
+              }).catch(() => {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--danger)">加载失败</td></tr>';
+              });
+            }
+
+            function renderColumnTree(tree, tbody, depth) {
+              tree.forEach(col => {
+                const indent = '　'.repeat(depth);
+                const typeLabel = { list: '列表页', page: '单页', link: '外链' }[col.type] || col.type;
+                const typeCls = col.type === 'link' ? 'color:#e0a870' : (col.type === 'page' ? 'color:#6ecf8a' : '');
+                const row = document.createElement('tr');
+                row.style.borderBottom = '1px solid var(--border)';
+                row.innerHTML =
+                  '<td style="font-size:12px;color:var(--text-muted)">' + col.id + '</td>' +
+                  '<td style="font-weight:' + (depth === 0 ? '600' : '400') + '">' + indent + '├ ' + escapeHtml(col.name) + '</td>' +
+                  '<td><span style="font-size:12px;' + typeCls + '">' + typeLabel + '</span></td>' +
+                  '<td style="font-size:12px;color:var(--text-muted)">' + escapeHtml(col.template || '—') + '</td>' +
+                  '<td style="font-size:12px;color:var(--text-muted)">' + col.sort_order + '</td>' +
+                  '<td>' +
+                    '<button class="btn-filter" onclick="openColumnAddModal(' + col.id + ')" title="添加子栏目" style="font-size:11px;padding:3px 8px">+子</button> ' +
+                    '<button class="btn-filter" onclick="openColumnEditModal(' + col.id + ')" title="编辑" style="font-size:11px;padding:3px 8px">编辑</button> ' +
+                    '<button class="btn-filter" onclick="deleteColumn(' + col.id + ')" title="删除" style="font-size:11px;padding:3px 8px;color:var(--danger)">删除</button>' +
+                  '</td>';
+                tbody.appendChild(row);
+
+                if (col.children && col.children.length > 0) {
+                  renderColumnTree(col.children, tbody, depth + 1);
+                }
+              });
+            }
+
+            function buildColParentOptions() {
+              const sel = $('col-parent-id');
+              sel.innerHTML = '<option value="0">顶级栏目</option>';
+              function addOpts(items, depth) {
+                items.forEach(c => {
+                  // 编辑时排除自身和子栏目
+                  if (colEditTarget && (c.id === colEditTarget.id)) return;
+                  const indent = '　'.repeat(depth);
+                  sel.innerHTML += '<option value="' + c.id + '">' + indent + '├ ' + escapeHtml(c.name) + '</option>';
+                  if (c.children) addOpts(c.children, depth + 1);
+                });
+              }
+              // 从 flatList 构建简单树
+              const roots = colFlatList.filter(c => c.parent_id == 0);
+              addOpts(roots, 0);
+              if (colEditTarget && colEditTarget.parent_id) {
+                sel.value = colEditTarget.parent_id;
+              }
+            }
+
+            function openColumnAddModal(parentId) {
+              colEditTarget = null;
+              $('column-modal-title').textContent = parentId === 0 ? '新增顶级栏目' : '新增子栏目';
+              $('col-id').value = '';
+              $('col-name').value = '';
+              $('col-type').value = 'list';
+              $('col-template').value = '';
+              $('col-url').value = '';
+              $('col-sort-order').value = '0';
+              $('col-url-group').style.display = 'none';
+              $('col-tpl-group').style.display = '';
+              $('col-err-name').classList.remove('show');
+              $('col-name').classList.remove('error');
+              buildColParentOptions();
+              $('col-parent-id').value = parentId;
+              $('column-modal').style.display = 'flex';
+            }
+
+            function openColumnEditModal(id) {
+              const col = colFlatList.find(c => c.id === id);
+              if (!col) return;
+              colEditTarget = col;
+              $('column-modal-title').textContent = '编辑栏目';
+              $('col-id').value = col.id;
+              $('col-name').value = col.name;
+              $('col-type').value = col.type;
+              $('col-template').value = col.template || '';
+              $('col-url').value = col.url || '';
+              $('col-sort-order').value = col.sort_order;
+              $('col-err-name').classList.remove('show');
+              $('col-name').classList.remove('error');
+              onColTypeChange();
+              buildColParentOptions();
+              $('column-modal').style.display = 'flex';
+            }
+
+            function closeColumnModal() {
+              $('column-modal').style.display = 'none';
+              colEditTarget = null;
+            }
+
+            function onColTypeChange() {
+              const t = $('col-type').value;
+              $('col-tpl-group').style.display = (t === 'link') ? 'none' : '';
+              $('col-url-group').style.display = (t === 'link') ? '' : 'none';
+            }
+
+            function submitColumnForm() {
+              const name = $('col-name').value.trim();
+              if (!name) {
+                $('col-name').classList.add('error');
+                $('col-err-name').classList.add('show');
+                return;
+              }
+              const id = $('col-id').value;
+              const action = id ? 'update' : 'create';
+              const data = {
+                action: action,
+                id: id ? parseInt(id) : undefined,
+                parent_id: parseInt($('col-parent-id').value),
+                name: name,
+                type: $('col-type').value,
+                template: $('col-template').value.trim(),
+                url: $('col-url').value.trim(),
+                sort_order: parseInt($('col-sort-order').value) || 0
+              };
+              if (!id) delete data.id;
+
+              const btn = $('col-submit-btn');
+              btn.disabled = true;
+              btn.querySelector('.spinner').style.display = 'inline-block';
+              btn.querySelector('.btn-text').textContent = '保存中…';
+
+              apiCall(COLUMNS_API, data).then(res => {
+                if (res.code === 0) {
+                  toast(res.msg || '保存成功', 'success');
+                  closeColumnModal();
+                  loadColumns();
+                } else {
+                  toast(res.msg || '操作失败', 'error');
+                }
+              }).catch(() => toast('网络错误', 'error')).finally(() => {
+                btn.disabled = false;
+                btn.querySelector('.spinner').style.display = 'none';
+                btn.querySelector('.btn-text').textContent = '保存';
+              });
+            }
+
+            function deleteColumn(id) {
+              if (!confirm('确定删除该栏目吗？如有子栏目请先删除子栏目。')) return;
+              apiCall(COLUMNS_API, { action: 'delete', id: id }).then(res => {
+                if (res.code === 0) {
+                  toast('已删除', 'success');
+                  loadColumns();
+                } else {
+                  toast(res.msg || '删除失败', 'error');
+                }
+              }).catch(() => toast('网络错误', 'error'));
             }
 
             // ══════════════════════════════════════════

@@ -275,6 +275,22 @@ function initDatabase($pdo) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统配置表'";
     $pdo->exec($sql);
 
+    // 创建栏目表（如不存在）
+    $sql = "CREATE TABLE IF NOT EXISTS `{$prefix}columns` (
+        `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        `parent_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '父栏目ID（0=顶级栏目）',
+        `name` VARCHAR(100) NOT NULL COMMENT '栏目名称',
+        `type` VARCHAR(20) NOT NULL DEFAULT 'list' COMMENT '栏目类型：list=列表页 page=单页 link=外链',
+        `template` VARCHAR(100) DEFAULT '' COMMENT '绑定的模板文件',
+        `url` VARCHAR(500) DEFAULT '' COMMENT '外链URL（type=link时使用）',
+        `sort_order` INT NOT NULL DEFAULT 0 COMMENT '排序（越小越靠前）',
+        `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX `idx_parent` (`parent_id`),
+        INDEX `idx_sort` (`sort_order`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='栏目表'";
+    $pdo->exec($sql);
+
     // 初始化默认模板设置
     $check = $pdo->query("SELECT 1 FROM `{$prefix}config` WHERE config_key = 'frontend_template' LIMIT 1");
     if ($check->rowCount() === 0) {

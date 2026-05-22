@@ -79,6 +79,33 @@ function tag_software_detail($attrs) {
     }
 }
 
+// ── 栏目标签 ──
+TagRegistry::register('columns', 'tag_loop_columns', '栏目循环（树形）。参数: pid=父栏目ID(默认0=顶级)。可用变量: [--id--][--name--][--url--][--type--]', 'category');
+
+function tag_loop_columns($attrs) {
+    $pid = isset($attrs['pid']) ? (int)$attrs['pid'] : 0;
+    try {
+        $pdo = getDB();
+        $prefix = DB_PREFIX;
+        $stmt = $pdo->prepare("SELECT id, parent_id, name, type, template, url, sort_order FROM `{$prefix}columns` WHERE parent_id = :pid ORDER BY sort_order ASC, id ASC");
+        $stmt->execute(array(':pid' => $pid));
+        $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($list as &$item) {
+            if ($item['type'] === 'link') {
+                $item['url'] = $item['url'];
+            } elseif ($item['template']) {
+                $item['url'] = getBaseUrl() . '/' . $item['template'];
+            } else {
+                $item['url'] = getBaseUrl() . '/list?col=' . $item['id'];
+            }
+        }
+        unset($item);
+        return $list;
+    } catch (Exception $e) {
+        return array();
+    }
+}
+
 // ── 分类标签 ──
 TagRegistry::register('categories', 'tag_loop_categories', '分类循环。可用变量: [--name--][--url--][--cnt--]', 'category');
 TagRegistry::register('category_nav', 'tag_category_nav', '分类导航直接输出HTML（按文章数降序）', 'category');
