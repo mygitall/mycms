@@ -2,135 +2,135 @@
 <html lang="zh-CN" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>[--site_name--] · 科技资讯与软件精选平台</title>
 </head>
 <body>
 [--include(name=header)--]
 
-<main class="page">
-  <!-- ═══════════ Top Grid: Hero + Today Focus ═══════════ -->
-  <section class="top-grid">
-    <article class="card hero">
-      <div class="hero-content">
-        <div class="badge">瀑布流内容墙</div>
+<main class="nova-page">
+  <section class="nova-top">
+    <article class="nova-card nova-hero">
+      <div class="nova-hero-copy">
+        <div class="nova-badge"><span></span> V1 Masonry Editorial</div>
         <h1>发布流式<span>内容墙</span><br>让信息呈现更自然</h1>
-        <p>支持多高度内容卡片自由排布，优化阅读节奏，<br>让优质内容被更多人发现。</p>
-        <div class="hero-buttons">
-          <button class="read" onclick="location.href='/article-list'">立即阅读</button>
-          <button class="more" onclick="location.href='/software-list'">了解更多</button>
+        <p>支持多高度内容卡片自由排布，优化阅读节奏，让优质内容被更多人发现。</p>
+        <div class="nova-actions">
+          <a class="primary" href="/article-list">立即阅读</a>
+          <a href="/software-list">了解更多</a>
         </div>
       </div>
-      <div class="hero-art"><svg viewBox="0 0 480 340" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="60" y="40" width="160" height="120" rx="16" fill="rgba(9,108,255,.07)"/><rect x="100" y="180" width="200" height="100" rx="14" fill="rgba(9,108,255,.04)"/><rect x="260" y="80" width="150" height="180" rx="18" fill="rgba(9,108,255,.06)"/><circle cx="380" cy="60" r="40" fill="rgba(9,108,255,.05)"/><circle cx="80" cy="280" r="30" fill="rgba(124,58,237,.06)"/></svg></div>
-      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="nova-hero-art" aria-hidden="true">
+        <div class="cube c1"></div>
+        <div class="cube c2"></div>
+        <div class="cube c3"></div>
+        <div class="platform"></div>
+        <div class="line l1"></div>
+        <div class="line l2"></div>
+        <div class="line l3"></div>
+      </div>
+      <div class="nova-dots"><i></i><i></i><i></i></div>
     </article>
 
-    <aside class="card focus-today">
-      <div class="ft-head">
+    <aside class="nova-card today-card">
+      <div class="card-head">
         <h2>今日关注</h2>
-        <a class="ft-more" href="/article-list">&rsaquo;</a>
+        <a href="/article-list">查看全部 ›</a>
       </div>
-      <div class="ft-list">
+      <div class="today-list">
         [--loop:articles(num=5,sort=view_count,order=DESC)--]
-        <a class="ft-item" href="[--url--]">
-          <span class="ft-num">[--_idx--]</span>
-          <span class="ft-body">
+        <a class="today-item" href="[--url--]">
+          <span class="rank">0[--_idx--]</span>
+          <span class="today-copy">
             <strong>[--title--]</strong>
-            <small>[--published_at--]</small>
+            <small>[--summary--]</small>
           </span>
+          <em>[--view_count--]</em>
         </a>
         [--/loop:articles--]
       </div>
     </aside>
   </section>
 
-  <!-- ═══════════ Mid Grid: Focus News + Software + Entry ═══════════ -->
-  <section class="mid-grid">
-    <article class="card focus-news">
-      <div class="section-head">
+  <section class="nova-mid">
+    <article class="nova-card focus-card">
+      <div class="card-head">
         <h2>焦点新闻</h2>
-        <span class="see"><a href="/article-list">查看全部 &rsaquo;</a></span>
+        <a href="/article-list">查看全部 ›</a>
       </div>
-      <div class="focus-news-body">
+      <div class="focus-grid">
         [--loop:articles(num=1,sort=published_at,order=DESC)--]
-        <div class="lead-news">
-          <div class="image-box">
-            <img src="[--cover_image--]" alt="[--title--]" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width='400' height='240' viewBox='0 0 400 240'%3E%3Crect fill='%23eef2f8' width='400' height='240'/%3E%3Cg fill='%23c8d4e4'%3E%3Crect x='160' y='88' width='80' height='64' rx='6'/%3E%3Ccircle cx='180' cy='108' r='8'/%3E%3Cpath d='M220 140l-16-20-12 14-8-10-24 32h60z'/%3E%3C/g%3E%3C/svg%3E'">
-            <span class="pin">置顶</span>
-          </div>
-          <h3><a href="[--url--]">[--title--]</a></h3>
+        <a class="lead-news" href="[--url--]">
+          <div class="media media-mountain"><span>置顶</span></div>
+          <h3>[--title--]</h3>
           <p>[--summary--]</p>
-          <div class="meta"><b>[--category--]</b>　[--published_at--]　[--view_count--] 阅读</div>
-        </div>
+          <div class="meta"><b>[--category--]</b><span>[--published_at--]</span><span>[--view_count--] 阅读</span></div>
+        </a>
         [--/loop:articles--]
-        <div class="news-list">
-          [--loop:articles(num=4,offset=1,sort=published_at,order=DESC)--]
-          <div class="mini-news">
-            <div class="mini-thumb"><img src="[--cover_image--]" alt="[--title--]" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width='400' height='240' viewBox='0 0 400 240'%3E%3Crect fill='%23eef2f8' width='400' height='240'/%3E%3Cg fill='%23c8d4e4'%3E%3Crect x='160' y='88' width='80' height='64' rx='6'/%3E%3Ccircle cx='180' cy='108' r='8'/%3E%3Cpath d='M220 140l-16-20-12 14-8-10-24 32h60z'/%3E%3C/g%3E%3C/svg%3E'"></div>
-            <div>
-              <strong><a href="[--url--]">[--title--]</a></strong>
-              <div class="meta"><b>[--category--]</b>　[--published_at--]</div>
-            </div>
-          </div>
+        <div class="compact-news">
+          [--loop:articles(num=4,sort=view_count,order=DESC)--]
+          <a class="compact-item" href="[--url--]">
+            <div class="thumb thumb-[--_idx--]"></div>
+            <span>
+              <strong>[--title--]</strong>
+              <small>[--category--]　[--published_at--]</small>
+            </span>
+          </a>
           [--/loop:articles--]
         </div>
       </div>
     </article>
 
-    <article class="card software">
-      <div class="section-head">
+    <article class="nova-card software-card">
+      <div class="card-head">
         <h2>软件精选</h2>
-        <span class="see"><a href="/software-list">查看全部 &rsaquo;</a></span>
+        <a href="/software-list">查看全部 ›</a>
       </div>
-      <div class="soft-list">
-        [--loop:software(num=4,sort=download_count,order=DESC)--]
-        <div class="soft-item">
-          <div class="soft-icon [--_idx--]"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg></div>
-          <div class="soft-info">
-            <strong><a href="[--url--]">[--name--]</a></strong>
-            <span>[--version--] · [--category_name--]</span>
-            <em>[--file_size--] MB · [--download_count--] 次下载</em>
-          </div>
-          <button class="soft-action" onclick="location.href='[--url--]'">下载</button>
-        </div>
+      <div class="software-list">
+        [--loop:software(num=4)--]
+        <a class="software-item" href="[--url--]">
+          <span class="app-icon app-[--_idx--]"></span>
+          <span class="software-copy">
+            <strong>[--name--]</strong>
+            <small>v[--version--] · [--category--]</small>
+          </span>
+          <em>下载</em>
+        </a>
         [--/loop:software--]
       </div>
     </article>
 
-    <article class="card entry">
-      <div class="section-head"><h2>栏目入口</h2></div>
+    <aside class="nova-card entry-card">
+      <div class="card-head">
+        <h2>栏目入口</h2>
+      </div>
       <div class="entry-grid">
-        [--loop:columns(pid=0,num=6)--]
-        <div class="entry-item" onclick="location.href='[--url--]'" style="cursor:pointer">
-          <div class="entry-icon [--_idx--]"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="4" width="14" height="16" rx="2" stroke="currentColor" stroke-width="2"/><path d="M9 8h6M9 12h6M9 16h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
-          <div class="entry-copy"><strong>[--name--]</strong><span>浏览[--name--]相关内容</span></div>
-          <div class="entry-arr">&rsaquo;</div>
-        </div>
+        [--loop:columns(pid=0)--]
+        <a class="entry-item" href="[--url--]">
+          <span class="entry-icon"></span>
+          <span><strong>[--name--]</strong><small>浏览[--name--]相关内容</small></span>
+          <em>›</em>
+        </a>
         [--/loop:columns--]
       </div>
-    </article>
+    </aside>
   </section>
 
-  <!-- ═══════════ Latest Articles ═══════════ -->
-  <section class="card latest">
+  <section class="nova-card latest-card">
     <div class="latest-head">
       <h2>最新文章</h2>
-      <div class="tabs">
-        <span class="active" data-sort="published_at" onclick="switchLatestTab(this)">最新</span>
-        <span data-sort="view_count" onclick="switchLatestTab(this)">最热</span>
-        <span data-sort="updated_at" onclick="switchLatestTab(this)">推荐</span>
-      </div>
+      <div class="tabs"><span class="active">最新</span><span>最热</span><span>推荐</span></div>
     </div>
-    <div class="article-row" id="latest-article-row">
+    <div class="latest-row">
       [--loop:articles(num=4,sort=published_at,order=DESC)--]
-      <article class="article">
-        <div class="article-img"><img src="[--cover_image--]" alt="[--title--]" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width='400' height='240' viewBox='0 0 400 240'%3E%3Crect fill='%23eef2f8' width='400' height='240'/%3E%3Cg fill='%23c8d4e4'%3E%3Crect x='160' y='88' width='80' height='64' rx='6'/%3E%3Ccircle cx='180' cy='108' r='8'/%3E%3Cpath d='M220 140l-16-20-12 14-8-10-24 32h60z'/%3E%3C/g%3E%3C/svg%3E'"></div>
-        <div>
-          <h3><a href="[--url--]">[--title--]</a></h3>
-          <p>[--summary--]</p>
-          <div class="meta"><b>[--category--]</b>　[--published_at--]　[--view_count--] 阅读</div>
-        </div>
-      </article>
+      <a class="latest-item" href="[--url--]">
+        <div class="latest-visual visual-[--_idx--]"></div>
+        <span>
+          <strong>[--title--]</strong>
+          <small>[--summary--]</small>
+          <em>[--category--]　[--published_at--]　[--view_count--] 阅读</em>
+        </span>
+      </a>
       [--/loop:articles--]
     </div>
   </section>
@@ -138,210 +138,534 @@
 
 [--include(name=footer)--]
 
-<script>
-// Latest articles tab switching
-function switchLatestTab(el) {
-  document.querySelectorAll('.tabs span').forEach(function(s){ s.classList.remove('active'); });
-  el.classList.add('active');
-  var sort = el.getAttribute('data-sort');
-  var bp = (window.__BASE_PATH__||'').replace(/\/$/,'');
-  var row = document.getElementById('latest-article-row');
-  row.style.opacity = '0.4';
-  fetch(bp+'/article/api/list.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page:1,page_size:4,sort_by:sort,sort_order:'DESC'})})
-  .then(function(r){return r.json()}).then(function(res){
-    if(res.code!==0)return;
-    var list=res.data.list||[];
-    var h='';list.forEach(function(a){
-      h+='<article class="article"><div class="article-img"><img src="'+(a.cover_image||'')+'" alt="'+esc(a.title)+'" onerror="this.parentElement.style.background=\'#e6eef9\'"></div><div><h3><a href="'+bp+'/article/p/'+a.id+'">'+esc(a.title)+'</a></h3><p>'+esc((a.content||'').substring(0,120))+'</p><div class="meta"><b>'+esc(a.category||'')+'</b>　'+esc(a.published_at||'')+'　'+(a.view_count||0)+' 阅读</div></div></article>';
-    });
-    row.innerHTML=h;row.style.opacity='1';
-  }).catch(function(){row.style.opacity='1';});
-  function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
-}
-</script>
-
 <style>
-  .page { width: min(1568px, calc(100% - 104px)); margin: 24px auto 15px; }
-  .card { background: var(--card-bg); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); }
-  .section-head { height: 35px; display: flex; align-items: flex-start; }
-  .section-head h2 { margin: 0; font-size: 19px; line-height: 25px; color: var(--text); font-weight: 900; letter-spacing: -.3px; }
-  .section-head .see { margin-left: auto; color: #7b8596; font-size: 12px; line-height: 24px; font-weight: 700; }
-  .section-head .see a { color: inherit; text-decoration: none; }
-  a { color: inherit; text-decoration: none; }
+  :root {
+    --nova-bg: #f5f8fd;
+    --nova-card: #fff;
+    --nova-line: #e8eef7;
+    --nova-text: #111827;
+    --nova-muted: #7b8597;
+    --nova-blue: #126fff;
+    --nova-blue-soft: #eaf3ff;
+    --nova-shadow: 0 14px 38px rgba(33, 74, 132, .08);
+  }
+  .nova-page, .nova-page * {
+    box-sizing: border-box;
+  }
+  .nova-page h1,
+  .nova-page h2,
+  .nova-page h3,
+  .nova-page p {
+    margin: 0;
+  }
+  .nova-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .nova-page strong,
+  .nova-page b {
+    font-weight: inherit;
+  }
+  .nova-page small,
+  .nova-page em {
+    font-style: normal;
+  }
+  html[data-theme="light"], body { background: var(--nova-bg); }
+  .nova-page {
+    width: min(1568px, calc(100% - 104px));
+    margin: 24px auto 18px;
+    color: var(--nova-text);
+  }
+  .nova-card {
+    background: var(--nova-card);
+    border: 1px solid var(--nova-line);
+    border-radius: 16px;
+    box-shadow: var(--nova-shadow);
+  }
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .card-head h2, .latest-head h2 {
+    margin: 0;
+    font-size: 19px;
+    line-height: 1.25;
+    font-weight: 900;
+    letter-spacing: 0;
+  }
+  .card-head a {
+    color: #7b8597;
+    font-size: 12px;
+    font-weight: 700;
+  }
 
-  /* Top Grid */
-  .top-grid { display: flex; gap: 20px; height: 260px; }
-  .hero { flex: 0 0 780px; height: 260px; overflow: hidden; position: relative; background: radial-gradient(circle at 79% 48%, rgba(24,119,255,.22) 0, rgba(24,119,255,.08) 28%, transparent 57%), linear-gradient(104deg, #f9fbff 0%, #eef5ff 52%, #eaf3ff 100%); }
-  [data-theme="dark"] .hero { background: radial-gradient(circle at 79% 48%, rgba(56,189,248,.12) 0, rgba(56,189,248,.04) 28%, transparent 57%), linear-gradient(104deg, #1e293b 0%, #1a2740 52%, #1e293b 100%); }
-  .hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 0 49%, rgba(255,255,255,.75) 50%, transparent 51%), linear-gradient(144deg, transparent 0 62%, rgba(255,255,255,.7) 63%, transparent 64%), linear-gradient(18deg, transparent 0 54%, rgba(255,255,255,.52) 55%, transparent 56%); opacity: .62; pointer-events: none; }
-  .hero-content { position: relative; z-index: 2; padding: 22px 0 0 26px; width: 360px; }
-  .badge { width: 120px; height: 24px; border: 1px solid #d9e1ee; border-radius: 14px; display: inline-flex; align-items: center; padding-left: 13px; color: #26334c; font-size: 11px; font-weight: 700; background: rgba(255,255,255,.54); }
-  .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; background: #1977ff; }
-  .hero h1 { margin: 16px 0 8px; font-size: 34px; line-height: 1.18; letter-spacing: -1px; color: #111936; font-weight: 900; }
-  .hero h1 span { color: #176cf5; }
-  [data-theme="dark"] .hero h1 { color: #f1f5f9; } [data-theme="dark"] .hero h1 span { color: #38bdf8; }
-  .hero p { margin: 0; width: 320px; color: #697488; font-size: 13px; line-height: 1.75; font-weight: 600; }
-  [data-theme="dark"] .hero p { color: #94a3b8; }
-  .hero-buttons { margin-top: 14px; display: flex; gap: 10px; }
-  .hero-buttons button { height: 32px; border-radius: 7px; font-size: 12px; font-weight: 800; border: 1px solid transparent; padding: 0 20px; cursor: pointer; }
-  .hero-buttons .read { background: #096cff; color: #fff; box-shadow: 0 7px 18px rgba(15,101,232,.20); }
-  .hero-buttons .more { background: #fff; border-color: #e3e8f0; color: #445066; }
-  [data-theme="dark"] .hero-buttons .more { background: #1e293b; border-color: #334155; color: #e2e8f0; }
-  .hero-art { position: absolute; z-index: 1; right: 10px; top: 0; width: 370px; height: 248px; opacity: .96; }
-  .dots { position: absolute; left: 340px; bottom: 12px; z-index: 3; display: flex; gap: 6px; }
-  .dots i { width: 14px; height: 2.5px; border-radius: 999px; background: #cad4e2; }
-  .dots i:first-child { width: 18px; background: #0975ff; }
+  .nova-top {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(360px, .92fr);
+    gap: 24px;
+  }
+  .nova-hero {
+    min-height: 270px;
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+    padding: 22px 28px;
+    background:
+      radial-gradient(circle at 72% 46%, rgba(18,111,255,.28), transparent 26%),
+      linear-gradient(120deg, #fbfdff 0%, #eff6ff 42%, #dcecff 100%);
+  }
+  .nova-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(122deg, transparent 0 52%, rgba(255,255,255,.72) 53%, transparent 54%),
+      linear-gradient(156deg, transparent 0 60%, rgba(255,255,255,.56) 61%, transparent 62%);
+    pointer-events: none;
+  }
+  .nova-hero-copy { position: relative; z-index: 2; width: min(390px, 48%); }
+  .nova-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 26px;
+    padding: 0 12px;
+    border: 1px solid #d9e3f0;
+    border-radius: 999px;
+    background: rgba(255,255,255,.58);
+    color: #26334c;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .nova-badge span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--nova-blue);
+  }
+  .nova-hero h1 {
+    margin: 20px 0 10px;
+    font-size: clamp(36px, 4vw, 54px);
+    line-height: 1.08;
+    font-weight: 950;
+    letter-spacing: 0;
+    color: #111936;
+  }
+  .nova-hero h1 span { color: var(--nova-blue); }
+  .nova-hero p {
+    margin: 0;
+    color: #697488;
+    font-size: 14px;
+    line-height: 1.72;
+    font-weight: 600;
+  }
+  .nova-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .nova-actions a {
+    min-width: 104px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid #dfe7f2;
+    background: #fff;
+    color: #445066;
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .nova-actions .primary {
+    background: linear-gradient(180deg, #1f82ff 0%, #096bff 100%);
+    border-color: #0b73ff;
+    color: #fff;
+    box-shadow: 0 9px 22px rgba(11, 107, 255, .2);
+  }
+  .nova-hero-art {
+    position: absolute;
+    right: 58px;
+    top: 24px;
+    width: 330px;
+    height: 216px;
+    z-index: 1;
+  }
+  .platform {
+    position: absolute;
+    left: 58px;
+    bottom: 12px;
+    width: 215px;
+    height: 58px;
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(203,225,255,.8));
+    transform: skewX(-18deg);
+    box-shadow: 0 34px 60px rgba(16,96,210,.24);
+  }
+  .cube {
+    position: absolute;
+    border-radius: 12px;
+    background: linear-gradient(145deg, rgba(85,166,255,.95), rgba(0,91,230,.92));
+    box-shadow: inset 0 1px rgba(255,255,255,.4), 0 18px 36px rgba(13,111,255,.28);
+  }
+  .c1 { width: 96px; height: 96px; left: 128px; top: 68px; }
+  .c2 { width: 78px; height: 78px; left: 82px; top: 100px; opacity: .82; }
+  .c3 { width: 92px; height: 36px; left: 130px; top: 34px; background: linear-gradient(180deg,#fff,#d9e9ff); }
+  .line {
+    position: absolute;
+    height: 2px;
+    border-radius: 99px;
+    background: linear-gradient(90deg, transparent, rgba(18,111,255,.4), transparent);
+  }
+  .l1 { width: 330px; left: -8px; top: 56px; transform: rotate(-26deg); }
+  .l2 { width: 270px; left: 16px; top: 122px; transform: rotate(-26deg); }
+  .l3 { width: 240px; left: 60px; top: 182px; transform: rotate(-26deg); }
+  .nova-dots {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    display: flex;
+    gap: 7px;
+  }
+  .nova-dots i {
+    width: 18px;
+    height: 3px;
+    border-radius: 999px;
+    background: #c7d3e4;
+  }
+  .nova-dots i:first-child { width: 24px; background: var(--nova-blue); }
 
-  /* Focus Today */
-  .focus-today { flex: 1 1 auto; min-width: 280px; max-width: 420px; padding: 0; height: 260px; overflow: hidden; display: flex; flex-direction: column; }
-  .ft-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 10px; flex-shrink: 0; }
-  .ft-head h2 { margin: 0; font-size: 16px; font-weight: 900; color: var(--text); }
-  .ft-more { color: var(--muted); text-decoration: none; font-size: 18px; line-height: 1; font-weight: 600; }
-  .ft-more:hover { color: var(--blue); }
-  .ft-list { flex: 1; overflow-y: auto; padding: 0 18px 8px; }
-  .ft-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); text-decoration: none; }
-  .ft-item:last-child { border-bottom: 0; }
-  .ft-num { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--muted); background: #f3f5f9; flex-shrink: 0; }
-  .ft-item:nth-child(1) .ft-num { background: #fef3c7; color: #d97706; }
-  .ft-item:nth-child(2) .ft-num { background: #eef5ff; color: #0d74ff; }
-  .ft-item:nth-child(3) .ft-num { background: #fff5e9; color: #ea580c; }
-  [data-theme="dark"] .ft-num { background: #334155; }
-  [data-theme="dark"] .ft-item:nth-child(1) .ft-num { background: rgba(217,119,6,.2); color: #fbbf24; }
-  [data-theme="dark"] .ft-item:nth-child(2) .ft-num { background: rgba(13,116,255,.2); color: #60a5fa; }
-  [data-theme="dark"] .ft-item:nth-child(3) .ft-num { background: rgba(234,88,12,.2); color: #fb923c; }
-  .ft-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-  .ft-body strong { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-  .ft-body small { font-size: 10px; color: var(--muted); margin-top: 2px; }
-  .ft-item:hover .ft-body strong { color: var(--blue); }
+  .today-card { padding: 22px; }
+  .today-list { display: grid; }
+  .today-item {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 54px;
+    gap: 12px;
+    align-items: center;
+    min-height: 52px;
+    border-bottom: 1px solid #edf1f6;
+  }
+  .today-item:last-child { border-bottom: 0; }
+  .rank {
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: #eef5ff;
+    color: var(--nova-blue);
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .today-item:nth-child(2) .rank { background: #fff2f0; color: #f04438; }
+  .today-item:nth-child(3) .rank { background: #fff5e8; color: #fb7a21; }
+  .today-copy strong {
+    display: block;
+    color: #151c31;
+    font-size: 14px;
+    line-height: 1.35;
+    font-weight: 850;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .today-copy small {
+    display: block;
+    margin-top: 4px;
+    color: #7f899b;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .today-item em {
+    color: #8a94a6;
+    font-style: normal;
+    font-size: 12px;
+    text-align: right;
+  }
 
+  .nova-mid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.23fr) minmax(330px, .78fr) minmax(360px, .94fr);
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .focus-card, .software-card, .entry-card { padding: 20px; }
+  .focus-grid {
+    display: grid;
+    grid-template-columns: minmax(245px, .9fr) minmax(0, 1fr);
+    gap: 22px;
+  }
+  .media {
+    height: 150px;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 62%, rgba(255,255,255,.7), transparent 12%),
+      linear-gradient(145deg, #0e3d91, #126fff 54%, #93c5fd);
+  }
+  .media::before {
+    content: "";
+    position: absolute;
+    inset: 18px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.34);
+    transform: skewX(-12deg);
+  }
+  .media span {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    z-index: 2;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: var(--nova-blue);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .lead-news h3 {
+    margin: 14px 0 8px;
+    color: #151c31;
+    font-size: 17px;
+    line-height: 1.35;
+    font-weight: 900;
+  }
+  .lead-news p {
+    color: #6c7688;
+    font-size: 13px;
+    line-height: 1.7;
+    margin: 0 0 12px;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    color: #96a0b2;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .meta b { color: #6f7b91; }
+  .compact-news { display: grid; gap: 12px; }
+  .compact-item {
+    display: grid;
+    grid-template-columns: 70px minmax(0, 1fr);
+    gap: 13px;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #edf1f6;
+  }
+  .compact-item:last-child { border-bottom: 0; }
+  .thumb {
+    height: 48px;
+    border-radius: 7px;
+    background: linear-gradient(145deg, #eaf3ff, #0b6bff);
+  }
+  .thumb-1 { background: linear-gradient(145deg, #eff6ff, #65a3ff); }
+  .thumb-2 { background: linear-gradient(145deg, #dbeafe, #0f3d92); }
+  .thumb-3 { background: linear-gradient(145deg, #e0f2fe, #0284c7); }
+  .compact-item strong {
+    display: block;
+    color: #151c31;
+    font-size: 14px;
+    line-height: 1.35;
+    font-weight: 850;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .compact-item small { color: #8a94a6; font-size: 12px; }
 
-  /* Mid Grid */
-  .mid-grid { display: flex; gap: 16px; margin-top: 16px; }
-  .focus-news { width: 626px; padding: 21px 21px 0; }
-  .focus-news-body { display: flex; gap: 23px; }
-  .lead-news { width: 269px; flex: 0 0 269px; position: relative; }
-  .lead-news .image-box { width: 269px; height: 158px; border-radius: 6px; overflow: hidden; position: relative; background: #e6effd; }
-  .lead-news .image-box img, .mini-thumb img, .article-img img { width: 100%; height: 100%; display: block; object-fit: cover; }
-  .pin { position: absolute; left: 9px; top: 10px; width: 35px; height: 19px; display: flex; align-items: center; justify-content: center; border-radius: 5px; background: #096cff; color: #fff; font-size: 11px; line-height: 19px; font-weight: 900; }
-  .lead-news h3 { margin: 14px 0 8px; font-size: 15px; line-height: 21px; font-weight: 900; letter-spacing: -.2px; }
-  .lead-news h3 a, .mini-news strong a { color: var(--text); }
-  .lead-news p { margin: 0 0 12px; color: #6c7688; font-size: 12px; line-height: 18px; font-weight: 600; }
-  [data-theme="dark"] .lead-news p { color: #94a3b8; }
-  .meta { color: #9aa3b4; font-size: 11px; line-height: 14px; font-weight: 700; }
-  .meta b { color: #6f7b91; font-weight: 800; }
-  [data-theme="dark"] .meta b { color: #38bdf8; }
-  .news-list { flex: 1; padding-top: 0; }
-  .mini-news { display: flex; align-items: flex-start; gap: 13px; border-bottom: 1px solid #edf1f6; padding: 0 0 11px; margin-bottom: 11px; }
-  [data-theme="dark"] .mini-news { border-bottom-color: #334155; }
-  .mini-news:last-child { margin-bottom: 0; border-bottom: 0; }
-  .mini-thumb { width: 68px; height: 45px; flex: 0 0 68px; border-radius: 4px; overflow: hidden; background: #e9f0fb; }
-  .mini-news strong { display: block; font-size: 13px; line-height: 17px; font-weight: 900; white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
-  .mini-news .meta { margin-top: 7px; }
+  .software-list { display: grid; }
+  .software-item {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 58px;
+    gap: 12px;
+    align-items: center;
+    min-height: 62px;
+    border-bottom: 1px solid #edf1f6;
+  }
+  .software-item:last-child { border-bottom: 0; }
+  .app-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #4298ff, #096cff);
+    position: relative;
+  }
+  .app-icon::before, .app-icon::after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    top: 19px;
+    height: 5px;
+    border-radius: 99px;
+    background: #fff;
+  }
+  .app-icon::after { transform: rotate(90deg); }
+  .app-1 { background: linear-gradient(145deg, #39a2ff, #096bff); }
+  .app-2 { background: linear-gradient(145deg, #8b5cf6, #5b3edc); }
+  .app-3 { background: linear-gradient(145deg, #111827, #030712); }
+  .software-copy strong {
+    display: block;
+    color: #151c31;
+    font-size: 14px;
+    font-weight: 900;
+  }
+  .software-copy small {
+    color: #7f899b;
+    font-size: 12px;
+  }
+  .software-item em {
+    justify-self: end;
+    min-width: 56px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #9fc3ff;
+    border-radius: 7px;
+    color: var(--nova-blue);
+    font-style: normal;
+    font-size: 12px;
+    font-weight: 800;
+  }
 
-  /* Software */
-  .software { width: 410px; padding: 21px 20px 0; }
-  .soft-list { margin-top: 3px; }
-  .soft-item { height: 63px; display: flex; align-items: center; border-bottom: 1px solid #edf1f6; }
-  [data-theme="dark"] .soft-item { border-bottom-color: #334155; }
-  .soft-item:last-child { border-bottom: 0; }
-  .soft-icon { width: 42px; height: 42px; border-radius: 9px; margin-right: 14px; flex: 0 0 42px; display: flex; align-items: center; justify-content: center; color: #fff; }
-  .soft-icon svg { width: 22px; height: 22px; }
-  .soft-icon._0, .soft-icon.plus { background: linear-gradient(145deg, #4298ff, #096cff); }
-  .soft-icon._1, .soft-icon.check { background: linear-gradient(145deg, #4798ff, #096bff); }
-  .soft-icon._2, .soft-icon.cube { background: linear-gradient(145deg, #8d73ff, #5b3edc); }
-  .soft-icon._3, .soft-icon.code { background: linear-gradient(145deg, #363a43, #111419); }
-  .soft-info { min-width: 0; flex: 1; }
-  .soft-info strong { display: block; font-size: 13px; line-height: 16px; font-weight: 900; }
-  .soft-info strong a { color: var(--text); }
-  .soft-info span { display: block; margin-top: 4px; color: #7f899b; font-size: 11px; line-height: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .soft-info em { display: block; margin-top: 5px; font-style: normal; color: #7f899b; font-size: 11px; font-weight: 600; }
-  .soft-action { width: 62px; height: 29px; border: 1px solid #9fc3ff; border-radius: 7px; background: #fff; color: #0b6bff; font-size: 12px; font-weight: 800; margin-left: 12px; cursor: pointer; flex-shrink: 0; }
-  [data-theme="dark"] .soft-action { background: #1e293b; border-color: #38bdf8; color: #38bdf8; }
+  .entry-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .entry-item {
+    min-height: 70px;
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) 16px;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid #e7edf5;
+    border-radius: 10px;
+    background: #fff;
+  }
+  .entry-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #eaf3ff;
+    position: relative;
+  }
+  .entry-icon::after {
+    content: "";
+    position: absolute;
+    inset: 10px;
+    border: 2px solid var(--nova-blue);
+    border-radius: 4px;
+  }
+  .entry-item strong {
+    display: block;
+    color: #1f2937;
+    font-size: 13px;
+    font-weight: 850;
+  }
+  .entry-item small {
+    display: block;
+    margin-top: 3px;
+    color: #7c8799;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .entry-item em { color: #8a94a5; font-style: normal; font-size: 20px; }
 
-  /* Entry Grid */
-  .entry { flex: 1; padding: 21px 20px 0; }
-  .entry-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 2px; }
-  .entry-item { border: 1px solid #e7edf5; border-radius: 8px; background: #fff; display: flex; align-items: center; padding: 10px 12px; gap: 10px; }
-  [data-theme="dark"] .entry-item { background: #1e293b; border-color: #334155; }
-  .entry-icon { width: 32px; height: 32px; border-radius: 8px; flex: 0 0 32px; display: flex; align-items: center; justify-content: center; }
-  .entry-icon svg { width: 18px; height: 18px; stroke-width: 2.3; }
-  .entry-icon._0, .entry-icon.blue { background: #eaf3ff; color: #0b6bff; }
-  .entry-icon._1, .entry-icon.green { background: #eafaf2; color: #17b26a; }
-  .entry-icon._2, .entry-icon.purple { background: #f1ebff; color: #7c3cff; }
-  .entry-icon._3, .entry-icon.orange { background: #fff2e6; color: #ff7a18; }
-  .entry-icon._4, .entry-icon.cyan { background: #eaf4ff; color: #1778ff; }
-  .entry-icon._5, .entry-icon.pink { background: #ffeaf5; color: #f23a9d; }
-  .entry-copy { min-width: 0; flex: 1; overflow: hidden; }
-  .entry-copy strong { display: block; color: #1f2937; font-size: 12px; line-height: 1.3; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  [data-theme="dark"] .entry-copy strong { color: #f1f5f9; }
-  .entry-copy span { display: block; margin-top: 2px; color: #7c8799; font-size: 10.5px; line-height: 1.3; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .entry-arr { color: #8a94a5; font-size: 18px; line-height: 1; flex-shrink: 0; opacity: .5; }
-
-  /* Latest */
-  .latest { margin-top: 16px; padding: 20px 21px 18px; }
-  .latest-head { height: 32px; display: flex; align-items: flex-start; }
-  .latest-head h2 { margin: 0 27px 0 0; font-size: 19px; line-height: 26px; font-weight: 900; }
-  .tabs { display: flex; gap: 22px; align-items: center; }
-  .tabs span { font-size: 13px; color: #4b5568; line-height: 27px; font-weight: 700; }
-  .tabs .active { width: 39px; height: 27px; background: #eef5ff; color: #096cff; border-radius: 6px; text-align: center; line-height: 27px; font-weight: 900; }
-  [data-theme="dark"] .tabs .active { background: rgba(56,189,248,.15); color: #38bdf8; }
-  .article-row { display: flex; gap: 42px; padding-top: 14px; }
-  .article { flex: 1; display: flex; min-width: 0; }
-  .article-img { width: 117px; height: 89px; flex: 0 0 117px; border-radius: 6px; overflow: hidden; background: #e6eef9; margin-right: 17px; }
-  .article h3 { margin: 2px 0 6px; font-size: 15px; line-height: 20px; font-weight: 900; letter-spacing: -.2px; }
-  .article h3 a { color: var(--text); }
-  .article p { margin: 0 0 10px; color: #6b7688; font-size: 12px; line-height: 18px; font-weight: 600; }
-  [data-theme="dark"] .article p { color: #94a3b8; }
-  .article .meta b { color: #156eff; margin-right: 17px; }
-  [data-theme="dark"] .article .meta b { color: #38bdf8; }
+  .latest-card {
+    margin-top: 16px;
+    padding: 20px;
+  }
+  .latest-head {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    margin-bottom: 16px;
+  }
+  .tabs { display: flex; gap: 14px; }
+  .tabs span {
+    min-width: 42px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 7px;
+    color: #4b5568;
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .tabs .active { background: #eef5ff; color: var(--nova-blue); }
+  .latest-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 30px;
+  }
+  .latest-item {
+    display: grid;
+    grid-template-columns: 118px minmax(0, 1fr);
+    gap: 16px;
+  }
+  .latest-visual {
+    height: 88px;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #dbeafe, #126fff);
+  }
+  .visual-1 { background: linear-gradient(145deg, #dbeafe, #0f3d92); }
+  .visual-2 { background: linear-gradient(145deg, #1e3a8a, #60a5fa); }
+  .visual-3 { background: linear-gradient(145deg, #bfdbfe, #2563eb); }
+  .latest-item strong {
+    display: block;
+    color: #151c31;
+    font-size: 15px;
+    line-height: 1.35;
+    font-weight: 900;
+  }
+  .latest-item small {
+    display: -webkit-box;
+    margin-top: 7px;
+    color: #6b7688;
+    font-size: 12px;
+    line-height: 1.55;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .latest-item em {
+    display: block;
+    margin-top: 8px;
+    color: #96a0b2;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 700;
+  }
 
   @media (max-width: 1280px) {
-    .page { width: calc(100% - 48px); }
-    .hero { flex: 1 1 auto; height: auto; min-height: 220px; }
-    .top-grid { flex-wrap: wrap; height: auto; }
-    .mid-grid { flex-wrap: wrap; }
-    .focus-today { flex: 0 1 auto; min-width: 260px; max-width: 340px; height: auto; }
-    .focus-news { width: calc(55% - 8px); }
-    .software { width: calc(45% - 8px); }
-    .entry { flex: 1 1 100%; }
-    .entry-item { width: calc((100% - 16px) / 3); }
+    .nova-page { width: calc(100% - 48px); }
+    .nova-top, .nova-mid { grid-template-columns: 1fr; }
+    .today-card { min-height: 0; }
+    .latest-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
-  @media (max-width: 860px) {
-    .page { width: calc(100% - 32px); margin-top: 16px; }
-    .top-grid { flex-direction: column; gap: 12px; height: auto; }
-    .mid-grid { flex-direction: column; gap: 12px; }
-    .hero { flex: none; width: 100%; height: auto; min-height: 200px; padding-bottom: 20px; }
-    .hero-content { padding: 18px 18px 0; width: 100%; }
-    .hero h1 { font-size: 26px; letter-spacing: -.5px; margin-top: 14px; }
-    .hero p { width: 100%; font-size: 13px; }
-    .hero-art { right: -80px; top: 0; opacity: .3; }
-    .hero-buttons { margin-top: 12px; }
-    .hero-buttons button { padding: 0 16px; height: 30px; font-size: 11px; }
-    .dots { left: 24px; bottom: 12px; }
-    .focus-today, .focus-news, .software, .entry, .latest { width: 100%; height: auto; }
-    .focus-news-body { flex-direction: column; }
-    .lead-news, .lead-news .image-box { width: 100%; }
-    .lead-news .image-box { height: 180px; }
-    .mini-news strong { max-width: 100%; }
-    .entry-grid { grid-template-columns: 1fr; }
-    .article-row { flex-direction: column; gap: 14px; padding-top: 8px; }
-    .article { width: 100%; flex-direction: row; }
-    .article-img { width: 100px; height: 70px; flex: 0 0 100px; }
-    .article h3 { font-size: 14px; }
-    .article p { max-width: none; }
-    .latest-head { height: auto; flex-wrap: wrap; gap: 8px; }
-    .section-head { height: auto; }
-    .badge { width: auto; padding: 0 12px; }
-  }
-@media (max-width: 480px) {
-    .page { width: calc(100% - 20px); }
-    .hero { min-height: 180px; }
-    .hero h1 { font-size: 20px; }
-    .hero-art { right: -150px; opacity: .2; }
-    .hero-content { padding: 14px 12px 0; }
-    .hero-buttons button { padding: 0 14px; height: 30px; font-size: 11px; }
-    .latest-head h2, .section-head h2 { font-size: 16px; }
-    .card-title { font-size: 13px; }
+  @media (max-width: 760px) {
+    .nova-page { width: calc(100% - 28px); margin-top: 16px; }
+    .nova-hero { min-height: 240px; padding: 18px; }
+    .nova-hero-copy { width: 100%; }
+    .nova-hero h1 { font-size: clamp(30px, 9vw, 40px); }
+    .nova-hero-art { right: -135px; top: 28px; opacity: .24; transform: scale(.86); transform-origin: center; }
+    .nova-dots { left: 24px; }
+    .focus-grid, .entry-grid, .latest-row { grid-template-columns: 1fr; }
+    .today-item { grid-template-columns: 34px minmax(0, 1fr); }
+    .today-item em { display: none; }
+    .latest-item { grid-template-columns: 92px minmax(0, 1fr); }
+    .latest-visual { height: 72px; }
   }
 </style>
 </body>

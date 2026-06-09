@@ -8060,13 +8060,7 @@ if (response.code == 401) {
                 $('article-published-at').value = '';
               }
 
-              if (article.cover_image && /^https?:\/\//.test(article.cover_image)) {
-                $('article-cover-preview').querySelector('img').src = article.cover_image;
-                $('article-cover-preview').style.display = 'block';
-              } else {
-                $('article-cover-preview').querySelector('img').src = '';
-                $('article-cover-preview').style.display = 'none';
-              }
+              setArticleCoverPreview(article.cover_image || '');
 
               clearArticleFormErrors();
               loadColumnOptions();
@@ -8121,6 +8115,10 @@ if (response.code == 401) {
                 hasError = true;
               }
               if (hasError) return;
+              if (coverImage && !isValidArticleCoverUrl(coverImage)) {
+                toast('封面图片URL格式不正确，请使用 http(s) 图片地址或 /storage/uploads/images/ 路径', 'error');
+                return;
+              }
 
               const submitBtn = $('article-submit-btn');
               submitBtn.disabled = true;
@@ -8244,19 +8242,39 @@ if (response.code == 401) {
               });
             }
 
+            function isValidArticleCoverUrl(value) {
+              const url = (value || '').trim();
+              return /^(https?:\/\/|\/storage\/uploads\/images\/|storage\/uploads\/images\/|data:image\/(png|jpe?g|gif|webp);base64,)/i.test(url);
+            }
+
+            function normalizeArticleCoverUrl(value) {
+              const url = (value || '').trim();
+              return /^storage\/uploads\/images\//i.test(url) ? '/' + url : url;
+            }
+
+            function setArticleCoverPreview(value) {
+              const preview = $('article-cover-preview');
+              if (!preview) return;
+              const img = preview.querySelector('img');
+              const url = normalizeArticleCoverUrl(value);
+              if (url && isValidArticleCoverUrl(url)) {
+                img.onerror = function() {
+                  img.removeAttribute('src');
+                  preview.style.display = 'none';
+                };
+                img.src = url;
+                preview.style.display = 'block';
+              } else {
+                img.removeAttribute('src');
+                preview.style.display = 'none';
+              }
+            }
+
             // 封面预览输入监听
             const coverInput = $('article-cover-image');
             if (coverInput) {
               coverInput.addEventListener('input', function() {
-                const preview = $('article-cover-preview');
-                const img = preview.querySelector('img');
-                if (this.value.trim()) {
-                  img.src = this.value.trim();
-                  preview.style.display = 'block';
-                  img.onerror = function() { preview.style.display = 'none'; };
-                } else {
-                  preview.style.display = 'none';
-                }
+                setArticleCoverPreview(this.value);
               });
             }
 
