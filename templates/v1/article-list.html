@@ -77,8 +77,8 @@
   .al-layout { display: flex; gap: 28px; align-items: flex-start; }
   .al-main { flex: 1; min-width: 0; }
 
-  .al-card { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); transition: padding .12s; }
-  .al-card:hover { padding-left: 4px; }
+  .al-card { display: flex; gap: 16px; padding: 16px; border-bottom: 1px solid var(--line); background: var(--card-bg); border-radius: 10px; margin-bottom: 12px; border: 1px solid var(--line); transition: box-shadow .15s; }
+  .al-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,.06); }
   .al-card-img { width: 160px; height: 106px; flex: 0 0 160px; border-radius: 8px; overflow: hidden; background: #eef2f8; display: block; }
   .al-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .25s; }
   .al-card:hover .al-card-img img { transform: scale(1.05); }
@@ -122,7 +122,7 @@
     .al-layout { flex-direction: column; }
     .al-sidebar { width: 100%; flex: none; position: static; }
     .al-card { flex-direction: column; gap: 14px; }
-    .al-card:hover { padding-left: 0; }
+    .al-card:hover { padding-left: 16px; }
     .al-card-img { width: 100%; height: 200px; flex: none; }
     .al-card-more { opacity: 1; transform: none; }
   }
