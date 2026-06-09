@@ -8,6 +8,8 @@ require_once __DIR__ . '/../config.php';
 
 setSecurityHeaders();
 
+$method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
+
 if (!sw_requireAdmin()) {
     http_response_code(401);
     echo json_encode(['code' => 401, 'msg' => '未授权访问']);
@@ -28,7 +30,6 @@ if (!$db) {
 initSoftwareTables();
 
 $input  = getSoftwareInput();
-$method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
 $prefix = defined('DB_PREFIX') ? DB_PREFIX : 'sys_';
 $adminId = sw_requireAdmin();
 $adminUsername = $adminId ? sw_getAdminUsername($db, $adminId) : 'unknown';

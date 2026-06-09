@@ -154,10 +154,10 @@ function getDB() {
                 $isApi = isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], '/api/') !== false;
                 if ($isApi) {
                     header('Content-Type: application/json', true);
-                    echo json_encode(['code' => 503, 'msg' => '系统未初始化，请先访问 /install/ 完成安装', 'data' => null], JSON_UNESCAPED_UNICODE);
+                    echo json_encode(['code' => 503, 'msg' => '系统未初始化，请先访问 /admin.php?force_setup=1 完成安装', 'data' => null], JSON_UNESCAPED_UNICODE);
                     exit;
                 }
-                $installUrl = defined('BASE_PATH') ? rtrim(BASE_PATH, '/') . '/install/' : '/install/';
+                $installUrl = defined('BASE_PATH') ? rtrim(BASE_PATH, '/') . '/admin.php?force_setup=1' : '/admin.php?force_setup=1';
                 header('Location: ' . $installUrl);
                 exit;
             }

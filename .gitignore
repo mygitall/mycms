@@ -1,6 +1,8 @@
 .DS_Store
-config.php
-install.lock
+/config.php
+/install/install.config.php
+/install/install.lock
+/mycms/
 uploads/*
 !uploads/.gitkeep
 data/backups/*

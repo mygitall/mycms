@@ -55,7 +55,7 @@ if ($hasArticles) {
 $software = [];
 if ($hasSoftware) {
     try {
-        $stmt = $pdo->query("SELECT s.*, c.name as category_name
+        $stmt = $pdo->query("SELECT s.*, COALESCE(NULLIF(s.category_name, ''), c.name, '') as category_name
                              FROM {$prefix}software s
                              LEFT JOIN {$prefix}software_categories c ON s.category_id = c.id
                              WHERE s.status = 1

@@ -49,6 +49,18 @@
   var bp = window.__BASE_PATH__ || '';
   var API = bp + '/search/api/list.php';
   var el = document.getElementById('q');
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+  function highlightTitle(title, keyword) {
+    var safeTitle = escapeHtml(title || '');
+    var safeKeyword = escapeHtml(keyword || '');
+    if (!safeKeyword) return safeTitle;
+    var kwEsc = safeKeyword.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    return safeTitle.replace(new RegExp('('+kwEsc+')','gi'),'<em>$1</em>');
+  }
 
   function doSearch(){
     var kw = el.value.trim();
@@ -72,15 +84,14 @@
       var html = '<p style="font-size:13px;color:var(--text-3);margin-bottom:16px">找到 '+d.data.total+' 条结果</p>';
       items.forEach(function(r){
         var title = r.title || r.name || '';
-        var kwEsc = kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-        var titleH = title.replace(new RegExp('('+kwEsc+')','gi'),'<em>$1</em>');
+        var titleH = highlightTitle(title, kw);
         var url = r.url || (r.type==='software' ? (bp+'/software/p/'+r.id) : (bp+'/article/p/'+r.id));
         var desc = (r.content || r.subtitle || '').substring(0,150);
-        html += '<a href="'+url+'" class="result-item">'
-          +'<div class="url">'+url+'</div>'
+        html += '<a href="'+escapeHtml(url)+'" class="result-item">'
+          +'<div class="url">'+escapeHtml(url)+'</div>'
           +'<h3>'+titleH+'</h3>'
-          +'<div class="desc">'+desc+'</div>'
-          +'<div class="result-meta">'+ (r.subtitle||r.type||'') +'</div>'
+          +'<div class="desc">'+escapeHtml(desc)+'</div>'
+          +'<div class="result-meta">'+ escapeHtml(r.subtitle||r.type||'') +'</div>'
           +'</a>';
       });
       res.innerHTML = html;

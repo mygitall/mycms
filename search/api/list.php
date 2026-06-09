@@ -122,6 +122,12 @@ if ($isAdmin) {
 
 // ── 获取数据源 ────────────────────────────────
 $sources = search_getSources();
+$allowedTables = [];
+foreach ($sources as $sourceConfig) {
+    if (!empty($sourceConfig['table']) && preg_match('/^[A-Za-z0-9_]+$/', $sourceConfig['table'])) {
+        $allowedTables[] = $sourceConfig['table'];
+    }
+}
 if ($source !== '' && !isset($sources[$source])) {
     jsonResponse(400, '无效的数据源类型: ' . htmlspecialchars($source), null);
 }
@@ -145,17 +151,27 @@ foreach ($activeSources as $type => $cfg) {
     $table = $cfg['table'];
     $searchCols = $cfg['search_cols'];
     $resultCols = $cfg['result_cols'];
+    $titleCol = isset($cfg['title_col']) ? $cfg['title_col'] : '';
 
     // 表名白名单校验，防止注入
-    $allowedTables = ['articles', 'sys_software'];
     if (!in_array($table, $allowedTables, true)) {
         continue;
     }
 
     // 动态构建每个数据源的查询
     $colSelects = [];
-    foreach ($resultCols as $col) {
-        $colSelects[] = "`{$col}`";
+    foreach ($resultCols as $alias => $col) {
+        if (is_int($alias)) {
+            $alias = $col;
+        }
+        if (!preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', (string)$alias)) {
+            continue;
+        }
+        if (preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', (string)$col)) {
+            $colSelects[] = "`{$col}` AS `{$alias}`";
+        } elseif (in_array((string)$col, array("''", '0', 'NULL'), true)) {
+            $colSelects[] = "{$col} AS `{$alias}`";
+        }
     }
     $colList = implode(', ', $colSelects);
 
@@ -179,13 +195,13 @@ foreach ($activeSources as $type => $cfg) {
 
     // relevance score: 命中标题优先于其他字段
     $relevanceExpr = '';
-    if (in_array('title', $searchCols)) {
+    if ($titleCol !== '' && in_array($titleCol, $searchCols, true)) {
         $p = ":kw{$paramIdx}";
         $params[$p] = '%' . $keyword . '%';
         $paramIdx++;
-        $relevanceExpr = "(CASE WHEN `title` LIKE {$p} THEN 3 ELSE 0 END)";
+        $relevanceExpr = "(CASE WHEN `{$titleCol}` LIKE {$p} THEN 3 ELSE 0 END)";
         foreach ($searchCols as $col) {
-            if ($col === 'title') continue;
+            if ($col === $titleCol) continue;
             $p2 = ":kw{$paramIdx}";
             $relevanceExpr .= " + (CASE WHEN `{$col}` LIKE {$p2} THEN 1 ELSE 0 END)";
             $params[$p2] = '%' . $keyword . '%';
@@ -278,16 +294,16 @@ foreach ($rows as $row) {
         $item['content'] .= mb_strlen(strip_tags($row['content'] ?? '')) > 120 ? '...' : '';
         $item['subtitle'] = $item['category'] . ($item['tags'] ? ' · ' . str_replace(',', ' / ', $item['tags']) : '');
     } elseif ($type === 'software') {
-        $item['title']    = $row['name'] ?? '';
+        $item['title']    = $row['title'] ?? '';
         $item['version']  = $row['version'] ?? '';
-        $item['category'] = $row['category_name'] ?? '';
+        $item['category'] = $row['category'] ?? '';
         $item['os']       = $row['os_support'] ?? '';
         $item['views']    = (int) ($row['view_count'] ?? 0);
         $item['downloads']= (int) ($row['download_count'] ?? 0);
         $item['url']      = ($cfg['detail_url'] ?? '') . $row['id'];
         $item['date']     = $row['created_at'] ?? '';
-        $item['content']  = mb_substr(strip_tags($row['description'] ?? ''), 0, 120);
-        $item['content'] .= mb_strlen(strip_tags($row['description'] ?? '')) > 120 ? '...' : '';
+        $item['content']  = mb_substr(strip_tags($row['content'] ?? ''), 0, 120);
+        $item['content'] .= mb_strlen(strip_tags($row['content'] ?? '')) > 120 ? '...' : '';
         $item['subtitle'] = $item['category'] . ($item['version'] ? ' · v' . $item['version'] : '');
     }
 

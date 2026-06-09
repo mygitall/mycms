@@ -111,13 +111,13 @@ function doSearch(page) {
         d.list.forEach(function(item) {
           var typeLabel = item.type === 'software' ? '[软件] ' : '';
           var title = escapeHtml(typeLabel + (item.title || '无标题'));
-          var content = truncate(item.content || '', 150);
+          var content = escapeHtml(truncate(item.content || '', 150));
           var date = formatDate(item.date || '');
           var url = item.url || (CMS.BASE + '/' + item.type + '/p/' + item.id);
           if (item.type === 'article') {
             url = CMS.BASE + '/detail?id=' + item.id;
           }
-          html += '<div class="item" style="cursor:pointer" onclick="location.href=\'' + url + '\'">' +
+          html += '<a class="item" style="cursor:pointer;text-decoration:none;color:inherit" href="' + escapeHtml(url) + '">' +
             '<div class="thumb">' + (item.type === 'software' ? 'S' : 'A') + '</div>' +
             '<div class="info">' +
               '<h3>' + title + '</h3>' +
@@ -128,7 +128,7 @@ function doSearch(page) {
                 '<span>相关度：' + (item.relevance || 0) + '</span>' +
               '</div>' +
             '</div>' +
-          '</div>';
+          '</a>';
         });
       } else {
         html = '<div class="empty"><p>无搜索结果</p></div>';

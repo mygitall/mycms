@@ -6229,6 +6229,10 @@ if (response.code == 401) {
               return div.innerHTML;
             }
 
+            function jsString(str) {
+              return JSON.stringify(String(str == null ? '' : str));
+            }
+
             $('search-input').addEventListener('input', () => renderUserTable(cachedUsers));
 
             // ─── Add User Modal ─────────────────────────────────────
@@ -7763,7 +7767,7 @@ if (response.code == 401) {
                     <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                   </svg>
                 </button>
-                <button class="btn btn-danger" onclick="openArticleDelModal(${article.id}, '${escapeHtml(article.title)}')" style="padding:5px 8px;font-size:12px">删除</button>
+                <button class="btn btn-danger" onclick="openArticleDelModal(${article.id}, ${escapeHtml(jsString(article.title))})" style="padding:5px 8px;font-size:12px">删除</button>
               </div>
             </td>
                   </tr>
@@ -8345,7 +8349,7 @@ if (response.code == 401) {
                       </svg>
                     </button>`
                 }
-                <button class="btn btn-danger" onclick="openSwDelModal(${item.id}, '${escapeHtml(item.name)}')" style="padding:5px 8px;font-size:12px">删除</button>
+                <button class="btn btn-danger" onclick="openSwDelModal(${item.id}, ${escapeHtml(jsString(item.name))})" style="padding:5px 8px;font-size:12px">删除</button>
               </div>
             </td>
                   </tr>
@@ -8848,7 +8852,7 @@ if (response.code == 401) {
             <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface-2);border-radius:8px;border:1px solid var(--border)">
               <span style="flex:1;font-size:13px;font-weight:500">${escapeHtml(cat.name)}</span>
               <span style="font-size:11px;color:var(--text-dim);padding:2px 6px;background:var(--surface-3);border-radius:4px">排序 ${cat.sort_order}</span>
-              <button class="btn-icon" onclick="editSwCat(${cat.id}, '${escapeHtml(cat.name)}', ${cat.sort_order})" title="编辑" style="padding:5px">
+              <button class="btn-icon" onclick="editSwCat(${cat.id}, ${escapeHtml(jsString(cat.name))}, ${cat.sort_order})" title="编辑" style="padding:5px">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:13px;height:13px">
                   <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
                 </svg>
