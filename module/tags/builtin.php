@@ -47,6 +47,52 @@ TagRegistry::register('config',       'tag_config',       '读取任意配置项
 TagRegistry::register('search_form',  'tag_search_form',  '搜索表单（GET方式提交到/search）', 'system');
 TagRegistry::register('login_form',   'tag_login_form',   '登录表单（POST方式，含CSRF保护）', 'system');
 
+function tag_clean_summary($html, $length)
+{
+    $text = (string)$html;
+    $text = preg_replace('/<(script|style|noscript|svg|iframe)\b[^>]*>.*?<\/\1>/is', ' ', $text);
+    $text = strip_tags($text);
+
+    for ($i = 0; $i < 2; $i++) {
+        $decoded = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+        if ($decoded === $text) {
+            break;
+        }
+        $text = $decoded;
+    }
+
+    $text = str_replace(array("\xc2\xa0", '&nbsp;'), ' ', $text);
+    $text = preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $text);
+    $text = preg_replace('/\s+/u', ' ', $text);
+
+    $noisePatterns = array(
+        '/^\s*(首页|要闻|更多|搜索|网页设置|登录|安装电脑版|内容更精彩|正在浏览[:：]?|\s)+/u',
+        '/首页\s+要闻\s+更多\s+正在浏览[:：]?/u',
+        '/央视新闻\s+搜索\s+网页设置\s+登录\s+安装电脑版\s+内容更精彩/u',
+        '/\s*关注\s*\d+\s*评论\s*\d+(?:\s*\d+)?\s*手机看\s*/u',
+        '/\s*(央视新闻|新华社|人民日报|中国新闻网)\s+\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}[^，。；;]{0,60}/u'
+    );
+    $text = preg_replace($noisePatterns, ' ', $text);
+    $text = preg_replace('/\s+/u', ' ', $text);
+    $text = trim($text);
+    $maxPrefix = min(80, (int)floor(mb_strlen($text, 'UTF-8') / 2));
+    for ($len = 6; $len <= $maxPrefix; $len++) {
+        $prefix = mb_substr($text, 0, $len, 'UTF-8');
+        if (mb_substr($text, $len, 1, 'UTF-8') === ' ' && mb_substr($text, $len + 1, $len, 'UTF-8') === $prefix) {
+            $text = $prefix . mb_substr($text, $len + 1 + $len, mb_strlen($text, 'UTF-8'), 'UTF-8');
+            break;
+        }
+    }
+    $text = preg_replace('/\s+/u', ' ', $text);
+    $text = trim($text, " \t\n\r\0\x0B　,，.。;；:：|_-");
+
+    if ($text === '') {
+        return '';
+    }
+
+    return mb_substr($text, 0, $length, 'UTF-8');
+}
+
 function tag_site_name($attrs) {
     try {
         $pdo = getDB();
@@ -267,7 +313,7 @@ function tag_loop_articles($attrs) {
         // 为每个 item 添加 url 字段
         foreach ($list as &$item) {
             $item['url'] = getArticleUrl($item['id']);
-            $item['summary'] = mb_substr(strip_tags((string)$item['content']), 0, 120);
+            $item['summary'] = tag_clean_summary($item['content'], 120);
         }
         unset($item);
 
@@ -297,7 +343,7 @@ function tag_software_list($attrs) {
         $html = '<div class="tag-software-list">';
         foreach ($list as $s) {
             $name = htmlspecialchars($s['name'], ENT_QUOTES, 'UTF-8');
-            $desc = htmlspecialchars(mb_substr((string)$s['description'], 0, 60), ENT_QUOTES, 'UTF-8');
+            $desc = htmlspecialchars(tag_clean_summary($s['description'], 60), ENT_QUOTES, 'UTF-8');
             $html .= "<div class=\"tag-sw-item\"><strong>{$name}</strong><p>{$desc}</p></div>";
         }
         $html .= '</div>';
@@ -394,7 +440,7 @@ function tag_loop_software($attrs) {
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($list as &$item) {
             $item['url'] = getBaseUrl() . '/software/p/' . $item['id'];
-            $item['summary'] = mb_substr((string)$item['description'], 0, 80);
+            $item['summary'] = tag_clean_summary($item['description'], 80);
         }
         unset($item);
         return $list;
@@ -438,7 +484,7 @@ function tag_article_detail($attrs) {
         if (!$a) return array();
 
         $a['url']      = getArticleUrl($a['id']);
-        $a['summary']  = mb_substr(strip_tags((string)$a['content']), 0, 200);
+        $a['summary']  = tag_clean_summary($a['content'], 200);
         $a['full_date'] = $a['published_at'] ?: $a['created_at'];
         return array($a);
     } catch (Exception $e) {
@@ -477,7 +523,7 @@ function tag_related_articles($attrs) {
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($list as &$item) {
             $item['url'] = getArticleUrl($item['id']);
-            $item['summary'] = mb_substr(strip_tags((string)$item['content']), 0, 100);
+            $item['summary'] = tag_clean_summary($item['content'], 100);
         }
         unset($item);
         return $list;
