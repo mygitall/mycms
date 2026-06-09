@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[--site_name--] · 科技资讯与软件精选平台</title>
+</head>
+<body>
+[--include(name=header)--]
+
+<main class="page">
+  <!-- ═══════════ Top Grid: Hero + Today Focus ═══════════ -->
+  <section class="top-grid">
+    <article class="card hero">
+      <div class="hero-content">
+        <div class="badge">瀑布流内容墙</div>
+        <h1>发布流式<span>内容墙</span><br>让信息呈现更自然</h1>
+        <p>支持多高度内容卡片自由排布，优化阅读节奏，<br>让优质内容被更多人发现。</p>
+        <div class="hero-buttons">
+          <button class="read" onclick="location.href='/article-list'">立即阅读</button>
+          <button class="more" onclick="location.href='/software-list'">了解更多</button>
+        </div>
+      </div>
+      <div class="hero-art"></div>
+      <div class="dots"><i></i><i></i><i></i></div>
+    </article>
+
+    <aside class="card focus-today">
+      <div class="section-head">
+        <h2>今日关注</h2>
+        <span class="see"><a href="/article-list">查看全部 &rsaquo;</a></span>
+      </div>
+      <div class="rank-list">
+        [--loop:articles(num=5,sort=view_count,order=DESC)--]
+        <div class="rank-item">
+          <div class="rank-num n[--_idx--]">0[--_idx--]</div>
+          <div class="rank-text">
+            <strong><a href="[--url--]">[--title--]</a></strong>
+            <span>[--summary--]</span>
+          </div>
+          <div class="rank-time">[--published_at--]</div>
+        </div>
+        [--/loop:articles--]
+      </div>
+    </aside>
+  </section>
+
+  <!-- ═══════════ Mid Grid: Focus News + Software ═══════════ -->
+  <section class="mid-grid">
+    <article class="card focus-news">
+      <div class="section-head">
+        <h2>焦点新闻</h2>
+        <span class="see"><a href="/article-list">查看全部 &rsaquo;</a></span>
+      </div>
+      <div class="focus-news-body">
+        [--loop:articles(num=1,sort=published_at,order=DESC)--]
+        <div class="lead-news">
+          <div class="image-box"><img src="[--cover_image--]" alt="[--title--]" onerror="this.style.display='none'"></div>
+          <h3><a href="[--url--]">[--title--]</a></h3>
+          <p>[--summary--]</p>
+          <div class="meta"><b>[--category--]</b>　[--published_at--]　[--view_count--] 阅读</div>
+        </div>
+        [--/loop:articles--]
+        <div class="news-list">
+          [--loop:articles(num=3,offset=1,sort=published_at,order=DESC)--]
+          <div class="mini-news">
+            <div class="mini-thumb"><img src="[--cover_image--]" alt="[--title--]" onerror="this.style.display='none'"></div>
+            <div>
+              <strong><a href="[--url--]">[--title--]</a></strong>
+              <div class="meta"><b>[--category--]</b>　[--published_at--]</div>
+            </div>
+          </div>
+          [--/loop:articles--]
+        </div>
+      </div>
+    </article>
+
+    <aside class="card software">
+      <div class="section-head">
+        <h2>推荐软件</h2>
+        <span class="see"><a href="/software-list">查看全部 &rsaquo;</a></span>
+      </div>
+      <div class="soft-list">
+        [--loop:software(num=4,sort=download_count,order=DESC)--]
+        <div class="soft-item">
+          <div class="soft-icon plus"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+          <div class="soft-info">
+            <strong><a href="[--url--]">[--name--]</a></strong>
+            <span>[--version--] · [--category_name--]</span>
+            <em>[--file_size--] MB · [--download_count--] 次下载</em>
+          </div>
+          <button class="soft-action" onclick="location.href='[--url--]'">下载</button>
+        </div>
+        [--/loop:software--]
+      </div>
+    </aside>
+  </section>
+
+  <!-- ═══════════ Latest Articles ═══════════ -->
+  <section class="card latest">
+    <div class="latest-head">
+      <h2>最新文章</h2>
+      <div class="tabs">
+        <span class="active">最新</span>
+        <span>推荐</span>
+      </div>
+    </div>
+    <div class="article-row">
+      [--loop:articles(num=2,sort=published_at,order=DESC)--]
+      <div class="article">
+        <div class="article-img"><img src="[--cover_image--]" alt="[--title--]" onerror="this.style.display='none'"></div>
+        <div>
+          <h3><a href="[--url--]">[--title--]</a></h3>
+          <p>[--summary--]</p>
+          <div class="meta"><b>[--category--]</b>　[--published_at--]　[--view_count--] 阅读</div>
+        </div>
+      </div>
+      [--/loop:articles--]
+    </div>
+  </section>
+</main>
+
+[--include(name=footer)--]
+
+<style>
+  .page { width: min(1568px, calc(100% - 104px)); margin: 24px auto 15px; }
+  .card { background: var(--card-bg); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); }
+  .section-head { height: 35px; display: flex; align-items: flex-start; }
+  .section-head h2 { margin: 0; font-size: 19px; line-height: 25px; color: var(--text); font-weight: 900; letter-spacing: -.3px; }
+  .section-head .see { margin-left: auto; color: #7b8596; font-size: 12px; line-height: 24px; font-weight: 700; }
+  .section-head .see a { color: inherit; text-decoration: none; }
+  a { color: inherit; text-decoration: none; }
+
+  /* Top Grid */
+  .top-grid { display: flex; gap: 24px; height: 332px; }
+  .hero { flex: 0 0 1052px; height: 332px; overflow: hidden; position: relative; background: radial-gradient(circle at 79% 48%, rgba(24,119,255,.22) 0, rgba(24,119,255,.08) 28%, transparent 57%), linear-gradient(104deg, #f9fbff 0%, #eef5ff 52%, #eaf3ff 100%); }
+  [data-theme="dark"] .hero { background: radial-gradient(circle at 79% 48%, rgba(56,189,248,.12) 0, rgba(56,189,248,.04) 28%, transparent 57%), linear-gradient(104deg, #1e293b 0%, #1a2740 52%, #1e293b 100%); }
+  .hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 0 49%, rgba(255,255,255,.75) 50%, transparent 51%), linear-gradient(144deg, transparent 0 62%, rgba(255,255,255,.7) 63%, transparent 64%), linear-gradient(18deg, transparent 0 54%, rgba(255,255,255,.52) 55%, transparent 56%); opacity: .62; pointer-events: none; }
+  .hero-content { position: relative; z-index: 2; padding: 31px 0 0 33px; width: 476px; }
+  .badge { width: 144px; height: 27px; border: 1px solid #d9e1ee; border-radius: 14px; display: inline-flex; align-items: center; padding-left: 13px; color: #26334c; font-size: 11px; font-weight: 700; background: rgba(255,255,255,.54); }
+  .badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; background: #1977ff; }
+  .hero h1 { margin: 27px 0 13px; font-size: 44px; line-height: 1.18; letter-spacing: -1.7px; color: #111936; font-weight: 900; }
+  .hero h1 span { color: #176cf5; }
+  [data-theme="dark"] .hero h1 { color: #f1f5f9; }
+  [data-theme="dark"] .hero h1 span { color: #38bdf8; }
+  .hero p { margin: 0; width: 390px; color: #697488; font-size: 15px; line-height: 1.75; font-weight: 600; }
+  [data-theme="dark"] .hero p { color: #94a3b8; }
+  .hero-buttons { margin-top: 21px; display: flex; gap: 12px; }
+  .hero-buttons button { height: 36px; border-radius: 7px; font-size: 13px; font-weight: 800; border: 1px solid transparent; padding: 0 29px; cursor: pointer; }
+  .hero-buttons .read { background: #096cff; color: #fff; box-shadow: 0 7px 18px rgba(15,101,232,.20); }
+  .hero-buttons .more { background: #fff; border-color: #e3e8f0; color: #445066; }
+  [data-theme="dark"] .hero-buttons .more { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+  .hero-art { position: absolute; z-index: 1; right: 14px; top: 0; width: 492px; height: 331px; opacity: .96; }
+  .dots { position: absolute; left: 454px; bottom: 18px; z-index: 3; display: flex; gap: 7px; }
+  .dots i { width: 17px; height: 3px; border-radius: 999px; background: #cad4e2; }
+  .dots i:first-child { width: 21px; background: #0975ff; }
+
+  /* Focus Today */
+  .focus-today { flex: 1 1 auto; padding: 22px 23px 0; height: 332px; }
+  .rank-list { padding-top: 3px; }
+  .rank-item { height: 51px; display: flex; align-items: center; border-bottom: 1px solid #eef1f6; }
+  [data-theme="dark"] .rank-item { border-bottom-color: #334155; }
+  .rank-item:last-child { border-bottom: 0; }
+  .rank-num { width: 29px; height: 25px; flex: 0 0 29px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; margin-right: 13px; }
+  .rank-num.n01, .rank-num.n1 { background: #eef5ff; color: #0d74ff; }
+  .rank-num.n02, .rank-num.n2 { background: #fff1ef; color: #ff4a3d; }
+  .rank-num.n03, .rank-num.n3 { background: #fff5e9; color: #ff8a1a; }
+  .rank-num.n04, .rank-num.n05, .rank-num.n4, .rank-num.n5 { background: #f5f6f8; color: #7b8492; }
+  .rank-text { min-width: 0; flex: 1; padding-top: 1px; }
+  .rank-text strong { display: block; font-size: 13px; line-height: 17px; font-weight: 900; letter-spacing: -.2px; }
+  .rank-text strong a { color: var(--text); }
+  .rank-text span { display: block; margin-top: 4px; color: #8992a4; font-size: 12px; line-height: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  [data-theme="dark"] .rank-text span { color: #64748b; }
+  .rank-time { width: 54px; text-align: right; color: #8a94a5; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+
+  /* Mid Grid */
+  .mid-grid { display: flex; gap: 16px; margin-top: 16px; height: 315px; }
+  .focus-news { width: 626px; padding: 21px 21px 0; }
+  .focus-news-body { display: flex; gap: 23px; height: 247px; }
+  .lead-news { width: 269px; flex: 0 0 269px; position: relative; }
+  .lead-news .image-box { width: 269px; height: 158px; border-radius: 6px; overflow: hidden; position: relative; background: #e6effd; }
+  .lead-news .image-box img, .mini-thumb img, .article-img img { width: 100%; height: 100%; display: block; object-fit: cover; }
+  .lead-news h3 { margin: 14px 0 8px; font-size: 15px; line-height: 21px; font-weight: 900; letter-spacing: -.2px; }
+  .lead-news h3 a, .mini-news strong a { color: var(--text); }
+  .lead-news p { margin: 0 0 12px; color: #6c7688; font-size: 12px; line-height: 18px; font-weight: 600; }
+  [data-theme="dark"] .lead-news p { color: #94a3b8; }
+  .meta { color: #9aa3b4; font-size: 11px; line-height: 14px; font-weight: 700; }
+  .meta b { color: #6f7b91; font-weight: 800; }
+  [data-theme="dark"] .meta b { color: #38bdf8; }
+  .news-list { flex: 1; padding-top: 0; }
+  .mini-news { height: 61px; display: flex; align-items: flex-start; gap: 13px; border-bottom: 1px solid #edf1f6; padding: 0 0 12px; margin-bottom: 11px; }
+  [data-theme="dark"] .mini-news { border-bottom-color: #334155; }
+  .mini-news:last-child { margin-bottom: 0; border-bottom: 0; }
+  .mini-thumb { width: 68px; height: 45px; flex: 0 0 68px; border-radius: 4px; overflow: hidden; background: #e9f0fb; }
+  .mini-news strong { display: block; font-size: 13px; line-height: 17px; font-weight: 900; white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+  .mini-news .meta { margin-top: 7px; }
+
+  /* Software */
+  .software { width: 410px; padding: 21px 20px 0; }
+  .soft-list { margin-top: 3px; }
+  .soft-item { height: 63px; display: flex; align-items: center; border-bottom: 1px solid #edf1f6; }
+  [data-theme="dark"] .soft-item { border-bottom-color: #334155; }
+  .soft-item:last-child { border-bottom: 0; }
+  .soft-icon { width: 42px; height: 42px; border-radius: 9px; margin-right: 14px; flex: 0 0 42px; display: flex; align-items: center; justify-content: center; color: #fff; }
+  .soft-icon svg { width: 22px; height: 22px; }
+  .soft-icon.plus { background: linear-gradient(145deg, #4298ff, #096cff); }
+  .soft-info { min-width: 0; flex: 1; }
+  .soft-info strong { display: block; font-size: 13px; line-height: 16px; font-weight: 900; }
+  .soft-info strong a { color: var(--text); }
+  .soft-info span { display: block; margin-top: 4px; color: #7f899b; font-size: 11px; line-height: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .soft-info em { display: block; margin-top: 5px; font-style: normal; color: #7f899b; font-size: 11px; font-weight: 600; }
+  .soft-action { width: 62px; height: 29px; border: 1px solid #9fc3ff; border-radius: 7px; background: #fff; color: #0b6bff; font-size: 12px; font-weight: 800; margin-left: 12px; cursor: pointer; }
+  [data-theme="dark"] .soft-action { background: #1e293b; border-color: #38bdf8; color: #38bdf8; }
+
+  /* Latest */
+  .latest { height: 174px; margin-top: 16px; padding: 20px 21px 0; }
+  .latest-head { height: 32px; display: flex; align-items: flex-start; }
+  .latest-head h2 { margin: 0 27px 0 0; font-size: 19px; line-height: 26px; font-weight: 900; }
+  .tabs { display: flex; gap: 22px; align-items: center; }
+  .tabs span { font-size: 13px; color: #4b5568; line-height: 27px; font-weight: 700; }
+  .tabs .active { width: 39px; height: 27px; background: #eef5ff; color: #096cff; border-radius: 6px; text-align: center; line-height: 27px; font-weight: 900; }
+  [data-theme="dark"] .tabs .active { background: rgba(56,189,248,.15); color: #38bdf8; }
+  .article-row { height: 103px; display: flex; gap: 42px; }
+  .article { flex: 1; display: flex; min-width: 0; }
+  .article-img { width: 117px; height: 89px; flex: 0 0 117px; border-radius: 6px; overflow: hidden; background: #e6eef9; margin-right: 17px; }
+  .article h3 { margin: 2px 0 6px; font-size: 15px; line-height: 20px; font-weight: 900; letter-spacing: -.2px; }
+  .article h3 a { color: var(--text); }
+  .article p { margin: 0 0 10px; color: #6b7688; font-size: 12px; line-height: 18px; font-weight: 600; max-width: 235px; }
+  [data-theme="dark"] .article p { color: #94a3b8; }
+  .article .meta b { color: #156eff; margin-right: 17px; }
+  [data-theme="dark"] .article .meta b { color: #38bdf8; }
+
+  @media (max-width: 1280px) {
+    .page { width: calc(100% - 40px); }
+    .hero { flex: 1 1 100%; }
+    .top-grid, .mid-grid { height: auto; flex-wrap: wrap; }
+    .focus-today { flex: 1 1 460px; }
+    .focus-news { width: calc(58% - 8px); }
+    .software { width: calc(42% - 8px); }
+    .latest { height: auto; padding-bottom: 18px; }
+    .article-row { height: auto; flex-wrap: wrap; gap: 24px; }
+    .article { flex: 1 1 calc(50% - 24px); }
+  }
+  @media (max-width: 820px) {
+    .page { width: calc(100% - 24px); margin-top: 12px; }
+    .top-grid, .mid-grid { flex-direction: column; gap: 12px; }
+    .hero { flex: none; width: 100%; height: 332px; }
+    .hero-content { padding-left: 22px; width: min(78%, 420px); }
+    .hero h1 { font-size: 34px; letter-spacing: -1.2px; }
+    .hero p { width: 92%; font-size: 13px; }
+    .hero-art { right: -170px; opacity: .48; }
+    .dots { left: 50%; transform: translateX(-50%); }
+    .focus-today, .focus-news, .software, .latest { width: 100%; height: auto; padding-bottom: 18px; }
+    .focus-news-body { height: auto; flex-direction: column; }
+    .lead-news, .lead-news .image-box { width: 100%; }
+    .lead-news .image-box { height: 190px; }
+    .mini-news strong { max-width: 100%; }
+    .article-row { flex-direction: column; gap: 18px; }
+    .article { width: 100%; }
+    .article p { max-width: none; }
+  }
+</style>
+</body>
+</html>
