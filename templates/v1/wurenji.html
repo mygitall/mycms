@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>无人机技术 - [--site_name--]</title></head>
+<body>
+[--include(name=header)--]
+<main class="page">
+<div class="ct-hero"><h1>低空智能与飞行科技</h1><p>围绕无人机产业、设备、应用场景和前沿趋势整理内容</p></div>
+<div class="wu-layout">
+<div class="wu-main">
+[--loop:articles(cat=无人机,num=16,sort=published_at,order=DESC)--]
+<article class="wu-card"><div class="wu-card-body"><h3><a href="[--url--]">[--title--]</a></h3><p>[--summary--]</p><div class="wu-meta"><span class="ct-cat">[--category--]</span><span>[--published_at--]</span><span class="ct-views"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8s3-5.5 6-5.5S14 8 14 8s-3 5.5-6 5.5S2 8 2 8Z"/><circle cx="8" cy="8" r="1.5"/></svg> [--view_count--]</span></div></div></article>
+[--/loop:articles--]
+</div>
+<aside class="wu-side"><div class="al-side-card"><h2>热门阅读</h2>
+[--loop:articles(cat=无人机,num=6,sort=view_count,order=DESC)--]
+<a class="wu-hot" href="[--url--]"><span class="al-rank-num">[--_idx--]</span><span class="al-rank-text">[--title--]</span><span class="al-rank-n">[--view_count--]</span></a>
+[--/loop:articles--]
+</div></aside>
+</div>
+</main>
+[--include(name=footer)--]
+<style>
+.ct-hero{text-align:center;padding:32px 0 24px}.ct-hero h1{margin:0;font-size:28px;font-weight:900;color:var(--text)}.ct-hero p{margin:6px 0 0;color:var(--muted);font-size:14px}
+.ct-cat{font-size:11px;font-weight:700;color:var(--blue);background:rgba(24,119,255,.06);padding:2px 8px;border-radius:3px}[data-theme="dark"] .ct-cat{background:rgba(56,189,248,.1);color:#38bdf8}
+.ct-views{display:flex;align-items:center;gap:4px}.ct-views svg{width:12px;height:12px;flex-shrink:0}
+.wu-layout{display:flex;gap:24px;align-items:flex-start;padding-bottom:32px}.wu-main{flex:1;min-width:0}
+.wu-card{padding:18px 20px;border:1px solid var(--line);border-radius:12px;background:var(--card-bg);margin-bottom:12px;transition:box-shadow .15s}.wu-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.wu-card-body h3{margin:0 0 6px;font-size:16px;font-weight:800}.wu-card-body h3 a{color:var(--text);text-decoration:none}
+.wu-card-body p{margin:0 0 10px;font-size:12px;color:var(--muted);line-height:1.5}
+.wu-meta{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted)}
+.wu-side{width:300px;flex:0 0 300px;position:sticky;top:80px}
+.al-side-card{padding:20px 22px;background:var(--card-bg);border:1px solid var(--line);border-radius:12px}.al-side-card h2{font-size:15px;font-weight:800;margin:0 0 12px}
+.wu-hot{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);text-decoration:none}.wu-hot:last-child{border-bottom:0}
+.al-rank-num{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:#f3f5f9;color:var(--muted);flex-shrink:0}
+.wu-hot:nth-child(2) .al-rank-num{background:#fef3c7;color:#f59e0b}.wu-hot:nth-child(3) .al-rank-num{background:#eef5ff;color:#0d74ff}.wu-hot:nth-child(4) .al-rank-num{background:#fff5e9;color:#ff8a1a}
+.al-rank-text{flex:1;font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.al-rank-n{font-size:11px;color:var(--muted);flex-shrink:0}
+[data-theme="dark"] .al-rank-num{background:#334155}[data-theme="dark"] .wu-hot:nth-child(2) .al-rank-num{background:rgba(245,158,11,.15);color:#f59e0b}[data-theme="dark"] .wu-hot:nth-child(3) .al-rank-num{background:rgba(56,189,248,.15);color:#38bdf8}[data-theme="dark"] .wu-hot:nth-child(4) .al-rank-num{background:rgba(255,138,26,.15);color:#ff8a1a}
+@media(max-width:820px){.wu-layout{flex-direction:column}.wu-side{width:100%;flex:none;position:static}}
+</style>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>搜索 - [--site_name--]</title>
+</head>
+<body>
+[--include(name=header)--]
+
+<main class="page">
+  <div class="sr-hero">
+    <h1>搜索内容</h1>
+    <p>在文章和软件库中搜索关键词，结果以清爽列表呈现。</p>
+    <div class="sr-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="search" id="q" placeholder="输入关键词搜索文章、软件…" autocomplete="off" onkeydown="if(event.key==='Enter')doSearch()">
+      <button onclick="doSearch()">搜索</button>
+    </div>
+  </div>
+
+  <div id="loading" style="display:none;text-align:center;padding:32px;color:var(--muted)">搜索中…</div>
+  <div id="results"></div>
+  <div class="sr-empty" id="empty" style="display:none"><p>输入关键词开始搜索</p></div>
+</main>
+
+[--include(name=footer)--]
+
+<script>
+(function(){
+  var bp=(window.__BASE_PATH__||'').replace(/\/$/,'');
+  var API=bp+'/search/api/list.php';
+  var input=document.getElementById('q'),loading=document.getElementById('loading'),results=document.getElementById('results'),empty=document.getElementById('empty');
+  function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+  function hl(t,k){var s=esc(t);if(!k)return s;var p=k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return s.replace(new RegExp('('+p+')','gi'),'<mark>$1</mark>');}
+  window.doSearch=function(){
+    var kw=input.value.trim();
+    if(!kw){empty.style.display='block';results.innerHTML='';return;}
+    empty.style.display='none';loading.style.display='block';results.innerHTML='';
+    history.replaceState(null,'','?q='+encodeURIComponent(kw));
+    fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keyword:kw,page:1,page_size:20})})
+    .then(function(r){return r.json()}).then(function(d){
+      loading.style.display='none';
+      if(d.code!==0||!d.data||!d.data.list||!d.data.list.length){results.innerHTML='<div class="sr-none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><line x1="8" y1="8" x2="16" y2="16"/></svg><h3>未找到结果</h3><p>尝试其他关键词</p></div>';return;}
+      var h='<p class="sr-count">找到 '+esc(d.data.total)+' 条结果</p>';
+      d.data.list.forEach(function(item){
+        var title=item.title||item.name||'',url=item.url||(item.type==='software'?bp+'/software/p/'+item.id:bp+'/article/p/'+item.id);
+        var sub=(item.content||item.subtitle||'').substring(0,200),typeLabel=item.type==='software'?'软件':'文章';
+        h+='<a class="sr-item" href="'+esc(url)+'"><span class="sr-type '+item.type+'">'+typeLabel+'</span><div class="sr-body"><h3>'+hl(title,kw)+'</h3><p>'+esc(sub)+'</p></div><span class="sr-arr">&rarr;</span></a>';
+      });
+      results.innerHTML=h;
+    }).catch(function(){loading.style.display='none';results.innerHTML='<div class="sr-none"><h3>搜索失败</h3><p>请稍后重试</p></div>';});
+  };
+  var q=new URLSearchParams(location.search).get('q')||'';if(q){input.value=q;doSearch();}if(!q)empty.style.display='block';
+})();
+</script>
+
+<style>
+  .sr-hero{text-align:center;padding:48px 0 32px}.sr-hero h1{margin:0;font-size:32px;font-weight:900;color:var(--text);letter-spacing:-.6px}.sr-hero p{margin:8px 0 24px;color:var(--muted);font-size:14px}
+  .sr-bar{display:flex;align-items:center;max-width:640px;margin:0 auto;height:52px;border:1px solid var(--line);border-radius:14px;background:var(--card-bg);overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+  .sr-bar svg{width:20px;height:20px;margin-left:18px;color:var(--muted);flex-shrink:0}.sr-bar input{flex:1;height:100%;border:0;outline:0;padding:0 14px;font-size:15px;background:transparent;color:var(--text)}.sr-bar input::placeholder{color:var(--muted)}.sr-bar button{height:40px;margin-right:6px;padding:0 24px;border:0;border-radius:10px;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+  .sr-count{color:var(--muted);font-size:13px;padding:8px 0 16px}
+  .sr-item{display:flex;align-items:center;gap:16px;padding:18px 20px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:var(--card-bg);text-decoration:none;transition:box-shadow .15s}.sr-item:hover{box-shadow:0 2px 12px rgba(0,0,0,.06)}
+  .sr-type{font-size:11px;font-weight:700;padding:3px 10px;border-radius:4px;white-space:nowrap}.sr-type.article{background:#eef5ff;color:#0d74ff}.sr-type.software{background:#eafaf2;color:#17b26a}
+  [data-theme="dark"] .sr-type.article{background:rgba(56,189,248,.15);color:#38bdf8}[data-theme="dark"] .sr-type.software{background:rgba(23,178,106,.15);color:#17b26a}
+  .sr-body{flex:1;min-width:0}.sr-body h3{margin:0 0 4px;font-size:15px;font-weight:800;color:var(--text)}.sr-body h3 mark{background:#fef08a;color:#111;border-radius:2px;padding:0 2px}.sr-body p{margin:0;font-size:12px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .sr-arr{color:var(--muted);font-size:18px;flex-shrink:0}.sr-none{text-align:center;padding:48px 0;color:var(--muted)}.sr-none svg{width:48px;height:48px;margin-bottom:12px}.sr-none h3{font-size:16px;margin:0 0 6px;color:var(--text)}.sr-empty{text-align:center;padding:48px 0;color:var(--muted);font-size:14px}
+  @media(max-width:820px){.sr-bar{max-width:100%;height:48px}.sr-hero{padding:32px 0 24px}.sr-hero h1{font-size:26px}}
+</style>
+</body>
+</html>

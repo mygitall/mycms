@@ -21,7 +21,7 @@
           <button class="more" onclick="location.href='/software-list'">了解更多</button>
         </div>
       </div>
-      <div class="hero-art"></div>
+      <div class="hero-art"><svg viewBox="0 0 480 340" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="60" y="40" width="160" height="120" rx="16" fill="rgba(9,108,255,.07)"/><rect x="100" y="180" width="200" height="100" rx="14" fill="rgba(9,108,255,.04)"/><rect x="260" y="80" width="150" height="180" rx="18" fill="rgba(9,108,255,.06)"/><circle cx="380" cy="60" r="40" fill="rgba(9,108,255,.05)"/><circle cx="80" cy="280" r="30" fill="rgba(124,58,237,.06)"/></svg></div>
       <div class="dots"><i></i><i></i><i></i></div>
     </article>
 
@@ -117,12 +117,12 @@
     <div class="latest-head">
       <h2>最新文章</h2>
       <div class="tabs">
-        <span class="active">最新</span>
-        <span>最热</span>
-        <span>推荐</span>
+        <span class="active" data-sort="published_at" onclick="switchLatestTab(this)">最新</span>
+        <span data-sort="view_count" onclick="switchLatestTab(this)">最热</span>
+        <span data-sort="updated_at" onclick="switchLatestTab(this)">推荐</span>
       </div>
     </div>
-    <div class="article-row">
+    <div class="article-row" id="latest-article-row">
       [--loop:articles(num=4,sort=published_at,order=DESC)--]
       <article class="article">
         <div class="article-img"><img src="[--cover_image--]" alt="[--title--]" onerror="this.parentElement.style.background='#e6eef9'"></div>
@@ -138,6 +138,28 @@
 </main>
 
 [--include(name=footer)--]
+
+<script>
+// Latest articles tab switching
+function switchLatestTab(el) {
+  document.querySelectorAll('.tabs span').forEach(function(s){ s.classList.remove('active'); });
+  el.classList.add('active');
+  var sort = el.getAttribute('data-sort');
+  var bp = (window.__BASE_PATH__||'').replace(/\/$/,'');
+  var row = document.getElementById('latest-article-row');
+  row.style.opacity = '0.4';
+  fetch(bp+'/article/api/list.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page:1,page_size:4,sort_by:sort,sort_order:'DESC'})})
+  .then(function(r){return r.json()}).then(function(res){
+    if(res.code!==0)return;
+    var list=res.data.list||[];
+    var h='';list.forEach(function(a){
+      h+='<article class="article"><div class="article-img"><img src="'+(a.cover_image||'')+'" alt="'+esc(a.title)+'" onerror="this.parentElement.style.background=\'#e6eef9\'"></div><div><h3><a href="'+bp+'/article/p/'+a.id+'">'+esc(a.title)+'</a></h3><p>'+esc((a.content||'').substring(0,120))+'</p><div class="meta"><b>'+esc(a.category||'')+'</b>　'+esc(a.published_at||'')+'　'+(a.view_count||0)+' 阅读</div></div></article>';
+    });
+    row.innerHTML=h;row.style.opacity='1';
+  }).catch(function(){row.style.opacity='1';});
+  function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+}
+</script>
 
 <style>
   .page { width: min(1568px, calc(100% - 104px)); margin: 24px auto 15px; }
