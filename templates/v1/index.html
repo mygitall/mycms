@@ -194,7 +194,7 @@ function switchLatestTab(el) {
   .dots i:first-child { width: 18px; background: #0975ff; }
 
   /* Focus Today */
-  .focus-today { flex: 0 0 auto; padding: 0; height: 260px; width: auto; }
+  .focus-today { flex: 1 1 auto; min-width: 280px; max-width: 420px; padding: 0; height: 260px; overflow: hidden; }
   .focus-today .section-head { padding: 0 18px; }
   .focus-today .rank-list { padding: 0 18px 12px; }
   .rank-list { padding: 0 18px 12px; }
@@ -295,10 +295,10 @@ function switchLatestTab(el) {
 
   @media (max-width: 1280px) {
     .page { width: calc(100% - 48px); }
-    .hero { flex: 1 1 100%; height: auto; min-height: 220px; }
+    .hero { flex: 1 1 auto; height: auto; min-height: 220px; }
     .top-grid { flex-wrap: wrap; height: auto; }
     .mid-grid { flex-wrap: wrap; }
-    .focus-today { flex: 0 0 300px; }
+    .focus-today { flex: 0 1 auto; min-width: 260px; max-width: 340px; height: auto; }
     .focus-news { width: calc(55% - 8px); }
     .software { width: calc(45% - 8px); }
     .entry { flex: 1 1 100%; }
