@@ -26,20 +26,19 @@
     </article>
 
     <aside class="card focus-today">
-      <div class="section-head">
+      <div class="ft-head">
         <h2>今日关注</h2>
-        <span class="see"><a href="/article-list">查看全部 &rsaquo;</a></span>
+        <a class="ft-more" href="/article-list">&rsaquo;</a>
       </div>
-      <div class="rank-list">
+      <div class="ft-list">
         [--loop:articles(num=5,sort=view_count,order=DESC)--]
-        <div class="rank-item">
-          <div class="rank-num n[--_idx--]">[--_idx--]</div>
-          <div class="rank-text">
-            <strong><a href="[--url--]">[--title--]</a></strong>
-            <span>[--summary--]</span>
-          </div>
-          <div class="rank-time">[--published_at--]</div>
-        </div>
+        <a class="ft-item" href="[--url--]">
+          <span class="ft-num">[--_idx--]</span>
+          <span class="ft-body">
+            <strong>[--title--]</strong>
+            <small>[--published_at--]</small>
+          </span>
+        </a>
         [--/loop:articles--]
       </div>
     </aside>
@@ -194,24 +193,27 @@ function switchLatestTab(el) {
   .dots i:first-child { width: 18px; background: #0975ff; }
 
   /* Focus Today */
-  .focus-today { flex: 1 1 auto; min-width: 280px; max-width: 420px; padding: 0; height: 260px; overflow: hidden; }
-  .focus-today .section-head { padding: 0 18px; }
-  .focus-today .rank-list { padding: 0 18px 12px; }
-  .rank-list { padding: 0 18px 12px; }
-  .rank-item { height: 51px; display: flex; align-items: center; border-bottom: 1px solid #eef1f6; }
-  [data-theme="dark"] .rank-item { border-bottom-color: #334155; }
-  .rank-item:last-child { border-bottom: 0; }
-  .rank-num { width: 29px; height: 25px; flex: 0 0 29px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; margin-right: 13px; }
-  .rank-num.n01, .rank-num.n1 { background: #eef5ff; color: #0d74ff; }
-  .rank-num.n02, .rank-num.n2 { background: #fff1ef; color: #ff4a3d; }
-  .rank-num.n03, .rank-num.n3 { background: #fff5e9; color: #ff8a1a; }
-  .rank-num.n04, .rank-num.n05, .rank-num.n4, .rank-num.n5 { background: #f5f6f8; color: #7b8492; }
-  .rank-text { min-width: 0; flex: 1; padding-top: 1px; }
-  .rank-text strong { display: block; font-size: 13px; line-height: 17px; font-weight: 900; letter-spacing: -.2px; }
-  .rank-text strong a { color: var(--text); }
-  .rank-text span { display: block; margin-top: 4px; color: #8992a4; font-size: 12px; line-height: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  [data-theme="dark"] .rank-text span { color: #64748b; }
-  .rank-time { width: 54px; text-align: right; color: #8a94a5; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .focus-today { flex: 1 1 auto; min-width: 280px; max-width: 420px; padding: 0; height: 260px; overflow: hidden; display: flex; flex-direction: column; }
+  .ft-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 10px; flex-shrink: 0; }
+  .ft-head h2 { margin: 0; font-size: 16px; font-weight: 900; color: var(--text); }
+  .ft-more { color: var(--muted); text-decoration: none; font-size: 18px; line-height: 1; font-weight: 600; }
+  .ft-more:hover { color: var(--blue); }
+  .ft-list { flex: 1; overflow-y: auto; padding: 0 18px 8px; }
+  .ft-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); text-decoration: none; }
+  .ft-item:last-child { border-bottom: 0; }
+  .ft-num { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--muted); background: #f3f5f9; flex-shrink: 0; }
+  .ft-item:nth-child(1) .ft-num { background: #fef3c7; color: #d97706; }
+  .ft-item:nth-child(2) .ft-num { background: #eef5ff; color: #0d74ff; }
+  .ft-item:nth-child(3) .ft-num { background: #fff5e9; color: #ea580c; }
+  [data-theme="dark"] .ft-num { background: #334155; }
+  [data-theme="dark"] .ft-item:nth-child(1) .ft-num { background: rgba(217,119,6,.2); color: #fbbf24; }
+  [data-theme="dark"] .ft-item:nth-child(2) .ft-num { background: rgba(13,116,255,.2); color: #60a5fa; }
+  [data-theme="dark"] .ft-item:nth-child(3) .ft-num { background: rgba(234,88,12,.2); color: #fb923c; }
+  .ft-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .ft-body strong { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+  .ft-body small { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .ft-item:hover .ft-body strong { color: var(--blue); }
+
 
   /* Mid Grid */
   .mid-grid { display: flex; gap: 16px; margin-top: 16px; }
