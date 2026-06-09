@@ -17,7 +17,16 @@ function tag_include($attrs) {
     if ($name === '') return '';
     // 安全检查：只允许字母数字和连字符
     if (!preg_match('/^[a-zA-Z0-9_-]+$/', $name)) return '';
-    $file = __DIR__ . '/../../templates/v4/' . $name . '.html';
+
+    $activeTemplate = 'v4';
+    if (function_exists('getActiveTemplate')) {
+        $activeTemplate = basename(getActiveTemplate());
+    }
+
+    $file = __DIR__ . '/../../templates/' . $activeTemplate . '/' . $name . '.html';
+    if (!is_file($file)) {
+        $file = __DIR__ . '/../../templates/v4/' . $name . '.html';
+    }
     if (!is_file($file)) {
         $file = __DIR__ . '/../../frontend/' . $name . '.html';
     }
