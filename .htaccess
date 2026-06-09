@@ -1,10 +1,7 @@
 RewriteEngine On
 
-# 禁止 Apache 自动给目录加斜杠（前台路由 /search 会被误判为目录）
-DirectorySlash Off
-
+# DirectorySlash 保持默认 On — admin 和 search 由 Apache 自动补斜杠后正常路由
 # 前台路由精确匹配
-RewriteRule ^search$ index.php [L,QSA]
 RewriteRule ^list$ /article-list [R=301,L]
 RewriteRule ^article-list$ index.php [L,QSA]
 RewriteRule ^drone-list$ index.php [L,QSA]
