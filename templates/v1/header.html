@@ -137,5 +137,11 @@
     var toggle=document.getElementById('v1NavToggle');
     if(nav&&nav.classList.contains('open')&&!nav.contains(e.target)&&e.target!==toggle&&!toggle.contains(e.target)){nav.classList.remove('open');}
   });
+  // 禁止所有平台双指缩放(iOS gesture)和双击缩放
+  document.addEventListener('touchstart',function(e){if(e.touches.length>1){e.preventDefault();}},{passive:false});
+  document.addEventListener('gesturestart',function(e){e.preventDefault();});
+  document.addEventListener('gesturechange',function(e){e.preventDefault();});
+  document.addEventListener('gestureend',function(e){e.preventDefault();});
+  var _lt=0;document.addEventListener('touchend',function(e){var n=Date.now();if(n-_lt<=300){e.preventDefault();}_lt=n;},false);
 })();
 </script>
