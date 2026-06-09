@@ -24,18 +24,16 @@
           <img src="[--cover_image--]" alt="[--title--]" loading="lazy" onerror="this.parentElement.style.display='none'">
         </a>
         <div class="al-card-body">
-          <div class="al-card-top">
-            <span class="al-card-cat">[--category--]</span>
-            <span class="al-card-date">[--published_at--]</span>
-          </div>
           <h3><a href="[--url--]">[--title--]</a></h3>
           <p>[--summary--]</p>
-          <div class="al-card-foot">
+          <div class="al-card-meta">
+            <span class="al-card-cat">[--category--]</span>
+            <span>[--published_at--]</span>
             <span class="al-card-views">
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8s3-5.5 6-5.5S14 8 14 8s-3 5.5-6 5.5S2 8 2 8Z"/><circle cx="8" cy="8" r="1.5"/></svg>
-              [--view_count--] 阅读
+              [--view_count--]
             </span>
-            <a class="al-card-more" href="[--url--]">阅读全文 &rarr;</a>
+            <a class="al-card-more" href="[--url--]">&rarr;</a>
           </div>
         </div>
       </article>
@@ -79,25 +77,23 @@
   .al-layout { display: flex; gap: 28px; align-items: flex-start; }
   .al-main { flex: 1; min-width: 0; }
 
-  .al-card { display: flex; gap: 22px; padding: 22px 0; border-bottom: 1px solid var(--line); transition: padding .15s; }
-  .al-card:hover { padding-left: 6px; }
-  .al-card-img { width: 220px; height: 148px; flex: 0 0 220px; border-radius: 10px; overflow: hidden; background: #eef2f8; display: block; }
-  .al-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
-  .al-card:hover .al-card-img img { transform: scale(1.04); }
-  .al-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
-  .al-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
-  .al-card-cat { font-size: 11px; font-weight: 700; color: var(--blue); background: rgba(24,119,255,.07); padding: 3px 10px; border-radius: 4px; }
-  [data-theme="dark"] .al-card-cat { background: rgba(56,189,248,.12); color: #38bdf8; }
-  .al-card-date { font-size: 11px; color: var(--muted); }
-  .al-card-body h3 { margin: 0 0 8px; font-size: 19px; line-height: 1.3; font-weight: 800; letter-spacing: -.3px; }
+  .al-card { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); transition: padding .12s; }
+  .al-card:hover { padding-left: 4px; }
+  .al-card-img { width: 160px; height: 106px; flex: 0 0 160px; border-radius: 8px; overflow: hidden; background: #eef2f8; display: block; }
+  .al-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .25s; }
+  .al-card:hover .al-card-img img { transform: scale(1.05); }
+  .al-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .al-card-body h3 { margin: 0 0 5px; font-size: 16px; line-height: 1.3; font-weight: 800; letter-spacing: -.2px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
   .al-card-body h3 a { color: var(--text); text-decoration: none; }
   .al-card-body h3 a:hover { color: var(--blue); }
-  .al-card-body p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .al-card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
-  .al-card-views { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); }
-  .al-card-views svg { width: 14px; height: 14px; }
-  .al-card-more { font-size: 12px; font-weight: 600; color: var(--blue); text-decoration: none; opacity: 0; transform: translateX(-8px); transition: .2s; }
-  .al-card:hover .al-card-more { opacity: 1; transform: translateX(0); }
+  .al-card-body p { margin: 0 0 8px; color: var(--muted); font-size: 12.5px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .al-card-meta { display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--muted); margin-top: auto; }
+  .al-card-cat { font-weight: 700; color: var(--blue); background: rgba(24,119,255,.06); padding: 2px 8px; border-radius: 3px; }
+  [data-theme="dark"] .al-card-cat { background: rgba(56,189,248,.1); color: #38bdf8; }
+  .al-card-views { display: flex; align-items: center; gap: 3px; }
+  .al-card-views svg { width: 12px; height: 12px; }
+  .al-card-more { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--blue); text-decoration: none; opacity: 0; transition: .15s; }
+  .al-card:hover .al-card-more { opacity: 1; }
 
   .al-sidebar { width: 312px; flex: 0 0 312px; display: flex; flex-direction: column; gap: 16px; position: sticky; top: 80px; }
   .al-side-card { padding: 20px 22px; }
