@@ -12,8 +12,15 @@
   <div class="al-breadcrumb">[--breadcrumb--]</div>
 
   <div class="al-hero">
-    <h1>[--column_info--]文章列表</h1>
-    <p>按时间、热度和栏目组织内容，保持干净阅读体验。</p>
+    <div class="al-hero-inner">
+      <div class="al-hero-badge">
+        <span class="al-hero-dot"></span>
+        文章中心
+      </div>
+      <h1>[--column_info--]文章列表</h1>
+      <p>按时间、热度和栏目组织内容，保持干净阅读体验。</p>
+      <div class="al-hero-line"></div>
+    </div>
   </div>
 
   <div class="al-layout">
@@ -71,9 +78,15 @@
   .al-breadcrumb { padding: 14px 0 0; color: var(--muted); font-size: 12px; }
   .al-breadcrumb a { color: var(--muted); text-decoration: none; }
   .al-breadcrumb a:hover { color: var(--blue); }
-  .al-hero { padding: 20px 0 24px; }
-  .al-hero h1 { margin: 0; font-size: 32px; font-weight: 900; color: var(--text); letter-spacing: -.6px; }
-  .al-hero p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+  .al-hero { background: var(--card-bg); border: 1px solid var(--line); border-radius: 14px; padding: 32px 36px; margin-bottom: 4px; position: relative; overflow: hidden; }
+  .al-hero:before { content:""; position:absolute; right:-40px; top:-20px; width:180px; height:180px; border-radius:50%; background: radial-gradient(circle, rgba(24,119,255,.06) 0%, transparent 70%); pointer-events:none; }
+  .al-hero-inner { position: relative; z-index: 1; }
+  .al-hero-badge { display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 14px; border: 1px solid #d9e5f6; border-radius: 14px; font-size: 11px; font-weight: 700; color: #4f6d95; margin-bottom: 16px; background: rgba(255,255,255,.6); }
+  [data-theme="dark"] .al-hero-badge { border-color: #334155; color: #94a3b8; background: rgba(30,41,59,.6); }
+  .al-hero-dot { width: 7px; height: 7px; border-radius: 50%; background: #0876ff; box-shadow: 0 0 8px rgba(8,118,255,.35); }
+  .al-hero h1 { margin: 0 0 8px; font-size: 32px; font-weight: 900; color: var(--text); letter-spacing: -.6px; }
+  .al-hero p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+  .al-hero-line { width: 48px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, #0876ff, #38bdf8); margin-top: 18px; }
   .al-layout { display: flex; gap: 28px; align-items: flex-start; }
   .al-main { flex: 1; min-width: 0; }
 
