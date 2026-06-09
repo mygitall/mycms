@@ -114,12 +114,24 @@
   .sd-back { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 20px; color: var(--muted); font-size: 14px; text-decoration: none; }
   .sd-back:hover { color: var(--blue); }
 
-  @media (max-width: 820px) {
-    .sd-page { width: calc(100% - 24px); }
+  @media (max-width: 860px) {
+    .sd-page { width: calc(100% - 32px); }
     .sd-layout { flex-direction: column; }
     .sd-side { width: 100%; flex: none; position: static; }
     .sd-hero { flex-direction: column; align-items: flex-start; }
-    .sd-title { font-size: 26px; }
+    .sd-title { font-size: 24px; }
+    .sd-icon { width: 72px; height: 72px; flex: 0 0 72px; border-radius: 18px; }
+    .sd-icon:before { width: 28px; height: 5px; }
+    .sd-icon:after { width: 5px; height: 28px; }
+  }
+  @media (max-width: 480px) {
+    .sd-page { width: calc(100% - 20px); }
+    .sd-title { font-size: 20px; }
+    .sd-icon { width: 56px; height: 56px; flex: 0 0 56px; }
+    .sd-card { padding: 20px 18px; }
+    .sd-card-title { font-size: 15px; }
+    .sd-ver { font-size: 13px; height: 26px; }
+    .sd-dl-btn { height: 46px; font-size: 14px; }
   }
 </style>
 </body>

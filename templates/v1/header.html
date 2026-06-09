@@ -59,8 +59,26 @@
   [data-theme="dark"] .btn-header.primary { border-color: #38bdf8; background: linear-gradient(180deg,#38bdf8 0%,#0ea5e9 100%); color: #0f172a; }
   [data-theme="dark"] .theme-toggle-btn { background: #1e293b; border-color: #334155; color: #e2e8f0; }
 
-  @media (max-width: 1280px) { .header-inner { width: calc(100% - 40px); } .main-nav { margin-left: 40px; gap: 24px; } .search { width: 210px; } }
-  @media (max-width: 820px) { .site-header { height: auto; } .header-inner { width: calc(100% - 28px); height: auto; padding: 14px 0; flex-wrap: wrap; gap: 12px; } .brand { width: 100%; } .main-nav { width: 100%; height: 42px; margin-left: 0; gap: 22px; overflow-x: auto; flex: none; } .main-nav a { height: 42px; line-height: 42px; font-size: 13px; flex: 0 0 auto; } .header-actions { width: 100%; gap: 10px; } .search { flex: 1; width: auto; } }
+  .nav-toggle { display: none; width: 40px; height: 40px; border: 1px solid #e2e7f0; border-radius: 7px; background: #fff; cursor: pointer; align-items: center; justify-content: center; color: #1f2937; flex-shrink: 0; }
+  [data-theme="dark"] .nav-toggle { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+  .nav-toggle svg { width: 20px; height: 20px; }
+  .main-nav.open { display: flex; }
+
+  @media (max-width: 1280px) { .header-inner { width: calc(100% - 48px); } .main-nav { margin-left: 28px; gap: 24px; } .search { width: 180px; } }
+  @media (max-width: 860px) { .site-header { height: auto; position: sticky; top: 0; z-index: 100; }
+    .header-inner { width: calc(100% - 32px); height: 56px; padding: 0; flex-wrap: nowrap; gap: 10px; }
+    .brand { width: auto; flex: 1; min-width: 0; }
+    .brand-text span { display: none; }
+    .main-nav { display: none; position: absolute; top: 56px; left: 0; right: 0; background: var(--card-bg); border-bottom: 1px solid var(--line); padding: 8px 16px 12px; flex-direction: column; gap: 2px; height: auto; margin: 0; box-shadow: 0 8px 24px rgba(0,0,0,.08); z-index: 99; }
+    .main-nav.open { display: flex; }
+    .main-nav a { height: 42px; line-height: 42px; font-size: 14px; font-weight: 600; }
+    .main-nav a.active::after { display: none; }
+    .main-nav a.active { background: rgba(9,108,255,.06); border-radius: 8px; padding: 0 12px; margin: 0 -12px; }
+    .search { flex: 1; width: auto; min-width: 0; }
+    .btn-header { display: none; }
+    .theme-toggle-btn { flex-shrink: 0; }
+    .nav-toggle { display: flex; }
+  }
 </style>
 
 <nav class="site-header">
@@ -94,6 +112,9 @@
         <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
+      <button class="nav-toggle" id="v1NavToggle" type="button" aria-label="菜单" onclick="document.getElementById('v1NavLinks').classList.toggle('open')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
     </div>
   </div>
 </nav>
@@ -109,6 +130,12 @@
   toggle.addEventListener('click',function(){
     var next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
     setTheme(next);
+  });
+  // 移动端点击菜单外部关闭
+  document.addEventListener('click',function(e){
+    var nav=document.getElementById('v1NavLinks');
+    var toggle=document.getElementById('v1NavToggle');
+    if(nav&&nav.classList.contains('open')&&!nav.contains(e.target)&&e.target!==toggle&&!toggle.contains(e.target)){nav.classList.remove('open');}
   });
 })();
 </script>
