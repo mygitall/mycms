@@ -78,6 +78,17 @@ $frontendRoutes = [
     '/login' => 'login.html',
 ];
 
+// 旧文章详情入口统一跳转到规范 URL，避免 /detail?id=17 和 /article/p/17 重复收录/展示
+$detailRoute = $BASE_PATH . '/detail';
+if (($path === $detailRoute || $path === '/detail') && isset($_GET['id'])) {
+    $legacyArticleId = (int) $_GET['id'];
+    if ($legacyArticleId > 0) {
+        $canonicalBase = ($BASE_PATH === '/') ? '' : $BASE_PATH;
+        header('Location: ' . $canonicalBase . '/article/p/' . $legacyArticleId, true, 301);
+        exit;
+    }
+}
+
 /**
  * 输出前台页面，自动替换资源路径和注入 BASE_PATH
  */
@@ -248,7 +259,11 @@ $baseForRe = preg_quote($BASE_PATH === '/' ? '' : $BASE_PATH, '/');
 $detailPattern = '/^' . $baseForRe . '\/article\/p\/(\d+)$/';
 if (preg_match($detailPattern, $path, $m)) {
     $articleId = (int)$m[1];
-    $file = __DIR__ . '/article/detail.html';
+    $activeTemplate = getActiveTemplate();
+    $file = __DIR__ . '/templates/' . $activeTemplate . '/article-detail.html';
+    if (!is_file($file)) {
+        $file = __DIR__ . '/article/detail.html';
+    }
     if (is_file($file)) {
         $html = file_get_contents($file);
 

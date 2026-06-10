@@ -150,6 +150,41 @@
   function setTheme(name){document.documentElement.setAttribute('data-theme',name);localStorage.setItem(STORAGE_KEY,name);}
   var current=localStorage.getItem(STORAGE_KEY)||'light';
   setTheme(current);
+  var nav=document.getElementById('v1NavLinks');
+  if(nav){
+    var aliases={'文章管理':'文章','软件管理':'软件'};
+    Array.prototype.forEach.call(nav.querySelectorAll('a'),function(a){
+      var text=a.textContent.trim();
+      if(aliases[text]) a.textContent=aliases[text];
+    });
+    var seen={};
+    Array.prototype.forEach.call(nav.querySelectorAll('a'),function(a){
+      var key;
+      try{
+        var u=new URL(a.getAttribute('href'),location.origin);
+        key=u.pathname.replace(/\/+$/,'')||'/';
+        if(u.search) key+=u.search;
+      }catch(e){ key=a.getAttribute('href')||a.textContent.trim(); }
+      if(seen[key]){ a.remove(); return; }
+      seen[key]=true;
+    });
+    var path=(location.pathname.replace(/\/+$/,'')||'/');
+    Array.prototype.forEach.call(nav.querySelectorAll('a'),function(a){a.classList.remove('active');});
+    var target='首页';
+    if(location.search.indexOf('col=22')>=0||path==='/guoji') target='国际新闻1';
+    else if(path==='/wurenji') target='无人机';
+    else if(path.indexOf('/article')===0||path==='/article-list') target='文章';
+    else if(path.indexOf('/software')===0||path==='/software-list') target='软件';
+    else if(path.indexOf('/search')===0) target='搜索';
+    var matched=false;
+    Array.prototype.forEach.call(nav.querySelectorAll('a'),function(a){
+      if(!matched&&a.textContent.trim()===target){a.classList.add('active');matched=true;}
+    });
+    if(!matched){
+      var home=nav.querySelector('a[href="/"]');
+      if(home) home.classList.add('active');
+    }
+  }
   toggle.addEventListener('click',function(){
     var next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
     setTheme(next);

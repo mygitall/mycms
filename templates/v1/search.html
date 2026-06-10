@@ -32,6 +32,16 @@
   var API=bp+'/search/api/list.php';
   var input=document.getElementById('q'),loading=document.getElementById('loading'),results=document.getElementById('results'),empty=document.getElementById('empty');
   function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+  function cleanSummary(s){
+    var d=document.createElement('div');
+    d.innerHTML=s||'';
+    var text=(d.textContent||d.innerText||'').replace(/\u00a0/g,' ');
+    text=text.replace(/首页\s+要闻\s+更多\s+正在浏览[:：]?/g,' ');
+    text=text.replace(/央视新闻\s+搜索\s+网页设置\s+登录\s+安装电脑版\s+内容更精彩/g,' ');
+    text=text.replace(/\s*关注\s*\d+\s*评论\s*\d+(?:\s*\d+)?\s*手机看\s*/g,' ');
+    text=text.replace(/\s+/g,' ').trim();
+    return text.substring(0,120);
+  }
   function hl(t,k){var s=esc(t);if(!k)return s;var p=k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return s.replace(new RegExp('('+p+')','gi'),'<mark>$1</mark>');}
   window.doSearch=function(){
     var kw=input.value.trim();
@@ -45,7 +55,7 @@
       var h='<p class="sr-count">找到 '+esc(d.data.total)+' 条结果</p>';
       d.data.list.forEach(function(item){
         var title=item.title||item.name||'',url=item.url||(item.type==='software'?bp+'/software/p/'+item.id:bp+'/article/p/'+item.id);
-        var sub=(item.content||item.subtitle||'').substring(0,200),typeLabel=item.type==='software'?'软件':'文章';
+        var sub=cleanSummary(item.content||item.subtitle||''),typeLabel=item.type==='software'?'软件':'文章';
         h+='<a class="sr-item" href="'+esc(url)+'"><span class="sr-type '+item.type+'">'+typeLabel+'</span><div class="sr-body"><h3>'+hl(title,kw)+'</h3><p>'+esc(sub)+'</p></div><span class="sr-arr">&rarr;</span></a>';
       });
       results.innerHTML=h;

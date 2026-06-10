@@ -79,6 +79,15 @@
 
 [--include(name=footer)--]
 
+<script>
+(function(){
+  var title=document.querySelector('.sd-title');
+  if(title&&title.textContent.trim()){
+    document.title=title.textContent.trim()+' - MYCMS';
+  }
+})();
+</script>
+
 <style>
   .sd-page { width: min(1568px, calc(100% - 104px)); margin: 0 auto; padding: 24px 0 32px; }
   .sd-layout { display: flex; gap: 24px; align-items: flex-start; }

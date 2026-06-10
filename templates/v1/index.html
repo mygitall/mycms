@@ -40,7 +40,7 @@
       <div class="today-list">
         [--loop:articles(num=5,sort=view_count,order=DESC)--]
         <a class="today-item" href="[--url--]">
-          <span class="rank">0[--_idx--]</span>
+          <span class="rank"></span>
           <span class="today-copy">
             <strong>[--title--]</strong>
             <small>[--summary--]</small>
@@ -364,8 +364,9 @@
   .nova-dots i:first-child { width: 24px; background: var(--nova-blue); }
 
   .today-card { padding: 22px; }
-  .today-list { display: grid; }
+  .today-list { display: grid; counter-reset: today-rank; }
   .today-item {
+    counter-increment: today-rank;
     display: grid;
     grid-template-columns: 34px minmax(0, 1fr) 54px;
     gap: 12px;
@@ -385,6 +386,7 @@
     font-size: 12px;
     font-weight: 900;
   }
+  .rank::before { content: counter(today-rank, decimal-leading-zero); }
   .today-item:nth-child(2) .rank { background: #fff2f0; color: #f04438; }
   .today-item:nth-child(3) .rank { background: #fff5e8; color: #fb7a21; }
   .today-copy strong {

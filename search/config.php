@@ -36,7 +36,7 @@ if (!function_exists('search_getSources')) {
                     'download_count' => '0',
                     'os_support' => "''",
                 ),
-                'detail_url' => $base . '/detail?id=',
+                'detail_url' => $base . '/article/p/',
             ),
             'software' => array(
                 'table' => $prefix . 'software',

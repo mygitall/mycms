@@ -8,6 +8,7 @@ RewriteRule ^drone-list$ index.php [L,QSA]
 RewriteRule ^software-list$ index.php [L,QSA]
 RewriteRule ^tag-doc$ index.php [L,QSA]
 RewriteRule ^detail$ index.php [L,QSA]
+RewriteRule ^search/?$ index.php [L,QSA]
 RewriteRule ^favorites$ index.php [L,QSA]
 RewriteRule ^login$ index.php [L,QSA]
 
