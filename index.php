@@ -78,15 +78,17 @@ $frontendRoutes = [
     '/login' => 'login.html',
 ];
 
-// 旧文章详情入口统一跳转到规范 URL，避免 /detail?id=17 和 /article/p/17 重复收录/展示
+// /detail 入口：带 ?id=N → 301 到 /article/p/N；无 id → 301 到文章列表
 $detailRoute = $BASE_PATH . '/detail';
-if (($path === $detailRoute || $path === '/detail') && isset($_GET['id'])) {
-    $legacyArticleId = (int) $_GET['id'];
-    if ($legacyArticleId > 0) {
+if ($path === $detailRoute || $path === '/detail') {
+    if (isset($_GET['id']) && (int)$_GET['id'] > 0) {
         $canonicalBase = ($BASE_PATH === '/') ? '' : $BASE_PATH;
-        header('Location: ' . $canonicalBase . '/article/p/' . $legacyArticleId, true, 301);
+        header('Location: ' . $canonicalBase . '/article/p/' . (int)$_GET['id'], true, 301);
         exit;
     }
+    $listUrl = ($BASE_PATH === '/' || $BASE_PATH === '') ? '/article-list' : ($BASE_PATH . '/article-list');
+    header('Location: ' . $listUrl, true, 301);
+    exit;
 }
 
 /**
@@ -181,11 +183,17 @@ function getActiveTemplate() {
 }
 
 if ($matchedRoute) {
-    // 优先使用当前模板目录下的文件，不存在则降级到 frontend/
+    // 优先级：当前模板 → v1 默认模板 → frontend/
     $activeTemplate = getActiveTemplate();
     $tplFile = __DIR__ . '/templates/' . $activeTemplate . '/' . $matchedRoute;
     if (is_file($tplFile)) {
         serveFrontend($tplFile, $BASE_PATH);
+    }
+    if ($activeTemplate !== 'v1') {
+        $v1File = __DIR__ . '/templates/v1/' . $matchedRoute;
+        if (is_file($v1File)) {
+            serveFrontend($v1File, $BASE_PATH);
+        }
     }
     serveFrontend(__DIR__ . '/frontend/' . $matchedRoute, $BASE_PATH);
 }
