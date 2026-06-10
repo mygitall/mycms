@@ -93,6 +93,23 @@ function tag_clean_summary($html, $length)
     return mb_substr($text, 0, $length, 'UTF-8');
 }
 
+function tag_default_cover_image()
+{
+    return 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27400%27 height=%27240%27 viewBox=%270 0 400 240%27%3E%3Cdefs%3E%3ClinearGradient id=%27g%27 x1=%270%27 y1=%270%27 x2=%271%27 y2=%271%27%3E%3Cstop stop-color=%27%23edf5ff%27/%3E%3Cstop offset=%271%27 stop-color=%27%23cfe2ff%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill=%27url(%23g)%27 width=%27400%27 height=%27240%27/%3E%3Cpath d=%27M92 151h216M116 125h168M142 99h116%27 stroke=%27%230b6bff%27 stroke-width=%278%27 stroke-linecap=%27round%27 opacity=%27.36%27/%3E%3Ccircle cx=%27290%27 cy=%2770%27 r=%2730%27 fill=%27%230b6bff%27 opacity=%27.14%27/%3E%3C/svg%3E';
+}
+
+function tag_normalize_cover_image($cover)
+{
+    $cover = trim((string)$cover);
+    if ($cover === '') {
+        return tag_default_cover_image();
+    }
+    if (preg_match('/^(https?:)?\/\//i', $cover) || strpos($cover, '/') === 0 || strpos($cover, 'data:image/') === 0) {
+        return $cover;
+    }
+    return tag_default_cover_image();
+}
+
 function tag_site_name($attrs) {
     try {
         $pdo = getDB();
@@ -314,6 +331,8 @@ function tag_loop_articles($attrs) {
         foreach ($list as &$item) {
             $item['url'] = getArticleUrl($item['id']);
             $item['summary'] = tag_clean_summary($item['content'], 120);
+            $item['category'] = trim((string)$item['category']) !== '' ? $item['category'] : '未分类';
+            $item['cover_image'] = tag_normalize_cover_image($item['cover_image']);
         }
         unset($item);
 

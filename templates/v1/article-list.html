@@ -9,7 +9,7 @@
 [--include(name=header)--]
 
 <main class="page">
-  <div class="al-breadcrumb">[--breadcrumb--]</div>
+  <div class="al-breadcrumb"><a href="/">首页</a><span>/</span><span>文章中心</span></div>
 
   <div class="al-hero">
     <div class="al-hero-inner">
@@ -75,65 +75,99 @@
 [--include(name=footer)--]
 
 <style>
-  .al-breadcrumb { padding: 14px 0 0; color: var(--muted); font-size: 12px; }
+  .page {
+    width: min(1568px, calc(100% - 104px));
+    margin: 0 auto;
+    padding: 24px 0 30px;
+    color: var(--text);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-areas:
+      "crumb crumb"
+      "hero side"
+      "main side";
+    gap: 16px 24px;
+    align-items: start;
+  }
+  .al-breadcrumb { grid-area: crumb; display: flex; align-items: center; gap: 7px; padding: 0; color: var(--muted); font-size: 12px; }
   .al-breadcrumb a { color: var(--muted); text-decoration: none; }
   .al-breadcrumb a:hover { color: var(--blue); }
-  .al-hero { background: var(--card-bg); border: 1px solid var(--line); border-radius: 14px; padding: 0; margin: 0; position: relative; overflow: hidden; }
-  .al-hero:before { content:""; position:absolute; right:-40px; top:-20px; width:180px; height:180px; border-radius:50%; background: radial-gradient(circle, rgba(24,119,255,.06) 0%, transparent 70%); pointer-events:none; }
-  .al-hero-inner { position: relative; z-index: 1; }
-  .al-hero-badge { display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 14px; border: 1px solid #d9e5f6; border-radius: 14px; font-size: 11px; font-weight: 700; color: #4f6d95; margin-bottom: 16px; background: rgba(255,255,255,.6); }
+  .al-hero { grid-area: hero; min-height: 218px; display: flex; align-items: stretch; background: radial-gradient(circle at 88% 24%, rgba(24,119,255,.14), transparent 24%), linear-gradient(135deg, rgba(255,255,255,.98), rgba(239,246,255,.86)); border: 1px solid var(--line); border-radius: 16px; padding: 0; margin: 0; position: relative; overflow: hidden; box-shadow: var(--shadow); }
+  .al-hero:before { content:""; position:absolute; right:-40px; top:-40px; width:260px; height:220px; border-radius:50%; background: radial-gradient(circle, rgba(24,119,255,.12) 0%, transparent 68%); pointer-events:none; }
+  .al-hero:after { content:""; position:absolute; inset:0; background: linear-gradient(120deg, transparent 0 58%, rgba(255,255,255,.62) 59%, transparent 60%); pointer-events:none; }
+  .al-hero-inner { position: relative; z-index: 1; padding: 28px 30px; width: min(620px, 100%); display: flex; flex-direction: column; justify-content: center; }
+  .al-hero-badge { display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 14px; border: 1px solid #d9e5f6; border-radius: 14px; font-size: 11px; font-weight: 700; color: #4f6d95; margin-bottom: 14px; background: rgba(255,255,255,.66); }
   [data-theme="dark"] .al-hero-badge { border-color: #334155; color: #94a3b8; background: rgba(30,41,59,.6); }
   .al-hero-dot { width: 7px; height: 7px; border-radius: 50%; background: #0876ff; box-shadow: 0 0 8px rgba(8,118,255,.35); }
-  .al-hero h1 { margin: 0 0 8px; font-size: 32px; font-weight: 900; color: var(--text); letter-spacing: -.6px; }
+  .al-hero h1 { margin: 0 0 8px; font-size: clamp(28px, 2.4vw, 38px); line-height: 1.15; font-weight: 950; color: var(--text); letter-spacing: 0; }
   .al-hero p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
-  .al-hero-line { width: 48px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, #0876ff, #38bdf8); margin-top: 18px; }
-  .al-layout { display: flex; gap: 28px; align-items: flex-start; }
-  .al-main { flex: 1; min-width: 0; }
+  .al-hero-line { width: 52px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, #0876ff, #38bdf8); margin-top: 16px; }
+  .al-layout { display: contents; }
+  .al-main { grid-area: main; min-width: 0; display: grid; gap: 12px; }
 
-  .al-card { display: flex; gap: 16px; padding: 16px; border-bottom: 1px solid var(--line); background: var(--card-bg); border-radius: 10px; margin-bottom: 12px; border: 1px solid var(--line); transition: box-shadow .15s; }
-  .al-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,.06); }
-  .al-card-img { width: 160px; height: 106px; flex: 0 0 160px; border-radius: 8px; overflow: hidden; background: #eef2f8; display: block; }
+  .al-card { display: flex; gap: 16px; padding: 16px; background: var(--card-bg); border-radius: 12px; margin: 0; border: 1px solid var(--line); box-shadow: 0 8px 24px rgba(34,78,143,.045); transition: border-color .15s, box-shadow .15s, transform .15s; }
+  .al-card:hover { border-color: rgba(24,119,255,.22); box-shadow: 0 12px 30px rgba(34,78,143,.08); transform: translateY(-1px); }
+  .al-card-img { width: 168px; height: 108px; flex: 0 0 168px; border-radius: 10px; overflow: hidden; background: #eef2f8; display: block; }
   .al-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .25s; }
   .al-card:hover .al-card-img img { transform: scale(1.05); }
   .al-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-  .al-card-body h3 { margin: 0 0 5px; font-size: 16px; line-height: 1.3; font-weight: 800; letter-spacing: -.2px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+  .al-card-body h3 { margin: 0 0 7px; font-size: 16px; line-height: 1.35; font-weight: 850; letter-spacing: 0; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
   .al-card-body h3 a { color: var(--text); text-decoration: none; }
   .al-card-body h3 a:hover { color: var(--blue); }
-  .al-card-body p { margin: 0 0 8px; color: var(--muted); font-size: 12.5px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .al-card-meta { display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--muted); margin-top: auto; }
-  .al-card-cat { font-weight: 700; color: var(--blue); background: rgba(24,119,255,.06); padding: 2px 8px; border-radius: 3px; }
+  .al-card-body p { margin: 0 0 10px; color: var(--muted); font-size: 12.5px; line-height: 1.58; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 39px; }
+  .al-card-body p:empty::before { content: "暂无摘要"; color: var(--muted); opacity: .72; }
+  .al-card-meta { display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--muted); margin-top: auto; flex-wrap: wrap; }
+  .al-card-cat { font-weight: 700; color: var(--blue); background: rgba(24,119,255,.06); padding: 2px 8px; border-radius: 5px; }
   [data-theme="dark"] .al-card-cat { background: rgba(56,189,248,.1); color: #38bdf8; }
   .al-card-views { display: flex; align-items: center; gap: 3px; }
   .al-card-views svg { width: 12px; height: 12px; }
-  .al-card-more { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--blue); text-decoration: none; opacity: 0; transition: .15s; }
+  .al-card-more { margin-left: auto; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 7px; background: rgba(24,119,255,.07); font-size: 13px; font-weight: 800; color: var(--blue); text-decoration: none; opacity: 0; transition: .15s; }
   .al-card:hover .al-card-more { opacity: 1; }
 
-  .al-sidebar { width: 312px; flex: 0 0 312px; display: flex; flex-direction: column; gap: 16px; position: sticky; top: 80px; }
-  .al-side-card { padding: 20px 22px; background: var(--card-bg); border: 1px solid var(--line); border-radius: 12px; }
+  .al-sidebar { grid-area: side; width: auto; min-width: 0; display: flex; flex-direction: column; gap: 16px; position: sticky; top: 84px; }
+  .al-side-card { padding: 20px 22px; background: var(--card-bg); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 8px 24px rgba(34,78,143,.045); }
   .al-side-head { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
   .al-side-head h2 { margin: 0; font-size: 15px; font-weight: 800; color: var(--text); }
   .al-side-head svg { width: 14px; height: 14px; color: #f59e0b; }
-  .al-rank-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); text-decoration: none; }
+  .al-side-card:first-child { counter-reset: al-rank; }
+  .al-rank-item { counter-increment: al-rank; display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); text-decoration: none; }
   .al-rank-item:last-child { border-bottom: 0; }
-  .al-rank-num { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; background: #f3f5f9; color: var(--muted); flex-shrink: 0; }
+  .al-rank-num { width: 25px; height: 25px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 0; font-weight: 800; background: #f3f5f9; color: var(--muted); flex-shrink: 0; }
+  .al-rank-num::before { content: counter(al-rank, decimal-leading-zero); font-size: 11px; }
   .al-rank-item:nth-child(2) .al-rank-num { background: #fef3c7; color: #f59e0b; }
   .al-rank-item:nth-child(3) .al-rank-num { background: #eef5ff; color: #0d74ff; }
   .al-rank-item:nth-child(4) .al-rank-num { background: #fff5e9; color: #ff8a1a; }
   .al-rank-text { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .al-rank-n { font-size: 11px; color: var(--muted); flex-shrink: 0; }
   .al-side-nav { display: flex; flex-direction: column; gap: 1px; }
+  .al-side-nav ul { list-style: none; margin: 0; padding: 0; }
+  .al-side-nav li { margin: 0; padding: 0; }
+  .al-side-nav li ul { margin: 2px 0 4px 12px; padding-left: 12px; border-left: 1px solid var(--line); }
   .al-side-nav a { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 7px; color: var(--muted); font-size: 13px; font-weight: 500; text-decoration: none; transition: .12s; }
   .al-side-nav a:before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--muted); opacity: .4; flex-shrink: 0; }
   .al-side-nav a:hover { color: var(--text); background: rgba(0,0,0,.025); }
+  [data-theme="dark"] .al-hero { background: radial-gradient(circle at 88% 24%, rgba(56,189,248,.16), transparent 24%), linear-gradient(135deg, rgba(30,41,59,.95), rgba(15,23,42,.9)); }
+  [data-theme="dark"] .al-hero:after { background: linear-gradient(120deg, transparent 0 58%, rgba(148,163,184,.12) 59%, transparent 60%); }
+  [data-theme="dark"] .al-card, [data-theme="dark"] .al-side-card { box-shadow: 0 14px 32px rgba(0,0,0,.22); }
   [data-theme="dark"] .al-side-nav a:hover { background: rgba(255,255,255,.035); }
   [data-theme="dark"] .al-rank-num { background: #334155; }
   [data-theme="dark"] .al-rank-item:nth-child(2) .al-rank-num { background: rgba(245,158,11,.15); color: #f59e0b; }
   [data-theme="dark"] .al-rank-item:nth-child(3) .al-rank-num { background: rgba(56,189,248,.15); color: #38bdf8; }
   [data-theme="dark"] .al-rank-item:nth-child(4) .al-rank-num { background: rgba(255,138,26,.15); color: #ff8a1a; }
 
-  @media (max-width: 1280px) {}
+  @media (max-width: 1280px) { .page { width: calc(100% - 48px); grid-template-columns: minmax(0, 1fr) 300px; } }
   @media (max-width: 860px) {
-    .al-layout { flex-direction: column; }
+    .page {
+      width: calc(100% - 32px);
+      padding-top: 16px;
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "crumb"
+        "hero"
+        "main"
+        "side";
+      gap: 16px;
+    }
     .al-sidebar { width: 100%; flex: none; position: static; }
     .al-card { padding: 12px; gap: 12px; }
     .al-card-img { width: 120px; height: 80px; flex: 0 0 120px; }
@@ -144,10 +178,13 @@
     .al-hero-inner { padding: 20px 18px; }
   }
   @media (max-width: 480px) {
+    .page { width: calc(100% - 28px); }
     .al-hero-inner { padding: 16px 14px; }
-    .al-card { padding: 12px; }
-    .al-card-img { height: 160px; }
+    .al-card { padding: 12px; flex-direction: column; }
+    .al-card-img { width: 100%; height: 168px; flex: none; }
     .al-card-body h3 { font-size: 14px; }
+    .al-card-body p { min-height: 0; -webkit-line-clamp: 2; }
+    .al-card-more { margin-left: 0; }
     .al-hero h1 { font-size: 24px; }
   }
 </style>

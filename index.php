@@ -251,6 +251,11 @@ if (preg_match($detailPattern, $path, $m)) {
     $file = __DIR__ . '/article/detail.html';
     if (is_file($file)) {
         $html = file_get_contents($file);
+
+        // 标签渲染：让文章详情页也能使用公共模板占位符，如 [--include(name=footer)--]
+        require_once __DIR__ . '/module/tags/config.php';
+        $html = TagHook::render($html, $file);
+
         $injectScript = "<script>window.__ARTICLE_ID__ = {$articleId};window.__BASE_PATH__ = " . json_encode($BASE_PATH === '/' ? '' : $BASE_PATH) . ";</script>";
         $lastBodyPos = strrpos($html, '</body>');
         if ($lastBodyPos !== false) {
