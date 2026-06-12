@@ -156,13 +156,18 @@ function tag_software_detail($attrs) {
         $prefix = DB_PREFIX;
         $stmt = $pdo->prepare(
             "SELECT id, name, version, description, category_name AS category,
-                    view_count, download_count, download_urls, created_at
+                    view_count, download_count, download_urls, file_size, os_support, tags,
+                    changelog, created_at
              FROM `{$prefix}software` WHERE id = :id AND status = 1 LIMIT 1"
         );
         $stmt->execute(array(':id' => $id));
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
             $row['url'] = getBaseUrl() . '/software/p/' . $row['id'];
+            // description 和 changelog 允许富文本，先净化后输出
+            $row['description'] = sanitizeHtml($row['description']);
+            $row['changelog']  = sanitizeHtml($row['changelog']);
+            // 其他字段通过 [--field--] 直接输出到 HTML 属性/文本节点，不需要后端转义
             return array($row);
         }
         return array();
@@ -676,4 +681,56 @@ function getBaseUrl() {
 
 function getArticleUrl($id) {
     return getBaseUrl() . '/article/p/' . (int)$id;
+}
+
+function sanitizeHtml($html) {
+    if (!$html || !is_string($html)) return '';
+    // 受信任的视频平台 iframe
+    $trustedHosts = array(
+        'player.bilibili.com',
+        'www.youtube.com',
+        'player.youku.com',
+        'v.qq.com',
+        'open.iqiyi.com',
+        'player.vimeo.com',
+        'www.douyin.com',
+    );
+    $placeholders = array();
+    foreach ($trustedHosts as $host) {
+        $hostEscaped = str_replace('.', '\.', preg_quote($host, '/'));
+        if (preg_match_all('/<iframe\b[^>]*src=["\']https?:\/\/' . $hostEscaped . '[^"\']*["\'][^>]*>.*?<\/iframe>/si', $html, $matches)) {
+            foreach ($matches[0] as $i => $m) {
+                $key = "\x00IFRAME" . $i . "\x00";
+                $placeholders[$key] = $m;
+                $html = str_replace($m, $key, $html);
+            }
+        }
+    }
+    // 剥离危险标签
+    $html = preg_replace('/<script\b[^>]*>.*?<\/script>/si', '', $html);
+    $html = preg_replace('/<iframe\b[^>]*>.*?<\/iframe>/si', '', $html);
+    $html = preg_replace('/<object\b[^>]*>.*?<\/object>/si', '', $html);
+    $html = preg_replace('/<embed\b[^>]*\/?>/si', '', $html);
+    $html = preg_replace('/<form\b[^>]*>.*?<\/form>/si', '', $html);
+    $html = preg_replace('/<input\b[^>]*\/?>/si', '', $html);
+    $html = preg_replace('/<button\b[^>]*>.*?<\/button>/si', '', $html);
+    $html = preg_replace('/<select\b[^>]*>.*?<\/select>/si', '', $html);
+    $html = preg_replace('/<textarea\b[^>]*>.*?<\/textarea>/si', '', $html);
+    $html = preg_replace('/<link\b[^>]*\/?>/si', '', $html);
+    $html = preg_replace('/<style\b[^>]*>.*?<\/style>/si', '', $html);
+    $html = preg_replace('/<meta\b[^>]*\/?>/si', '', $html);
+    $html = preg_replace('/<!--.*?-->/s', '', $html);
+    $html = preg_replace('/<svg\b[^>]*>.*?<\/svg>/si', '', $html);
+    $html = preg_replace('/<math\b[^>]*>.*?<\/math>/si', '', $html);
+    // 剥离事件属性
+    $html = preg_replace('/\son\w+\s*=\s*"[^"]*"/i', '', $html);
+    $html = preg_replace('/\son\w+\s*=\s*\'[^\']*\'/i', '', $html);
+    $html = preg_replace('/\son\w+\s*=\s*[^\s>]*/i', '', $html);
+    // 剥离 javascript: URL
+    $html = preg_replace('/javascript\s*:/i', '', $html);
+    // 恢复受信任 iframe
+    foreach ($placeholders as $key => $val) {
+        $html = str_replace($key, $val, $html);
+    }
+    return $html;
 }

@@ -133,8 +133,8 @@ PHP;
 
         if ($node['type'] === TagParser::TAG) {
             $name = $node['name'];
-            // HTML 内容字段不转义（content/description/download_urls）
-            $htmlFields = array('content', 'description', 'download_urls');
+            // HTML 内容字段不转义（content/description/download_urls/changelog）
+            $htmlFields = array('content', 'description', 'download_urls', 'changelog');
             if (in_array($name, $htmlFields)) {
                 return "if (isset({$itemVar}['{$name}'])) { echo {$itemVar}['{$name}']; }\n";
             }

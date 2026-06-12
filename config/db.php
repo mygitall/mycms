@@ -537,6 +537,10 @@ function resolveAdminToken() {
     if ($token !== null && $token !== '') {
         return $token;
     }
+    // 兜底：从 HttpOnly Cookie 读取（fetch + modal 登录场景）
+    if (!empty($_COOKIE['admin_token'])) {
+        return $_COOKIE['admin_token'];
+    }
     return null;
 }
 

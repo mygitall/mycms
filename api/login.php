@@ -32,7 +32,7 @@ function recordFailure($rateLimitFile, $banFile, $banIsEnabled, $now, &$attempts
 $input = getInput();
 
 $username = isset($input['username']) ? trim($input['username']) : '';
-$password = isset($input['password']) ? $input['password'] : '';
+$password = isset($input['password']) ? trim($input['password']) : '';
 $device   = isset($input['device'])   ? trim($input['device']) : '';
 $remember = !empty($input['remember']);
 
@@ -127,6 +127,15 @@ if (file_exists($rateLimitFile)) @unlink($rateLimitFile);
 if (file_exists($banFile))       @unlink($banFile);
 
 $tokenInfo = createToken($pdo, $user['id'], $device, $remember ? (30 * 24 * 60 * 60) : 0);
+$cookieExpiry = time() + (int)$tokenInfo['expires_in'];
+$isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+setcookie('admin_token', $tokenInfo['token'], [
+    'expires'  => $cookieExpiry,
+    'path'     => '/',
+    'secure'   => $isSecure,
+    'httponly' => true,
+    'samesite' => 'Strict',
+]);
 
 $prefix = DB_PREFIX;
 $upd = $pdo->prepare("UPDATE {$prefix}users SET login_count = login_count + 1, last_login_at = NOW() WHERE id = :uid");

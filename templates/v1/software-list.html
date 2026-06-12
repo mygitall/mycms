@@ -12,77 +12,711 @@
 [--include(name=header)--]
 
 <main class="page" id="main-content">
-  <div class="soft-hero">
-    <h1>软件精选</h1>
-    <p>把工具陈列得更克制，突出名称、版本、分类和摘要，适合快速浏览与跳转。</p>
-  </div>
 
-  <div class="soft-grid">
-    [--loop:software(num=20)--]
-    <article class="soft-card">
-      <div class="soft-card-icon">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+  <!-- ═══ Hero ═══ -->
+  <section class="sw-hero">
+    <div class="sw-hero-copy">
+      <div class="sw-badge"><span></span> 软件精选</div>
+      <h1>精选<span>实用工具</span>，提升数字工作流</h1>
+      <p>每一款软件都经过筛选，按分类、平台和热度整理，帮你快速找到趁手工具。</p>
+    </div>
+    <div class="sw-hero-stats">
+      <div class="sw-stat">
+        <strong>[--loop:software(num=1)--][--_total--][--/loop:software--]</strong>
+        <span>精选工具</span>
       </div>
-      <div class="soft-card-body">
-        <div class="soft-card-head">
-          <h3><a href="[--url--]">[--name--]</a></h3>
-          <span class="soft-card-ver">v[--version--]</span>
+      <div class="sw-stat">
+        <strong>4+</strong>
+        <span>分类覆盖</span>
+      </div>
+      <div class="sw-stat">
+        <strong>macOS</strong>
+        <span>Windows · Linux</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 分类筛选 ═══ -->
+  <div id="sw-filter-category" class="sw-filters" role="tablist" aria-label="软件分类筛选"></div>
+
+  <!-- ═══ 主内容 ═══ -->
+  <div class="sw-layout">
+
+    <div class="sw-main">
+      <div class="sw-grid">
+        [--loop:software(num=20)--]
+        <article class="sw-card" data-category="[--category--]">
+          <div class="sw-card-inner">
+            <div class="sw-card-icon" aria-hidden="true">
+              <span class="sw-card-icon-text">[--name--]</span>
+            </div>
+            <div class="sw-card-body">
+              <div class="sw-card-top">
+                <h3><a href="[--url--]">[--name--]</a></h3>
+                <span class="sw-ver">v[--version--]</span>
+              </div>
+              <p class="sw-card-desc">[--summary--]</p>
+              <div class="sw-card-foot">
+                <span class="sw-card-cat">[--category--]</span>
+                <span class="sw-card-stat">
+                  <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v12m0 0-4-4m4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+                  [--download_count--]
+                </span>
+                <a class="sw-card-link" href="[--url--]">详情 <span aria-hidden="true">&rarr;</span></a>
+              </div>
+            </div>
+          </div>
+        </article>
+        [--/loop:software--]
+      </div>
+    </div>
+
+    <!-- ═══ 侧边栏 ═══ -->
+    <aside class="sw-side">
+      <div class="sw-side-card" id="popular-panel">
+        <div class="sw-side-head">
+          <h2>热门下载</h2>
+          <svg aria-hidden="true" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l2.5 5 5.5.8-4 3.9.9 5.5L8 13.8l-4.9 2.6.9-5.5-4-3.9 5.5-.8L8 1.5z"/></svg>
         </div>
-        <p>[--summary--]</p>
-        <div class="soft-card-foot">
-          <span class="soft-card-cat">[--category--]</span>
-          <span>[--view_count--] 浏览</span>
-          <span>[--download_count--] 下载</span>
-          <a class="soft-card-btn" href="[--url--]">查看详情</a>
+        <div class="sw-rank-list">
+          [--loop:software(num=8,sort=download_count,order=DESC)--]
+          <a class="sw-rank-item" href="[--url--]">
+            <span class="sw-rank-num"></span>
+            <span class="sw-rank-body">
+              <strong>[--name--]</strong>
+              <small>[--category--] · v[--version--]</small>
+            </span>
+            <span class="sw-rank-val">[--download_count--]</span>
+          </a>
+          [--/loop:software--]
         </div>
       </div>
-    </article>
-    [--/loop:software--]
+
+      <div class="sw-side-card">
+        <div class="sw-side-head">
+          <h2>分类标签</h2>
+        </div>
+        <div class="sw-tag-cloud" id="sw-tag-cloud"></div>
+      </div>
+    </aside>
+
   </div>
 </main>
 
 [--include(name=footer)--]
 
 <style>
-  .soft-hero { padding: 24px 0 20px; }
-  .soft-hero h1 { margin: 0; font-size: 28px; font-weight: 900; color: var(--text); letter-spacing: -.3px; }
-  .soft-hero p { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
-  .soft-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding-bottom: 24px; }
-  .soft-card { display: flex; gap: 16px; padding: 20px; background: var(--card-bg); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); align-items: flex-start; }
-  .soft-card-icon { width: 44px; height: 44px; border-radius: 10px; flex: 0 0 44px; display: flex; align-items: center; justify-content: center; color: #fff; background: linear-gradient(145deg, #4298ff, #096cff); }
-  .soft-card-icon svg { width: 20px; height: 20px; }
-  .soft-card:nth-child(4n+2) .soft-card-icon { background: linear-gradient(145deg, #4798ff, #096bff); }
-  .soft-card:nth-child(4n+3) .soft-card-icon { background: linear-gradient(145deg, #8d73ff, #5b3edc); }
-  .soft-card:nth-child(4n+4) .soft-card-icon { background: linear-gradient(145deg, #363a43, #111419); }
-  .soft-card-body { flex: 1; min-width: 0; }
-  .soft-card-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
-  .soft-card-head h3 { margin: 0; font-size: 16px; font-weight: 800; }
-  .soft-card-head h3 a { color: var(--text); text-decoration: none; }
-  .soft-card-head h3 a:hover { color: var(--blue); }
-  .soft-card-ver { font-size: 11px; font-weight: 700; color: var(--blue); background: rgba(24,119,255,.08); padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
-  .soft-card-body p { margin: 0 0 10px; color: var(--muted); font-size: 13px; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .soft-card-foot { display: flex; align-items: center; gap: 16px; font-size: 11px; color: var(--muted); flex-wrap: wrap; }
-  .soft-card-cat { font-weight: 700; color: #6f7b91; }
-  [data-theme="dark"] .soft-card-cat { color: #94a3b8; }
-  .soft-card-btn { margin-left: auto; padding: 5px 14px; border: 1px solid #9fc3ff; border-radius: 6px; color: #0b6bff; font-size: 11px; font-weight: 700; text-decoration: none; white-space: nowrap; }
-  .soft-card-btn:hover { background: #eef5ff; }
-  [data-theme="dark"] .soft-card-btn { border-color: #38bdf8; color: #38bdf8; }
-  [data-theme="dark"] .soft-card-btn:hover { background: rgba(56,189,248,.1); }
-  [data-theme="dark"] .soft-card-ver { background: rgba(56,189,248,.15); color: #38bdf8; }
+/* ═══════════════════════════════════════════
+   Software List — V1 Magazine Editorial
+   ═══════════════════════════════════════════ */
 
-  @media (max-width: 860px) {
-    .soft-grid { grid-template-columns: 1fr; }
-    .soft-card { padding: 16px; }
-    .soft-card-foot { gap: 10px; flex-wrap: wrap; }
-    .soft-card-btn { margin-left: 0; }
+.page {
+  width: min(1440px, calc(100% - 104px));
+  margin: 22px auto 28px;
+  color: var(--text);
+}
+
+/* ── Hero ─────────────────────────────────── */
+.sw-hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 0;
+  padding: 22px 30px;
+  background:
+    radial-gradient(circle at 82% 34%, rgba(18,111,255,.1), transparent 32%),
+    linear-gradient(135deg, rgba(255,255,255,.98), rgba(239,246,255,.88));
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+.sw-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(122deg, transparent 0 54%, rgba(255,255,255,.5) 55%, transparent 56%),
+    linear-gradient(156deg, transparent 0 62%, rgba(18,111,255,.06) 63%, transparent 64%);
+  pointer-events: none;
+}
+.sw-hero-copy { position: relative; z-index: 2; flex: 1; min-width: 0; }
+.sw-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 26px;
+  padding: 0 12px;
+  border: 1px solid #d9e3f0;
+  border-radius: 999px;
+  background: rgba(255,255,255,.62);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.sw-badge span {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+}
+.sw-hero h1 {
+  margin: 0;
+  font-size: clamp(24px, 2.2vw, 32px);
+  line-height: 1.2;
+  font-weight: 950;
+  letter-spacing: 0;
+  color: var(--text);
+}
+.sw-hero h1 span { color: var(--blue); }
+.sw-hero p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+  max-width: 480px;
+}
+
+/* Hero 内嵌统计 */
+.sw-hero-stats {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 0;
+  flex-shrink: 0;
+  background: rgba(255,255,255,.72);
+  border: 1px solid rgba(18,111,255,.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+[data-theme="dark"] .sw-hero-stats {
+  background: rgba(15,23,42,.6);
+  border-color: rgba(148,163,184,.16);
+}
+.sw-stat {
+  text-align: center;
+  padding: 12px 20px;
+  position: relative;
+}
+.sw-stat + .sw-stat::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 8px; bottom: 8px;
+  width: 1px;
+  background: rgba(18,111,255,.12);
+}
+.sw-stat strong {
+  display: block;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: -.2px;
+}
+.sw-stat span {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* Hero 暗色 */
+[data-theme="dark"] .sw-hero {
+  background:
+    radial-gradient(circle at 82% 34%, rgba(56,189,248,.1), transparent 32%),
+    linear-gradient(135deg, rgba(30,41,59,.96), rgba(15,23,42,.88));
+}
+[data-theme="dark"] .sw-hero::before {
+  background:
+    linear-gradient(122deg, transparent 0 54%, rgba(148,163,184,.08) 55%, transparent 56%),
+    linear-gradient(156deg, transparent 0 62%, rgba(56,189,248,.06) 63%, transparent 64%);
+}
+[data-theme="dark"] .sw-badge {
+  border-color: rgba(148,163,184,.2);
+  background: rgba(15,23,42,.44);
+}
+[data-theme="dark"] .sw-stat + .sw-stat::before {
+  background: rgba(148,163,184,.14);
+}
+
+/* ── 分类筛选栏 ──────────────────────────── */
+.sw-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.sw-filters button {
+  height: 34px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--card-bg);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s, box-shadow .15s;
+}
+.sw-filters button:hover {
+  border-color: rgba(18,111,255,.28);
+  color: var(--text);
+  background: rgba(18,111,255,.04);
+}
+.sw-filters button.active {
+  border-color: var(--blue);
+  background: rgba(18,111,255,.08);
+  color: var(--blue);
+  box-shadow: 0 0 0 2px rgba(18,111,255,.08);
+}
+[data-theme="dark"] .sw-filters button.active {
+  background: rgba(56,189,248,.12);
+  box-shadow: 0 0 0 2px rgba(56,189,248,.08);
+}
+
+/* ── 主内容 + 侧边栏布局 ──────────────────── */
+.sw-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
+}
+.sw-main { min-width: 0; }
+
+/* ── 卡片网格 ────────────────────────────── */
+.sw-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/* ── 软件卡片 ────────────────────────────── */
+.sw-card {
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+.sw-card:hover {
+  border-color: rgba(18,111,255,.22);
+  box-shadow: 0 12px 30px rgba(34,78,143,.1);
+  transform: translateY(-2px);
+}
+.sw-card-inner {
+  display: flex;
+  gap: 16px;
+  padding: 18px 20px;
+  align-items: flex-start;
+}
+.sw-card-icon {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #4298ff, #096cff);
+  box-shadow: 0 10px 22px rgba(18,111,255,.18);
+  position: relative;
+  overflow: hidden;
+}
+.sw-card-icon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,.28), transparent 60%);
+}
+.sw-card-icon-text {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .3px;
+  display: block;
+  max-width: 44px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1;
+  text-align: center;
+}
+/* 图标颜色变化 */
+.sw-card:nth-child(5n+2) .sw-card-icon { background: linear-gradient(145deg, #8b5cf6, #5b3edc); box-shadow: 0 10px 22px rgba(139,92,246,.18); }
+.sw-card:nth-child(5n+3) .sw-card-icon { background: linear-gradient(145deg, #059669, #047857); box-shadow: 0 10px 22px rgba(5,150,105,.18); }
+.sw-card:nth-child(5n+4) .sw-card-icon { background: linear-gradient(145deg, #f59e0b, #d97706); box-shadow: 0 10px 22px rgba(245,158,11,.18); }
+.sw-card:nth-child(5n+5) .sw-card-icon { background: linear-gradient(145deg, #ef4444, #dc2626); box-shadow: 0 10px 22px rgba(239,68,68,.18); }
+
+.sw-card-body { flex: 1; min-width: 0; }
+.sw-card-top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.sw-card-top h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 850;
+  letter-spacing: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sw-card-top h3 a {
+  color: var(--text);
+  text-decoration: none;
+  transition: color .15s;
+}
+.sw-card-top h3 a:hover { color: var(--blue); }
+.sw-ver {
+  font-size: 11px;
+  font-weight: 750;
+  color: var(--blue);
+  background: rgba(18,111,255,.07);
+  padding: 2px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: .1px;
+}
+[data-theme="dark"] .sw-ver { background: rgba(56,189,248,.13); }
+.sw-card-desc {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sw-card-foot {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.sw-card-cat {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--blue);
+  background: rgba(18,111,255,.06);
+  padding: 3px 9px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+[data-theme="dark"] .sw-card-cat { background: rgba(56,189,248,.1); }
+.sw-card-stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.sw-card-stat svg { width: 13px; height: 13px; }
+.sw-card-link {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color .15s;
+}
+.sw-card-link:hover { color: var(--blue); }
+.sw-card-link span { font-size: 13px; }
+
+/* ── 侧边栏 ──────────────────────────────── */
+.sw-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 84px;
+}
+.sw-side-card {
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+}
+.sw-side-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.sw-side-head h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 850;
+  color: var(--text);
+  letter-spacing: 0;
+  flex: 1;
+}
+.sw-side-head svg {
+  width: 14px;
+  height: 14px;
+  color: #f59e0b;
+  flex-shrink: 0;
+}
+
+/* 热门排名 */
+.sw-rank-list {
+  counter-reset: sw-rank;
+  display: flex;
+  flex-direction: column;
+}
+.sw-rank-item {
+  counter-increment: sw-rank;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+  text-decoration: none;
+  color: inherit;
+  transition: background .12s;
+  border-radius: 6px;
+  margin: 0 -6px;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+.sw-rank-item:last-child { border-bottom: 0; }
+.sw-rank-item:hover { background: rgba(18,111,255,.03); }
+.sw-rank-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  background: #f3f5f9;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.sw-rank-num::before { content: counter(sw-rank, decimal-leading-zero); }
+.sw-rank-item:nth-child(1) .sw-rank-num { background: #fef3c7; color: #f59e0b; }
+.sw-rank-item:nth-child(2) .sw-rank-num { background: #eef5ff; color: #0d74ff; }
+.sw-rank-item:nth-child(3) .sw-rank-num { background: #fff5e9; color: #ff8a1a; }
+[data-theme="dark"] .sw-rank-num { background: #334155; }
+[data-theme="dark"] .sw-rank-item:nth-child(1) .sw-rank-num { background: rgba(245,158,11,.15); color: #f59e0b; }
+[data-theme="dark"] .sw-rank-item:nth-child(2) .sw-rank-num { background: rgba(56,189,248,.15); color: #38bdf8; }
+[data-theme="dark"] .sw-rank-item:nth-child(3) .sw-rank-num { background: rgba(255,138,26,.15); color: #ff8a1a; }
+[data-theme="dark"] .sw-rank-item:hover { background: rgba(255,255,255,.03); }
+
+.sw-rank-body {
+  flex: 1;
+  min-width: 0;
+}
+.sw-rank-body strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sw-rank-body small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.sw-rank-val {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* 分类标签云 */
+.sw-tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.sw-tag {
+  height: 30px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.sw-tag:hover {
+  border-color: rgba(18,111,255,.28);
+  color: var(--text);
+}
+.sw-tag.active {
+  border-color: var(--blue);
+  background: rgba(18,111,255,.07);
+  color: var(--blue);
+}
+[data-theme="dark"] .sw-tag.active { background: rgba(56,189,248,.12); }
+
+/* ── 暗色模式 ────────────────────────────── */
+[data-theme="dark"] .sw-hero {
+  background:
+    radial-gradient(circle at 82% 34%, rgba(56,189,248,.16), transparent 32%),
+    linear-gradient(135deg, rgba(30,41,59,.96), rgba(15,23,42,.88));
+}
+[data-theme="dark"] .sw-hero::before {
+  background:
+    linear-gradient(122deg, transparent 0 54%, rgba(148,163,184,.1) 55%, transparent 56%),
+    linear-gradient(156deg, transparent 0 62%, rgba(56,189,248,.08) 63%, transparent 64%);
+}
+[data-theme="dark"] .sw-badge {
+  border-color: rgba(148,163,184,.22);
+  background: rgba(15,23,42,.44);
+}
+[data-theme="dark"] .sw-card:hover {
+  border-color: rgba(56,189,248,.22);
+  box-shadow: 0 12px 30px rgba(0,0,0,.28);
+}
+
+/* ── 筛选 JS ────────────────────────────── */
+.sw-card.hidden { display: none; }
+
+/* ── 响应式 ──────────────────────────────── */
+@media (max-width: 1280px) {
+  .page { width: calc(100% - 48px); }
+  .sw-layout { grid-template-columns: 1fr; }
+  .sw-side {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
   }
-  @media (max-width: 480px) {
-    .soft-card { padding: 14px; flex-direction: column; align-items: flex-start; }
-    .soft-card-icon { width: 36px; height: 36px; flex: 0 0 36px; border-radius: 8px; }
-    .soft-card-head { flex-wrap: wrap; }
-    .soft-card-head h3 { font-size: 14px; }
-    .soft-hero h1 { font-size: 24px; }
+  .sw-hero { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 860px) {
+  .page { width: calc(100% - 32px); padding-top: 0; }
+  .sw-hero { padding: 22px 20px; border-radius: 14px; }
+  .sw-hero h1 { font-size: clamp(26px, 7vw, 34px); }
+  .sw-grid { grid-template-columns: 1fr; }
+  .sw-hero-stats { border-radius: 10px; }
+  .sw-side {
+    grid-template-columns: 1fr;
   }
+  .sw-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+  .sw-filters button { flex-shrink: 0; }
+}
+@media (max-width: 480px) {
+  .page { width: calc(100% - 24px); }
+  .sw-hero { padding: 18px 16px; }
+  .sw-hero h1 { font-size: 23px; }
+  .sw-card-inner { padding: 14px; gap: 12px; }
+  .sw-card-icon { width: 44px; height: 44px; flex: 0 0 44px; border-radius: 12px; }
+  .sw-card-icon-text { font-size: 10px; max-width: 34px; }
+  .sw-card-top h3 { font-size: 14px; }
+  .sw-hero-stats { width: 100%; }
+  .sw-stat { flex: 1; }
+  .sw-stat:nth-child(2)::before { display: none; }
+}
 </style>
+
+<script>
+(function(){
+  var filterBar = document.getElementById('sw-filter-category');
+  var tagCloud = document.getElementById('sw-tag-cloud');
+  var activeFilter = 'all';
+
+  // 从已渲染的软件卡片中提取所有唯一分类
+  function collectCategories() {
+    var cats = [];
+    var seen = {};
+    var cards = document.querySelectorAll('.sw-card');
+    cards.forEach(function(c) {
+      var cat = c.getAttribute('data-category');
+      if (cat && !seen[cat]) {
+        seen[cat] = true;
+        cats.push(cat);
+      }
+    });
+    return cats;
+  }
+
+  // 构建筛选按钮 HTML
+  function buildButtons(categories, active) {
+    var html = '<button class="' + (active === 'all' ? 'active' : '') + '" role="tab" data-filter="all">全部</button>';
+    categories.forEach(function(cat) {
+      html += '<button class="' + (active === cat ? 'active' : '') + '" role="tab" data-filter="' + cat.replace(/"/g, '&quot;') + '">' + cat + '</button>';
+    });
+    return html;
+  }
+
+  // 构建标签云 HTML
+  function buildTags(categories, active) {
+    var html = '<button class="sw-tag ' + (active === 'all' ? 'active' : '') + '" data-filter="all">全部工具</button>';
+    categories.forEach(function(cat) {
+      html += '<button class="sw-tag ' + (active === cat ? 'active' : '') + '" data-filter="' + cat.replace(/"/g, '&quot;') + '">' + cat + '</button>';
+    });
+    return html;
+  }
+
+  // 初始化：从卡片收集分类并渲染按钮
+  var categories = collectCategories();
+  if (filterBar) filterBar.innerHTML = buildButtons(categories, activeFilter);
+  if (tagCloud) tagCloud.innerHTML = buildTags(categories, activeFilter);
+
+  // 刷新按钮 active 态
+  function syncButtons(name) {
+    activeFilter = name;
+    if (filterBar) filterBar.innerHTML = buildButtons(categories, name);
+    if (tagCloud) tagCloud.innerHTML = buildTags(categories, name);
+  }
+
+  // 筛选卡片
+  function applyFilter(name) {
+    var cards = document.querySelectorAll('.sw-card');
+    cards.forEach(function(c) {
+      if (name === 'all' || c.getAttribute('data-category') === name) {
+        c.classList.remove('hidden');
+      } else {
+        c.classList.add('hidden');
+      }
+    });
+    syncButtons(name);
+  }
+
+  if (filterBar) {
+    filterBar.addEventListener('click', function(e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      applyFilter(btn.getAttribute('data-filter'));
+    });
+  }
+
+  if (tagCloud) {
+    tagCloud.addEventListener('click', function(e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      applyFilter(btn.getAttribute('data-filter'));
+    });
+  }
+})();
+</script>
+
 </body>
 </html>

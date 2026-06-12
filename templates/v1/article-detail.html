@@ -1294,6 +1294,17 @@
       width: calc(100% - 32px);
     }
   }
+
+  /* ── 收藏 Toast ────────────────────────── */
+  .fav-toast {
+    position: absolute; right: 16px; bottom: 60px;
+    padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 700;
+    animation: fav-toast-in .25s ease-out;
+    z-index: 10; pointer-events: none;
+  }
+  .fav-toast-success { background: rgba(23,178,106,.1); border: 1px solid rgba(23,178,106,.25); color: #17b26a; }
+  .fav-toast-error   { background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2); color: #ef4444; }
+  @keyframes fav-toast-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
 <script>
@@ -1770,15 +1781,15 @@ const FAVORITE_API  = BASE_PATH + '/article/api/favorite.php';
 const UNFAVORITE_API = BASE_PATH + '/article/api/unfavorite.php';
 const FAV_STATUS_API = BASE_PATH + '/article/api/favorite_status.php';
 
-function getToken() {
-  return localStorage.getItem('cms_token') || '';
+function isLoggedIn() {
+  return !!localStorage.getItem('v1_username');
 }
 
 window.toggleFavorite = async function() {
-  const token = getToken();
-  if (!token) {
-    alert('请先登录后再收藏');
-    if (window.openLoginModal) { window.openLoginModal(); }
+  if (!isLoggedIn()) {
+    showFavToast('请先登录', 'error');
+    var overlay = document.getElementById('v1ModalOverlay');
+    if (overlay) { overlay.removeAttribute('hidden'); document.body.style.overflow = 'hidden'; }
     return;
   }
   const btn = document.getElementById('fav-btn');
@@ -1791,37 +1802,54 @@ window.toggleFavorite = async function() {
     const res = await fetch(api, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ _token: token, article_id: articleId })
+      body: JSON.stringify({ article_id: articleId })
     });
     const json = await res.json();
     if (json.code === 0) {
       updateFavUI(!isFaved);
+      showFavToast(isFaved ? '已取消收藏' : '收藏成功', 'success');
     } else if (json.code === 401) {
-      alert('登录已过期，请重新登录');
+      showFavToast('登录已过期，请重新登录', 'error');
+      var overlay = document.getElementById('v1ModalOverlay');
+      if (overlay) { overlay.removeAttribute('hidden'); document.body.style.overflow = 'hidden'; }
     } else {
-      alert(json.msg || '操作失败');
+      showFavToast(json.msg || '操作失败', 'error');
     }
   } catch (e) {
-    alert('网络错误');
+    showFavToast('网络错误，请稍后重试', 'error');
   } finally {
     if (btn) { btn.disabled = false; btn.style.opacity = ''; }
   }
 };
 
 async function checkFavStatus() {
-  const token = getToken();
-  if (!token || !articleId) return;
+  if (!isLoggedIn() || !articleId) return;
   try {
     const res = await fetch(FAV_STATUS_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ _token: token, article_id: articleId })
+      body: JSON.stringify({ article_id: articleId })
     });
     const json = await res.json();
     if (json.code === 0) {
       updateFavUI(json.data && json.data[articleId] === true);
     }
   } catch (e) { /* 静默失败 */ }
+}
+
+function showFavToast(msg, type) {
+  var existing = document.querySelector('.fav-toast');
+  if (existing) existing.remove();
+  var toast = document.createElement('div');
+  toast.className = 'fav-toast fav-toast-' + (type || 'success');
+  toast.textContent = msg;
+  toast.setAttribute('role', 'status');
+  toast.setAttribute('aria-live', 'polite');
+  var footer = document.querySelector('.article-footer');
+  if (footer) {
+    footer.appendChild(toast);
+    setTimeout(function() { toast.remove(); }, 2500);
+  }
 }
 
 function updateFavUI(faved) {

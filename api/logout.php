@@ -26,6 +26,17 @@ require_once __DIR__ . '/../config/db.php';
 $pdo   = getDB();
 $input = getInput();
 $token = getRequestToken();
+$isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+
+function clearAuthCookie($isSecure) {
+    setcookie('admin_token', '', [
+        'expires'  => time() - 3600,
+        'path'     => '/',
+        'secure'   => $isSecure,
+        'httponly' => true,
+        'samesite' => 'Strict',
+    ]);
+}
 
 // 也支持从请求体获取 token
 if (empty($token) && isset($input['token'])) {
@@ -33,6 +44,7 @@ if (empty($token) && isset($input['token'])) {
 }
 
 if (empty($token)) {
+    clearAuthCookie($isSecure);
     jsonResponse(400, 'Token 不能为空', null);
 }
 
@@ -54,7 +66,9 @@ if ($tokenRow) {
 }
 
 if (deleteToken($pdo, $token)) {
+    clearAuthCookie($isSecure);
     jsonResponse(0, '已注销', null);
 } else {
+    clearAuthCookie($isSecure);
     jsonResponse(401, 'Token 无效或已过期', null);
 }
