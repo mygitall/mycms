@@ -2,13 +2,16 @@
 <html lang="zh-CN" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#f5f8fd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+<script>document.documentElement.setAttribute('data-theme',localStorage.getItem('v1_theme')||'light')</script>
 <title>[--column_info--]文章列表 - [--site_name--]</title>
 </head>
 <body>
 [--include(name=header)--]
 
-<main class="page">
+<main class="page" id="main-content">
   <div class="al-breadcrumb"><a href="/">首页</a><span>/</span><span>文章中心</span></div>
 
   <div class="al-hero">
@@ -26,24 +29,23 @@
   <div class="al-layout">
     <div class="al-main">
       [--loop:articles(col=1,num=20,sort=published_at,order=DESC)--]
-      <article class="al-card">
-        <a class="al-card-img" href="[--url--]">
-          <img src="[--cover_image--]" alt="[--title--]" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width='400' height='240' viewBox='0 0 400 240'%3E%3Crect fill='%23eef2f8' width='400' height='240'/%3E%3Cg fill='%23c8d4e4'%3E%3Crect x='160' y='88' width='80' height='64' rx='6'/%3E%3Ccircle cx='180' cy='108' r='8'/%3E%3Cpath d='M220 140l-16-20-12 14-8-10-24 32h60z'/%3E%3C/g%3E%3C/svg%3E'">
-        </a>
+      <a class="al-card" href="[--url--]">
+        <div class="al-card-img">
+          <img src="[--cover_image--]" alt="[--title--]" width="168" height="108" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width='400' height='240' viewBox='0 0 400 240'%3E%3Crect fill='%23eef2f8' width='400' height='240'/%3E%3Cg fill='%23c8d4e4'%3E%3Crect x='160' y='88' width='80' height='64' rx='6'/%3E%3Ccircle cx='180' cy='108' r='8'/%3E%3Cpath d='M220 140l-16-20-12 14-8-10-24 32h60z'/%3E%3C/g%3E%3C/svg%3E'">
+        </div>
         <div class="al-card-body">
-          <h3><a href="[--url--]">[--title--]</a></h3>
+          <h3>[--title--]</h3>
           <p>[--summary--]</p>
           <div class="al-card-meta">
             <span class="al-card-cat">[--category--]</span>
             <span>[--published_at--]</span>
             <span class="al-card-views">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8s3-5.5 6-5.5S14 8 14 8s-3 5.5-6 5.5S2 8 2 8Z"/><circle cx="8" cy="8" r="1.5"/></svg>
+              <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8s3-5.5 6-5.5S14 8 14 8s-3 5.5-6 5.5S2 8 2 8Z"/><circle cx="8" cy="8" r="1.5"/></svg>
               [--view_count--]
             </span>
-            <a class="al-card-more" href="[--url--]">&rarr;</a>
           </div>
         </div>
-      </article>
+      </a>
       [--/loop:articles--]
     </div>
 
@@ -105,15 +107,14 @@
   .al-layout { display: contents; }
   .al-main { grid-area: main; min-width: 0; display: grid; gap: 12px; }
 
-  .al-card { display: flex; gap: 16px; padding: 16px; background: var(--card-bg); border-radius: 12px; margin: 0; border: 1px solid var(--line); box-shadow: 0 8px 24px rgba(34,78,143,.045); transition: border-color .15s, box-shadow .15s, transform .15s; }
+  .al-card { display: flex; gap: 16px; padding: 16px; background: var(--card-bg); border-radius: 12px; margin: 0; border: 1px solid var(--line); box-shadow: 0 8px 24px rgba(34,78,143,.045); transition: border-color .15s, box-shadow .15s, transform .15s; text-decoration: none; color: inherit; }
   .al-card:hover { border-color: rgba(24,119,255,.22); box-shadow: 0 12px 30px rgba(34,78,143,.08); transform: translateY(-1px); }
   .al-card-img { width: 168px; height: 108px; flex: 0 0 168px; border-radius: 10px; overflow: hidden; background: #eef2f8; display: block; }
   .al-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .25s; }
   .al-card:hover .al-card-img img { transform: scale(1.05); }
   .al-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-  .al-card-body h3 { margin: 0 0 7px; font-size: 16px; line-height: 1.35; font-weight: 850; letter-spacing: 0; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-  .al-card-body h3 a { color: var(--text); text-decoration: none; }
-  .al-card-body h3 a:hover { color: var(--blue); }
+  .al-card-body h3 { margin: 0 0 7px; font-size: 16px; line-height: 1.35; font-weight: 850; letter-spacing: 0; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; color: var(--text); }
+  .al-card:hover .al-card-body h3 { color: var(--blue); }
   .al-card-body p { margin: 0 0 10px; color: var(--muted); font-size: 12.5px; line-height: 1.58; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 39px; }
   .al-card-body p:empty::before { content: "暂无摘要"; color: var(--muted); opacity: .72; }
   .al-card-meta { display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--muted); margin-top: auto; flex-wrap: wrap; }
@@ -121,8 +122,6 @@
   [data-theme="dark"] .al-card-cat { background: rgba(56,189,248,.1); color: #38bdf8; }
   .al-card-views { display: flex; align-items: center; gap: 3px; }
   .al-card-views svg { width: 12px; height: 12px; }
-  .al-card-more { margin-left: auto; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 7px; background: rgba(24,119,255,.07); font-size: 13px; font-weight: 800; color: var(--blue); text-decoration: none; opacity: 0; transition: .15s; }
-  .al-card:hover .al-card-more { opacity: 1; }
 
   .al-sidebar { grid-area: side; width: auto; min-width: 0; display: flex; flex-direction: column; gap: 16px; position: sticky; top: 84px; }
   .al-side-card { padding: 20px 22px; background: var(--card-bg); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 8px 24px rgba(34,78,143,.045); }

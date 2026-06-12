@@ -2,13 +2,16 @@
 <html lang="zh-CN" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#f5f8fd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+<script>document.documentElement.setAttribute('data-theme',localStorage.getItem('v1_theme')||'light')</script>
 <title>软件列表 - [--site_name--]</title>
 </head>
 <body>
 [--include(name=header)--]
 
-<main class="page">
+<main class="page" id="main-content">
   <div class="soft-hero">
     <h1>软件精选</h1>
     <p>把工具陈列得更克制，突出名称、版本、分类和摘要，适合快速浏览与跳转。</p>

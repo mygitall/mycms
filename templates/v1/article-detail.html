@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5f8fd" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+  <script>document.documentElement.setAttribute('data-theme',localStorage.getItem('v1_theme')||'light')</script>
   <title>文章详情</title>
   <style>
     :root {
@@ -20,8 +23,7 @@
       --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
       --ff: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
     }
-    @media (prefers-color-scheme: dark) {
-      :root {
+    [data-theme="dark"] {
         --bg: #18191a;
         --surface: #242526;
         --border: #3e4042;
@@ -307,7 +309,7 @@
       padding: 8px 18px; border: 1px solid var(--border);
       border-radius: 20px; background: var(--surface);
       color: var(--text-muted); font-size: 13px; cursor: pointer;
-      transition: all 0.2s; font-family: var(--ff); white-space: nowrap;
+      transition: border-color 0.2s, color 0.2s, background 0.2s; font-family: var(--ff); white-space: nowrap;
     }
     .fav-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
     .fav-btn.faved { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
@@ -333,6 +335,10 @@
     @keyframes pulse {
       0%,100% { opacity: 0.3; transform: scale(0.8); }
       50% { opacity: 1; transform: scale(1.3); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .loading-dot { animation: none; }
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
 
     /* ── 错误 ── */
@@ -940,7 +946,7 @@
 	      font-weight: 900;
 	      text-align: right;
 	    }
-	    @media (prefers-color-scheme: dark) {
+	    [data-theme="dark"] {
 	      :root {
 	        --bg: #0d1320;
 	        --surface: rgba(20,30,48,.9);
@@ -1368,7 +1374,7 @@ async function loadArticle() {
     main.innerHTML = `
     <div class="detail-toolbar">
       <a href="${LIST_URL}" class="back-btn" id="back-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
         </svg>
         返回文章列表
@@ -1395,7 +1401,7 @@ async function loadArticle() {
               <div class="article-author-row">
                 <div class="author-avatar">
                   ${a.author_avatar
-                    ? `<img src="${escapeHtml(a.author_avatar)}" alt="avatar" onerror="this.parentElement.innerHTML='<span>${escapeHtml((a.author_name||'A')[0])}</span>'">`
+                    ? `<img src="${escapeHtml(a.author_avatar)}" alt="avatar" width="42" height="42" onerror="this.parentElement.innerHTML='<span>${escapeHtml((a.author_name||'A')[0])}</span>'">`
                     : `<span>${escapeHtml((a.author_name || 'A')[0])}</span>`
                   }
                 </div>
@@ -1403,14 +1409,14 @@ async function loadArticle() {
                   <span class="author-name">${escapeHtml(a.author_name || '匿名作者')}</span>
                   <div class="article-stats-row">
                     <span class="stat-item">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                       ${a.view_count || 0}
                     </span>
                     <span class="stat-item">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                       </svg>
                       ${formatDate(a.published_at || a.created_at)}
@@ -1430,7 +1436,7 @@ async function loadArticle() {
         <div class="article-footer">
           <div class="footer-left">
             <span class="footer-views">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -1533,7 +1539,7 @@ function renderArticleCover(article) {
   if (cover) {
     return `
       <figure class="article-cover-wrap">
-        <img class="article-cover" src="${escapeHtml(cover)}" alt="${escapeHtml(article.title || '文章封面')}" loading="lazy" onerror="this.parentElement.innerHTML=renderInlineCoverFallback('MYCMS')">
+        <img class="article-cover" src="${escapeHtml(cover)}" alt="${escapeHtml(article.title || '文章封面')}" width="400" height="225" loading="lazy" onerror="this.parentElement.innerHTML=renderInlineCoverFallback('MYCMS')">
       </figure>`;
   }
   return `<figure class="article-cover-wrap">${renderCoverFallback(article.category || article.title || 'MYCMS')}</figure>`;
@@ -1752,10 +1758,11 @@ function escapeHtml(str) {
 function formatDate(dateStr) {
   if (!dateStr) return '';
   try {
-    const d = new Date(dateStr);
-    return d.getFullYear() + '-' +
-      String(d.getMonth() + 1).padStart(2, '0') + '-' +
-      String(d.getDate()).padStart(2, '0');
+    return new Intl.DateTimeFormat('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(new Date(dateStr)).replace(/\//g, '-');
   } catch { return dateStr; }
 }
 

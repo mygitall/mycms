@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f5f8fd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+<script>document.documentElement.setAttribute('data-theme',localStorage.getItem('v1_theme')||'light')</script>
+<title>登录 - [--site_name--]</title>
+[--include(name=header)--]
+
+<style>
+.login-wrap {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 40px 36px;
+  box-shadow: 0 14px 38px rgba(33,74,132,.08);
+}
+.login-card .brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.login-card .brand-icon {
+  width: 44px;
+  height: 44px;
+  position: relative;
+  transform: skewX(-10deg);
+  flex-shrink: 0;
+}
+.login-card .brand-icon::before,
+.login-card .brand-icon::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  height: 36px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #5fa1ff 0%, #136eff 52%, #0038c7 100%);
+  box-shadow: 0 8px 18px rgba(13,103,255,.2);
+}
+.login-card .brand-icon::before { left: 1px; width: 16px; }
+.login-card .brand-icon::after { right: 0; width: 16px; }
+.login-card .brand-icon i {
+  position: absolute;
+  left: 15px;
+  top: 3px;
+  width: 14px;
+  height: 36px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #0b59e9 0%, #57a3ff 100%);
+  transform: rotate(-21deg);
+  transform-origin: center;
+}
+.login-card h1 {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: 0;
+  margin-bottom: 8px;
+}
+.login-card .subtitle {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+.form-item {
+  margin-bottom: 18px;
+}
+.form-item label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 7px;
+}
+.form-item .input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.form-item .input-wrap svg {
+  position: absolute;
+  left: 13px;
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+.form-item input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px 0 40px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.form-item input::placeholder { color: #9aa3b3; font-weight: 400; }
+.form-item input:focus-visible {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(18,111,255,.1);
+}
+[data-theme="dark"] .form-item input {
+  background: rgba(15,23,42,.6);
+  border-color: #334155;
+}
+[data-theme="dark"] .form-item input:focus-visible {
+  box-shadow: 0 0 0 3px rgba(56,189,248,.12);
+}
+.form-item .toggle-pw {
+  position: absolute;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--muted);
+  background: none;
+  border: none;
+  padding: 0;
+}
+.form-item .toggle-pw:hover { color: var(--text); }
+.form-item .toggle-pw svg { width: 16px; height: 16px; }
+.form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  font-size: 13px;
+}
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 600;
+}
+.remember-me input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+.forgot-link {
+  color: var(--blue);
+  font-weight: 700;
+  text-decoration: none;
+}
+.forgot-link:hover { text-decoration: underline; }
+.btn-login {
+  width: 100%;
+  height: 46px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #1f82ff 0%, #096bff 100%);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 9px 22px rgba(11,107,255,.2);
+  transition: transform .12s, box-shadow .12s;
+  letter-spacing: 0;
+}
+.btn-login:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(11,107,255,.28);
+}
+.btn-login:active { transform: translateY(0); }
+.btn-login:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+.msg-box {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+.msg-box.error {
+  display: flex;
+  background: rgba(239,68,68,.08);
+  border: 1px solid rgba(239,68,68,.2);
+  color: #ef4444;
+}
+.msg-box.success {
+  display: flex;
+  background: rgba(23,178,106,.08);
+  border: 1px solid rgba(23,178,106,.2);
+  color: #17b26a;
+}
+.msg-box svg { width: 16px; height: 16px; flex-shrink: 0; }
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 20px 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.login-footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.login-footer a {
+  color: var(--blue);
+  font-weight: 700;
+  text-decoration: none;
+}
+.login-footer a:hover { text-decoration: underline; }
+.login-help {
+  margin-top: 24px;
+  padding: 14px 16px;
+  background: rgba(24,119,255,.04);
+  border: 1px solid rgba(24,119,255,.1);
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.login-help strong { color: var(--text); font-weight: 700; }
+.login-help a { color: var(--blue); text-decoration: none; }
+.login-help a:hover { text-decoration: underline; }
+@media (max-width: 520px) {
+  .login-wrap { padding: 24px 16px; }
+  .login-card { padding: 28px 20px; }
+}
+</style>
+
+<main class="page" id="main-content">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="brand-mark">
+        <div class="brand-icon"><i></i></div>
+      </div>
+      <h1>登录账号</h1>
+      <p class="subtitle">登录后可收藏文章、参与评论等互动</p>
+
+      <div class="msg-box" id="msg-box" aria-live="polite">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="msg-text"></span>
+      </div>
+
+      <form id="login-form" action="/login.php" method="POST" novalidate>
+        <input type="hidden" name="_token" id="csrf-token" value="">
+
+        <div class="form-item">
+          <label for="username">用户名</label>
+          <div class="input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="username" name="username" placeholder="请输入用户名…" autocomplete="username" required>
+          </div>
+        </div>
+
+        <div class="form-item">
+          <label for="password">密码</label>
+          <div class="input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="password" name="password" placeholder="请输入密码…" autocomplete="current-password" required>
+            <button type="button" class="toggle-pw" id="toggle-pw" aria-label="显示密码">
+              <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="remember-me">
+            <input type="checkbox" name="remember" id="remember">
+            30 天内自动登录
+          </label>
+          <a class="forgot-link" href="/reset_admin.php" target="_blank" rel="noopener noreferrer" onclick="return confirm('重置密码将清除当前账号的密码信息，确定继续？')">忘记密码？</a>
+        </div>
+
+        <button type="submit" class="btn-login" id="btn-login">登 录</button>
+      </form>
+
+      <div class="login-divider">或</div>
+
+      <div class="login-footer">
+        还没有账号？<a href="/login?action=register">前往注册</a>
+      </div>
+
+      <div class="login-help">
+        <strong>忘记登录密码？</strong><br>
+        1. 访问 <a href="/reset_admin.php" target="_blank" rel="noopener noreferrer">/reset_admin.php</a> 直接重置为 <code>admin / admin123</code><br>
+        2. 或通过 phpMyAdmin 打开 <code>sys_users</code> 表手动修改
+      </div>
+    </div>
+  </div>
+</main>
+
+[--include(name=footer)--]
+
+<script>
+(function(){
+  // CSRF Token 获取（从 cookie）
+  function getCsrfToken() {
+    var match = document.cookie.match(/csrf_token=([^;]+)/);
+    return match ? match[1] : '';
+  }
+
+  // 初始化 CSRF token
+  var tokenInput = document.getElementById('csrf-token');
+  if (tokenInput) tokenInput.value = getCsrfToken();
+
+  // POST 失败重定向回 login.php 时，login.php 注入的错误消息或 URL 参数
+  function checkLoginError() {
+    var errMsg = window.__LOGIN_ERROR__ || '';
+    if (!errMsg) {
+      var params = new URLSearchParams(window.location.search);
+      errMsg = params.get('msg') || '';
+    }
+    if (errMsg) {
+      var msgBox = document.getElementById('msg-box');
+      var msgTxt = document.getElementById('msg-text');
+      if (msgBox && msgTxt) {
+        msgTxt.textContent = errMsg;
+        msgBox.className = 'msg-box error';
+        msgBox.style.display = 'flex';
+        var svg = msgBox.querySelector('svg');
+        if (svg) svg.innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+      }
+    }
+  }
+  checkLoginError();
+
+  // 显示消息
+  function showMsg(text, type) {
+    var box = document.getElementById('msg-box');
+    var txt = document.getElementById('msg-text');
+    if (!box || !txt) return;
+    txt.textContent = text;
+    box.className = 'msg-box ' + type;
+    box.style.display = 'flex';
+    if (type === 'error') {
+      box.querySelector('svg').innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+    } else {
+      box.querySelector('svg').innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>';
+    }
+  }
+
+  function clearMsg() {
+    var box = document.getElementById('msg-box');
+    if (box) box.style.display = 'none';
+  }
+
+  // 密码可见性切换
+  var toggleBtn = document.getElementById('toggle-pw');
+  var pwInput = document.getElementById('password');
+  if (toggleBtn && pwInput) {
+    toggleBtn.addEventListener('click', function() {
+      var isPw = pwInput.type === 'password';
+      pwInput.type = isPw ? 'text' : 'password';
+      var open = toggleBtn.querySelector('.eye-open');
+      var closed = toggleBtn.querySelector('.eye-closed');
+      if (open) open.style.display = isPw ? 'none' : '';
+      if (closed) closed.style.display = isPw ? '' : 'none';
+    });
+  }
+
+  // 注册表单提交
+  var form = document.getElementById('login-form');
+  var btn = document.getElementById('btn-login');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      clearMsg();
+
+      var username = document.getElementById('username').value.trim();
+      var password = document.getElementById('password').value;
+      var remember = document.getElementById('remember').checked;
+
+      if (!username) {
+        showMsg('请输入用户名', 'error');
+        return;
+      }
+      if (!password) {
+        showMsg('请输入密码', 'error');
+        return;
+      }
+
+      if (btn) { btn.disabled = true; btn.textContent = '登录中…'; }
+
+      var formData = new FormData();
+      formData.append('_token', getCsrfToken());
+      formData.append('username', username);
+      formData.append('password', password);
+      if (remember) formData.append('remember', '1');
+
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin'
+      })
+      .then(function(res) {
+        // 302 重定向 → 成功
+        if (res.redirected || res.url.indexOf('admin.php') >= 0) {
+          showMsg('登录成功，跳转中…', 'success');
+          setTimeout(function() { window.location.href = res.url || '/admin.php'; }, 400);
+          return;
+        }
+        // 返回 login.php 页面内容 → 可能验证失败，提取错误信息
+        return res.text().then(function(html) {
+          var match = html.match(/class="msg"[^>]*>([^<]+)/);
+          var errMsg = match ? match[1].replace(/<[^>]+>/g, '').trim() : '登录失败，请检查账号密码';
+          showMsg(errMsg, 'error');
+          if (btn) { btn.disabled = false; btn.textContent = '登 录'; }
+        });
+      })
+      .catch(function(err) {
+        showMsg('网络错误，请稍后重试', 'error');
+        if (btn) { btn.disabled = false; btn.textContent = '登 录'; }
+      });
+    });
+  }
+
+  // URL 参数判断：注册模式
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('action') === 'register') {
+    var h1 = document.querySelector('.login-card h1');
+    var sub = document.querySelector('.login-card .subtitle');
+    if (h1) h1.textContent = '注册账号';
+    if (sub) sub.textContent = '创建账号后即可收藏文章、参与互动';
+    var footer = document.querySelector('.login-footer');
+    if (footer) footer.innerHTML = '已有账号？<a href="/login">立即登录</a>';
+    var divider = document.querySelector('.login-divider');
+    if (divider) divider.style.display = 'none';
+  }
+})();
+</script>
+</body>
+</html>

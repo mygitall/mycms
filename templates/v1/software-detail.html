@@ -2,14 +2,17 @@
 <html lang="zh-CN" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>[--name--] - [--site_name--]</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#f5f8fd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+<script>document.documentElement.setAttribute('data-theme',localStorage.getItem('v1_theme')||'light')</script>
+<title>软件详情 - [--site_name--]</title>
 </head>
 <body>
 [--include(name=header)--]
 
 [--loop:software_detail--]
-<div class="sd-page">
+<main class="sd-page" id="main-content">
   <div class="sd-layout">
     <section class="sd-main">
       <header class="sd-hero">
@@ -55,9 +58,9 @@
         </a>
         <div class="sd-info-list">
           <div class="sd-info-row">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v4h4"/><path d="M8 12h8M8 16h8"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v4h4"/></svg>
             <span>文件大小</span>
-            <span>[--file_size--] MB</span>
+            <span>[--file_size--]</span>
           </div>
           <div class="sd-info-row">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M12 16v4M8 20h8"/></svg>
@@ -74,16 +77,17 @@
       <a class="sd-back" href="/software-list">&larr; 返回软件列表</a>
     </aside>
   </div>
-</div>
+</main>
 [--/loop:software_detail--]
 
 [--include(name=footer)--]
 
 <script>
+// 动态设置页面标题
 (function(){
-  var title=document.querySelector('.sd-title');
-  if(title&&title.textContent.trim()){
-    document.title=title.textContent.trim()+' - MYCMS';
+  var t=document.querySelector('.sd-title');
+  if(t&&t.textContent.trim()){
+    document.title=t.textContent.trim()+' - [--site_name--]';
   }
 })();
 </script>

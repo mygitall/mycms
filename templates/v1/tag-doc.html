@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN" data-theme="light">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"><title>模板标签 - [--site_name--]</title></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#f5f8fd" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)"><script>document.documentElement.setAttribute('data-theme',localStorage.getItem('v1_theme')||'light')</script><title>模板标签 - [--site_name--]</title></head>
 <body>
 [--include(name=header)--]
-<main class="page">
+<main class="page" id="main-content">
 <div class="td-hero"><h1>模板标签参考</h1><p>V1 模板支持的标签语法一览</p></div>
 <div class="td-grid">
 <div class="td-card"><h2>系统标签</h2>
@@ -45,7 +45,7 @@
 </div>
 <div class="td-card" style="margin-top:16px"><h2>实时文章预览</h2>
 [--loop:articles(num=3,sort=published_at,order=DESC)--]
-<article class="al-card"><a class="al-card-img" href="[--url--]"><img src="[--cover_image--]" alt="[--title--]" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width='400' height='240' viewBox='0 0 400 240'%3E%3Crect fill='%23eef2f8' width='400' height='240'/%3E%3Cg fill='%23c8d4e4'%3E%3Crect x='160' y='88' width='80' height='64' rx='6'/%3E%3Ccircle cx='180' cy='108' r='8'/%3E%3Cpath d='M220 140l-16-20-12 14-8-10-24 32h60z'/%3E%3C/g%3E%3C/svg%3E'"></a><div class="al-card-body"><h3><a href="[--url--]">[--title--]</a></h3><p>[--summary--]</p><div class="al-card-meta"><span class="al-card-cat">[--category--]</span><span>[--published_at--]</span><span class="al-card-views"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8s3-5.5 6-5.5S14 8 14 8s-3 5.5-6 5.5S2 8 2 8Z"/><circle cx="8" cy="8" r="1.5"/></svg> [--view_count--]</span></div></div></article>
+<article class="al-card"><a class="al-card-img" href="[--url--]"><img src="[--cover_image--]" alt="[--title--]" width="120" height="80" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width='400' height='240' viewBox='0 0 400 240'%3E%3Crect fill='%23eef2f8' width='400' height='240'/%3E%3Cg fill='%23c8d4e4'%3E%3Crect x='160' y='88' width='80' height='64' rx='6'/%3E%3Ccircle cx='180' cy='108' r='8'/%3E%3Cpath d='M220 140l-16-20-12 14-8-10-24 32h60z'/%3E%3C/g%3E%3C/svg%3E'"></a><div class="al-card-body"><h3><a href="[--url--]">[--title--]</a></h3><p>[--summary--]</p><div class="al-card-meta"><span class="al-card-cat">[--category--]</span><span>[--published_at--]</span><span class="al-card-views"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8s3-5.5 6-5.5S14 8 14 8s-3 5.5-6 5.5S2 8 2 8Z"/><circle cx="8" cy="8" r="1.5"/></svg> [--view_count--]</span></div></div></article>
 [--/loop:articles--]
 </div>
 </main>
